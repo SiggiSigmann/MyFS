@@ -1,3 +1,4 @@
+#Docker version 18.06.1-ce, build 67f9a391
 From ubuntu:16.04
 
 RUN apt-get update &&\
@@ -11,9 +12,8 @@ RUN apt-get update &&\
                     pkg-config=0.29.1-0ubuntu1 \
                     -y
 
-COPY CMakeLists.txt /MyFS/
-COPY includes /MyFS/includes
-COPY Makefile /MyFS/
+COPY CMakeLists.txt Makefile /MyFS/
+COPY includes /MyFS/includes/
 COPY src /MyFS/src
 COPY unittests /MyFS/unittests
 
