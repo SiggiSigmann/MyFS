@@ -11,4 +11,10 @@ RUN apt-get update &&\
                     pkg-config=0.29.1-0ubuntu1 \
                     -y
 
-Run git clone https://github.com/hacker-h/MyFS
+COPY CMakeLists.txt /MyFS/
+COPY includes /MyFS/includes
+COPY Makefile /MyFS/
+COPY src /MyFS/src
+COPY unittests /MyFS/unittests
+
+CMD cd /MyFS/ && make
