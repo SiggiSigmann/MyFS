@@ -17,4 +17,4 @@ COPY includes /MyFS/includes/
 COPY src /MyFS/src
 COPY unittests /MyFS/unittests
 
-CMD cd /MyFS/ && make
+CMD cd /MyFS/ && make && ./unittest
