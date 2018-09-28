@@ -21,4 +21,4 @@ void gen_random(char *s, const int len) {
     }
 }
 
-// TODO: Implement you helper funcitons here
+// TODO: Implement you helper functions here
