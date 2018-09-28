@@ -1,4 +1,13 @@
 #/bin/sh
+#check if docker is available
+docker ps > /dev/null
+if [ $? -ne 0 ]
+then
+    echo "Docker is not running, aborting.."
+    exit
+fi
+
+
 #build the image silently
 docker build -q -t test-machine . > /dev/null
 
