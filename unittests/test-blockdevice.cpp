@@ -26,39 +26,42 @@ TEST_CASE( "Write/Read blocks", "[blockdevice]" ) {
     bd.create(BD_PATH);
     
     SECTION("writing single block") {
-        char* r= new char[BD_BLOCK_SIZE];
-        memset(r, 0, BD_BLOCK_SIZE);
+        char* readBuffer= new char[BD_BLOCK_SIZE];
+        memset(readBuffer, 0, BD_BLOCK_SIZE);
         
-        char* w= new char[BD_BLOCK_SIZE];
-        gen_random(w, BD_BLOCK_SIZE);
+        char* writeBuffer= new char[BD_BLOCK_SIZE];
+        gen_random(writeBuffer, BD_BLOCK_SIZE);
         
-        bd.write(0, w);
-        bd.read(0, r);
+        bd.write(0, writeBuffer);
+        bd.read(0, readBuffer);
         
-        REQUIRE(memcmp(w, r, BD_BLOCK_SIZE) == 0);
+        REQUIRE(memcmp(writeBuffer, readBuffer, BD_BLOCK_SIZE) == 0);
 
-        delete [] r;
-        delete [] w;
+        delete [] readBuffer;
+        delete [] writeBuffer;
     }
     
     SECTION("writing multiple blocks") {
-        char* r= new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
-        memset(r, 0, BD_BLOCK_SIZE * NUM_TESTBLOCKS);
+        char* readBuffer= new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
+        memset(readBuffer, 0, BD_BLOCK_SIZE * NUM_TESTBLOCKS);
         
-        char* w= new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
-        gen_random(w, BD_BLOCK_SIZE * NUM_TESTBLOCKS);
+        char* writeBuffer= new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
+        gen_random(writeBuffer, BD_BLOCK_SIZE * NUM_TESTBLOCKS);
         
         // write all blocks
-        for(int b= 0; b < NUM_TESTBLOCKS; b++) {
-            bd.write(b, w + b*BD_BLOCK_SIZE);
+        for(int i= 0; i < NUM_TESTBLOCKS; i++) {
+            bd.write(i, writeBuffer + i*BD_BLOCK_SIZE);
         }
         
         // read all blocks
-        for(int b= 0; b < NUM_TESTBLOCKS; b++) {
-            bd.read(b, r + b*BD_BLOCK_SIZE);
+        for(int i= 0; i < NUM_TESTBLOCKS; i++) {
+            bd.read(i, readBuffer + i*BD_BLOCK_SIZE);
         }
 
-        REQUIRE(memcmp(w, r, BD_BLOCK_SIZE * NUM_TESTBLOCKS) == 0);
+        REQUIRE(memcmp(writeBuffer, readBuffer, BD_BLOCK_SIZE * NUM_TESTBLOCKS) == 0);
+        
+        delete [] readBuffer;
+        delete [] writeBuffer;
     }
     
     bd.close();
