@@ -25,23 +25,19 @@ TEST_CASE( "Write/Read bytes", "[blockdevice]" ) {
     
     BlockDevice bd;
     bd.create(BD_PATH);
-
-    MyFS* myfs = new MyFS();
     
     SECTION("writing 13337 bytes") {
         char* writeBuffer = new char[NUM_TESTBYTES];
         gen_random(writeBuffer, NUM_TESTBYTES);
         
         // write all bytes
-        myfs->writeBytes(bd, 0, writeBuffer, NUM_TESTBYTES);
+        writeBytes(bd, 0, writeBuffer, NUM_TESTBYTES);
 
         // read all bytes
-        char* readBuffer = myfs->readBytes(bd, 0, NUM_TESTBYTES);
+        char* readBuffer = readBytes(bd, 0, NUM_TESTBYTES);
 
         REQUIRE(memcmp(writeBuffer, readBuffer, NUM_TESTBYTES) == 0);
     }
-    
-    delete myfs;
 
     bd.close();
     remove(BD_PATH);

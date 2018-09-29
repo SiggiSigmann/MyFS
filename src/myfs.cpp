@@ -262,7 +262,7 @@ int MyFS::fuseGetxattr(const char *path, const char *name, char *value, size_t s
 /*
 Writes 'size' bytes to the block device, starting at index 'firstBlockIndex'
 */
-void MyFS::writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
+void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
     // number of perfect blocks
     int numberOfBlocks = size / BD_BLOCK_SIZE;
 
@@ -290,7 +290,7 @@ void MyFS::writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size
 /*
 Reads 'numberOfBytes' bytes from the block device, starting at index 'firstBlockIndex'
 */
-char* MyFS::readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
+char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
     char* readBuffer = new char[numberOfBytes];
     // number of perfect blocks
     int numberOfBlocks = numberOfBytes / BD_BLOCK_SIZE;
