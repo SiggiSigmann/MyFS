@@ -26,6 +26,27 @@ public:
     
     // TODO: Add attributes of your file system here
     
+    struct Superblock {
+        uint32_t SUPERBLOCK_BLOCK;
+        uint32_t FS_SIZE_IN_BLOCKS;
+        uint32_t number_of_free_blocks;
+        uint32_t D_MAP_FIRST_BLOCK;
+        uint32_t D_MAP_LAST_BLOCK;
+        uint32_t FAT_FIRST_BLOCK;
+        uint32_t FAT_LAST_BLOCK;
+        uint32_t first_free_block;
+        uint32_t FIRST_DATA_BLOCK;
+        uint32_t LAST_DATA_BLOCK;
+        uint32_t NUMBER_OF_INODES;
+        uint32_t number_of_free_inodes;
+        uint32_t I_MAP_FIRST_BLOCK;
+        uint32_t I_MAP_LAST_BLOCK;
+        uint32_t first_free_inode;
+        uint32_t FIRST_INODE_BLOCK;
+        uint32_t LAST_INODE_BLOCK;
+    };
+    
+
     MyFS();
     ~MyFS();
     
