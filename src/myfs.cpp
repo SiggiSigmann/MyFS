@@ -264,6 +264,28 @@ Writes 'size' bytes to the block device, starting at index 'firstBlockIndex'
 */
 void writeBytes(int firstBlockIndex, char* bytes, int size) {
     //TODO
+    //perfect number of blocks
+    int numberOfBlocks = size / BD_BLOCK_SIZE;
+
+    int remainder = size % BD_BLOCK_SIZE;
+
+    // write all blocks
+    for(int i = 0; i < numberOfBlocks; i++) {
+        bd.write(i, bytes + i * BD_BLOCK_SIZE);
+    }
+
+    // write remainding bytes (as one block), if necessary
+    if (remainder > 0){
+        //bd.write only accepts buffers of size BD_BLOCK_SIZE, so we need to temporarily create one
+        char* remainderBlockBytes = new char[BD_BLOCK_SIZE];
+        //copy the remainder amount of bytes to the new block buffer, offset: all recently wrote perfect blocks
+        memcpy(remainderBlockBytes, bytes + (numberOfBlocks * BD_BLOCK_SIZE), remainder)
+        //set the boilerplate values to zero
+        memset(remainderBlockBytes+remainder, 0, BD_BLOCK_SIZE-remainder)
+        bd.write(numberOfBlocks, remainderBlockBytes)
+        //cleanup the temporary buffer
+        delete [] remainderBlockBytes;
+    }
 }
 
 /*
