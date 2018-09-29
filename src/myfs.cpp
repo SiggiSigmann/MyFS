@@ -258,5 +258,19 @@ int MyFS::fuseGetxattr(const char *path, const char *name, char *value, size_t s
 }
         
 // TODO: Add your own additional methods here!
-            
 
+/*
+Writes 'size' bytes to the block device, starting at index 'firstBlockIndex'
+*/
+void writeBytes(int firstBlockIndex, char* bytes, int size) {
+    //TODO
+}
+
+/*
+Reads 'size' bytes from the block device, starting at index 'firstBlockIndex'
+*/
+char* readBytes(int firstBlockIndex, int size) {
+    char* bytes = new char[size];
+    //TODO
+    return bytes;
+}
