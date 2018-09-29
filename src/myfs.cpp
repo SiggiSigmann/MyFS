@@ -264,12 +264,12 @@ Writes 'size' bytes to the block device, starting at index 'firstBlockIndex'
 */
 void writeBytes(int firstBlockIndex, char* bytes, int size) {
     //TODO
-    //perfect number of blocks
+    // number of perfect blocks
     int numberOfBlocks = size / BD_BLOCK_SIZE;
 
     int remainder = size % BD_BLOCK_SIZE;
 
-    // write all blocks
+    // write all perfect blocks
     for(int i = 0; i < numberOfBlocks; i++) {
         bd.write(i, bytes + i * BD_BLOCK_SIZE);
     }
@@ -289,10 +289,31 @@ void writeBytes(int firstBlockIndex, char* bytes, int size) {
 }
 
 /*
-Reads 'size' bytes from the block device, starting at index 'firstBlockIndex'
+Reads 'numberOfBytes' bytes from the block device, starting at index 'firstBlockIndex'
 */
-char* readBytes(int firstBlockIndex, int size) {
-    char* bytes = new char[size];
+char* readBytes(int firstBlockIndex, int numberOfBytes) {
     //TODO
-    return bytes;
+    char* readBuffer = new char[numberOfBytes];
+    // number of perfect blocks
+    int numberOfBlocks = numberOfBytes / BD_BLOCK_SIZE;
+    
+    int remainder = numberOfBytes % BD_BLOCK_SIZE;
+
+    // read all perfect blocks
+    for(int i = 0; i < numberOfBlocks; i++) {
+        bd.read(i, readBuffer + i * BD_BLOCK_SIZE);
+    }
+
+    // read remainding bytes (as one block), if necessary
+    if (remainder > 0){
+        //bd.read only accepts buffers of size BD_BLOCK_SIZE, so we need to temporarily create one
+        char* remainderBlockBytes = new char[BD_BLOCK_SIZE];
+        //read the entire block containing the remainding bytes (obviously the block after the last perfect block)
+        bd.read(numberOfBlocks, remainderBlockBytes);
+        //append all remainding bytes after the perfect blocks
+        memcpy(readBuffer + (numberOfBlocks*BD_BLOCK_SIZE), remainderBlockBytes, remainder)
+        //cleanup the temporary buffer
+        delete [] remainderBlockBytes;
+    }
+    return readBuffer;
 }
