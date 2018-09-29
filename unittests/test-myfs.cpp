@@ -33,12 +33,10 @@ TEST_CASE( "Write/Read bytes", "[blockdevice]" ) {
         gen_random(writeBuffer, NUM_TESTBYTES);
         
         // write all bytes
-        //TODO
         myfs->writeBytes(bd, 0, writeBuffer, NUM_TESTBYTES);
 
         // read all bytes
         char* readBuffer = myfs->readBytes(bd, 0, NUM_TESTBYTES);
-        //TODO
 
         REQUIRE(memcmp(writeBuffer, readBuffer, NUM_TESTBYTES) == 0);
     }
