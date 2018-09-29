@@ -14,6 +14,7 @@
 #include "helper.hpp"
 
 #include "blockdevice.h"
+#include "myfs.h"
 
 #define BD_PATH "/tmp/bd.bin"
 #define NUM_TESTBLOCKS 1024
@@ -62,35 +63,6 @@ TEST_CASE( "Write/Read blocks", "[blockdevice]" ) {
         
         delete [] readBuffer;
         delete [] writeBuffer;
-    }
-    
-    bd.close();
-    remove(BD_PATH);
-    
-}
-
-#define NUM_TESTBYTES 13337
-
-TEST_CASE( "Write/Read bytes", "[blockdevice]" ) {
-    
-    remove(BD_PATH);
-    
-    BlockDevice bd;
-    bd.create(BD_PATH);
-    
-    SECTION("writing 13337 bytes") {
-        char* writeBuffer = new char[NUM_TESTBYTES];
-        gen_random(writeBuffer, NUM_TESTBYTES);
-        
-        // write all bytes
-        //TODO
-        writeBytes(0, writeBuffer, NUM_TESTBYTES);
-
-        // read all bytes
-        char* readBuffer = readBytes(0, NUM_TESTBYTES);
-        //TODO
-
-        REQUIRE(memcmp(writeBuffer, readBuffer, NUM_TESTBYTES) == 0);
     }
     
     bd.close();
