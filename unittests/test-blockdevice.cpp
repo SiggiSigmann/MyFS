@@ -50,12 +50,12 @@ TEST_CASE( "Write/Read blocks", "[blockdevice]" ) {
         
         // write all blocks
         for(int i = 0; i < NUM_TESTBLOCKS; i++) {
-            bd.write(i, writeBuffer + i*BD_BLOCK_SIZE);
+            bd.write(i, writeBuffer + i * BD_BLOCK_SIZE);
         }
         
         // read all blocks
         for(int i = 0; i < NUM_TESTBLOCKS; i++) {
-            bd.read(i, readBuffer + i*BD_BLOCK_SIZE);
+            bd.read(i, readBuffer + i * BD_BLOCK_SIZE);
         }
 
         REQUIRE(memcmp(writeBuffer, readBuffer, BD_BLOCK_SIZE * NUM_TESTBLOCKS) == 0);
