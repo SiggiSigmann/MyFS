@@ -42,19 +42,19 @@ TEST_CASE( "Write/Read blocks", "[blockdevice]" ) {
     }
     
     SECTION("writing multiple blocks") {
-        char* readBuffer= new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
+        char* readBuffer = new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
         memset(readBuffer, 0, BD_BLOCK_SIZE * NUM_TESTBLOCKS);
         
-        char* writeBuffer= new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
+        char* writeBuffer = new char[BD_BLOCK_SIZE * NUM_TESTBLOCKS];
         gen_random(writeBuffer, BD_BLOCK_SIZE * NUM_TESTBLOCKS);
         
         // write all blocks
-        for(int i= 0; i < NUM_TESTBLOCKS; i++) {
+        for(int i = 0; i < NUM_TESTBLOCKS; i++) {
             bd.write(i, writeBuffer + i*BD_BLOCK_SIZE);
         }
         
         // read all blocks
-        for(int i= 0; i < NUM_TESTBLOCKS; i++) {
+        for(int i = 0; i < NUM_TESTBLOCKS; i++) {
             bd.read(i, readBuffer + i*BD_BLOCK_SIZE);
         }
 
