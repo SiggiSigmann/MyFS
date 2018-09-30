@@ -333,7 +333,7 @@ void MyFS::writeSuperblock(BlockDevice bd) {
     *ptrBuffer++ = MyFS::superblock.I_MAP_FIRST_BLOCK;
     *ptrBuffer++ = MyFS::superblock.I_MAP_LAST_BLOCK;
 
-    //Inodex
+    //Inodes
     *ptrBuffer++ = MyFS::superblock.NUMBER_OF_INODE_BLOCKS;
     *ptrBuffer++ = MyFS::superblock.FIRST_INODE_BLOCK;
     *ptrBuffer++ = MyFS::superblock.LAST_INODE_BLOCK;
@@ -370,10 +370,11 @@ Reads the Superblock from the BlockDevice into the Superblock struct.
 void MyFS::readSuperblock(BlockDevice bd) {
     char* buffer = readBytes(bd, MyFS::superblock.SUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
     uint32_t* ptrBuffer = (uint32_t*) buffer;
+    
     //general specs
     MyFS::superblock.SUPERBLOCK_BLOCK_INDEX = *ptrBuffer++;
     MyFS::superblock.NUMBER_OF_USABLE_DATABLOCKS = *ptrBuffer++;
-    MyFS::superblock.NUMBER_OF_INODES = *ptrBuffer;
+    MyFS::superblock.NUMBER_OF_INODES = *ptrBuffer++;
 
     //I-Map
     MyFS::superblock.NUMBER_OF_I_MAP_BLOCKS = *ptrBuffer++;
@@ -381,7 +382,7 @@ void MyFS::readSuperblock(BlockDevice bd) {
     MyFS::superblock.I_MAP_LAST_BLOCK = *ptrBuffer++;
 
     //Inodes
-    MyFS::superblock.NUMBER_OF_INODES = *ptrBuffer++;
+    MyFS::superblock.NUMBER_OF_INODE_BLOCKS = *ptrBuffer++;
     MyFS::superblock.FIRST_INODE_BLOCK = *ptrBuffer++;
     MyFS::superblock.LAST_INODE_BLOCK = *ptrBuffer++;
 
