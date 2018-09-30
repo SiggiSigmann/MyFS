@@ -318,7 +318,7 @@ char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
 
 void MyFS::writeSuperblock(BlockDevice bd){
     char* buffer = new char[BD_BLOCK_SIZE];
-    //Serializing 
+    //Serialization of the Superblock
     uint32_t* ptrBuffer = (uint32_t*) buffer;
     *ptrBuffer++ = MyFS::superblock.SUPERBLOCK_BLOCK_INDEX;
     *ptrBuffer++ = MyFS::superblock.NUMBER_OF_USABLE_DATABLOCKS;
@@ -342,6 +342,7 @@ void MyFS::writeSuperblock(BlockDevice bd){
     *ptrBuffer++ = MyFS::superblock.first_free_inode;
     *ptrBuffer++ = MyFS::superblock.number_of_free_blocks;
     *ptrBuffer++ = MyFS::superblock.first_free_block;
+    //Write the Superblock
     writeBytes(bd, MyFS::superblock.SUPERBLOCK_BLOCK_INDEX, buffer, sizeof(buffer));
     delete [] buffer;
 }
