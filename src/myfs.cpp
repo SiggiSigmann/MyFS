@@ -315,3 +315,33 @@ char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
     }
     return readBuffer;
 }
+
+void MyFS::writeSuperblock(BlockDevice bd){
+    char* buffer = new char[BD_BLOCK_SIZE];
+    //Serializing 
+    uint32_t* ptrBuffer = (uint32_t*) buffer;
+    *ptrBuffer++ = MyFS::superblock.SUPERBLOCK_BLOCK_INDEX;
+    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_USABLE_DATABLOCKS;
+    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_INODES;
+    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_I_MAP_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.I_MAP_FIRST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.I_MAP_LAST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_INODE_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.FIRST_INODE_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.LAST_INODE_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_D_MAP_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.D_MAP_FIRST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.D_MAP_LAST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.FAT_SIZE_IN_BYTES;
+    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_FAT_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.FAT_FIRST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.FAT_LAST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.FIRST_DATA_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.LAST_DATA_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.number_of_free_inodes;
+    *ptrBuffer++ = MyFS::superblock.first_free_inode;
+    *ptrBuffer++ = MyFS::superblock.number_of_free_blocks;
+    *ptrBuffer++ = MyFS::superblock.first_free_block;
+    writeBytes(bd, MyFS::superblock.SUPERBLOCK_BLOCK_INDEX, buffer, sizeof(buffer));
+    delete [] buffer;
+}

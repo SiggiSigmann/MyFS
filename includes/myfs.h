@@ -67,8 +67,8 @@ public:
         uint32_t first_free_inode;
         uint32_t number_of_free_blocks;
         uint32_t first_free_block;
-    };
-    
+    } superblock;
+
     MyFS();
     ~MyFS();
     
@@ -113,6 +113,7 @@ public:
     void fuseDestroy();
     
     // TODO: Add methods of your file system here
+    void writeSuperblock(BlockDevice bd);
 };
 void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size);
 char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes);
