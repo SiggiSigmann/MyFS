@@ -43,3 +43,32 @@ TEST_CASE( "Write/Read bytes", "[blockdevice]" ) {
     remove(BD_PATH);
     
 }
+
+TEST_CASE( "Write/Read Superblock", "[blockdevice]" ) {
+    
+    remove(BD_PATH);
+    
+    BlockDevice bd;
+    bd.create(BD_PATH);
+    MyFS* myfs = new MyFS();
+    
+    SECTION("writing Superblock") {
+        //TODO fix: test fails
+        //copy Superblock
+        MyFS::Superblock originalSuperblock = myfs->superblock;
+        originalSuperblock.number_of_free_inodes = 21;
+        myfs->superblock.number_of_free_inodes = 45;
+        //write Superblock
+        myfs->writeSuperblock(bd);
+        //modify Superblock
+        myfs->superblock.number_of_free_inodes = 1337;
+        //read Superblock
+        myfs->readSuperblock(bd);
+        REQUIRE(originalSuperblock.number_of_free_inodes == 21);
+        REQUIRE(myfs->superblock.number_of_free_inodes == 45);
+    }
+
+    bd.close();
+    remove(BD_PATH);
+    
+}

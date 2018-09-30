@@ -114,6 +114,7 @@ public:
     
     // TODO: Add methods of your file system here
     void writeSuperblock(BlockDevice bd);
+    void readSuperblock(BlockDevice bd);
 };
 void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size);
 char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes);
