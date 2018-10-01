@@ -21,7 +21,7 @@ LINKFLAGS = -g -Wall
 LIBS = `pkg-config fuse --libs`
 
 # all targets in project TODO: add new targets here (and add objects and link target)
-TARGETS = mount.myfs mkfs.myfs
+TARGETS = mount.myfs mkfs.myfs unittest
 
 # object files for target mkfs.myfs TODO: add new object files here
 MKFS_MYFS_OBJS = $(OBJDIR)/blockdevice.o \
@@ -65,7 +65,7 @@ $(OBJDIR)/%.o :  $(SRCDIR)/%.cpp
 $(OBJDIR)/%.o :  $(SRCDIR)/%.c $(HEADERDIR)/%.h
 	gcc -c $(CFLAGS) -o $@  $<
 
-# compile c file with header dependency	
+# compile c file without header dependency	
 $(OBJDIR)/%.o :  $(SRCDIR)/%.c
 	gcc -c $(CFLAGS) -o $@  $<
 	
