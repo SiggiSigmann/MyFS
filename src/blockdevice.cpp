@@ -22,12 +22,12 @@
 #undef DEBUG
 
 BlockDevice::BlockDevice(u_int32_t blockSize) {
-    assert(blockSize % 512 == 0);
+    assert(blockSize % BD_BLOCK_SIZE == 0);
     this->blockSize= blockSize;
 }
 
 void BlockDevice::resize(u_int32_t blockSize) {
-    assert(blockSize % 512 == 0);
+    assert(blockSize % BD_BLOCK_SIZE == 0);
     this->blockSize= blockSize;
 }
 

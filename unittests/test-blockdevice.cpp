@@ -63,6 +63,7 @@ TEST_CASE( "Write/Read blocks", "[blockdevice]" ) {
         
         delete [] readBuffer;
         delete [] writeBuffer;
+
     }
     
     bd.close();
