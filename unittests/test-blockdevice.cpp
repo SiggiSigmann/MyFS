@@ -59,6 +59,9 @@ TEST_CASE( "Write/Read blocks", "[blockdevice]" ) {
         }
 
         REQUIRE(memcmp(w, r, BD_BLOCK_SIZE * NUM_TESTBLOCKS) == 0);
+        
+        delete [] r;
+        delete [] w;
     }
     
     bd.close();
