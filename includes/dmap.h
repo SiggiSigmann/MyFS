@@ -7,9 +7,9 @@ manage the dmap of the FS
 
 class DMap{
     private:
-        bool *dmap;
+        bool *dmap;             //defines if datablock is used (0=free, 1=used)
     public:
-        DMap();
+        DMap(unsigned int dmapSize);
 
 }
 

@@ -6,13 +6,13 @@ Manage the superblock of the FS
 #define superblock
 
 struct SuperStruct{
-    uint dmapAddress;
-    uint fatAdress;
-    uint rootAdress;
-    uint maxFiles;
-    uint blockSize;
-    uint amountOfBlocks;
-}
+    unsigned intdmapAddress;
+    unsigned intfatAdress;
+    unsigned introotAdress;
+    unsigned intmaxFiles;
+    unsigned intblockSize;
+    unsigned intamountOfBlocks;
+};
 
 class SuperBlock{
     private:

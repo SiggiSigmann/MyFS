@@ -9,7 +9,7 @@ fi
 
 
 #build the image silently
-docker build -q -t test-machine . > /dev/null
+docker build -q -t test-machine 
 
 #run the container
 #using the 'obj' dir as volume enables the caching of linking objects to save compile time

@@ -7,9 +7,9 @@ manage the fat of the FS
 
 class Fat{
     private:
-        uint *dmap;
+        unsigned int* fat;
     public:
-        Fat();
+        Fat(unsigned int fatSize);
 
 }
 

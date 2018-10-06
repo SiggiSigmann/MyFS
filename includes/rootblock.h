@@ -7,15 +7,15 @@ Manage the rootblock of the FS
 
 struct Inode{
     char *fileName;
-    uint fileSize;
-    uint userID;
-    uint groupID;
-    uint mode;
-    uint mtime;
-    uint ctime;
-    uint atime;
-    uint data;
-}
+    unsigned int fileSize;
+    unsigned int userID;
+    unsigned int groupID;
+    unsigned int mode;
+    unsigned int mtime;
+    unsigned int ctime;
+    unsigned int atime;
+    unsigned int data;
+};
 
 class RootBlock{
     private:
