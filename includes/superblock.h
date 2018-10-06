@@ -18,7 +18,7 @@ class SuperBlock{
     private:
         SuperStruct *superBlock;
     public:
-
+        SuperBlock();
 
 }
 
