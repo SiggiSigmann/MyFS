@@ -18,9 +18,9 @@ struct InodeStruct{
 };
 
 class Inode{
-    public:
-        void create(BlockDevice *bd, int index);
-        InodeStruct* getInode(BlockDevice *bd, int index);
+    public:        
+        InodeStruct* get(BlockDevice *bd, int index);
+        void create(BlockDevice *bd, int index, int testNumber);
 
 };
 
