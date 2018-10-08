@@ -6,7 +6,7 @@
 
 void Inode::create(BlockDevice *bd, int index, int testNumber){
     InodeStruct *newInode = (InodeStruct *)malloc(BLOCK_SIZE);
-    newInode->dmapAddress = testNumber;
+    newInode->testNumber = testNumber;
     bd->write(index, (char *)newInode);
 
 }

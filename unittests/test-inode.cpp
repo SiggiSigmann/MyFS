@@ -33,7 +33,7 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         
         InodeStruct* currentInode = (InodeStruct *)malloc(BLOCK_SIZE);
         currentInode = inodeHelper->get(bd,index);
-        REQUIRE(testNumber==currentInode->dmapAddress);
+        REQUIRE(testNumber==currentInode->testNumber);
         delete currentInode;
     }
     

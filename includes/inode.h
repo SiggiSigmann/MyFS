@@ -9,12 +9,7 @@ manage the fat of the FS
 #include <stdlib.h>
 
 struct InodeStruct{
-    unsigned int dmapAddress;
-    unsigned int fatAdress;
-    unsigned int rootAdress;
-    unsigned int maxFiles;
-    unsigned int blockSize;
-    unsigned int amountOfBlocks;
+    unsigned int testNumber;
 };
 
 class Inode{
