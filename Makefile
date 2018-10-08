@@ -76,9 +76,10 @@ TSRCDIR = unittests
 
 # object files for target unittests TODO: add new object files here
 UNITTEST_OBJS = $(OBJDIR)/main.o \
+	$(OBJDIR)/inode.o \
+	$(OBJDIR)/test-inode.o \
 	$(OBJDIR)/blockdevice.o \
 	$(OBJDIR)/test-blockdevice.o \
-	$(OBJDIR)/test-inode.o \
 	$(OBJDIR)/myfs.o \
 	$(OBJDIR)/test-myfs.o \
 	$(OBJDIR)/helper.o
