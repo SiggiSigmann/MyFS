@@ -7,7 +7,7 @@ Manage the superblock of the FS
 
 #include <cstdint>
 #include "constants.h"
-#include "blockdevice.h"
+
 
 //define which metedata the fs conatains
 struct SuperStruct {
@@ -23,13 +23,13 @@ struct SuperStruct {
     uint32_t NUMBER_OF_INODES = NUM_DIR_ENTRIES; //needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
 
     //D-Map
-    uint32_t NUMBER_OF_D_MAP_BLOCKS = NUMBER_OF_USABLE_DATABLOCKS/BD_BLOCK_SIZE; //can map (4byte int32_t)BlockNumber -> (1byte bool)used, 512-times per D-Map Block (512Bytes)
+    uint32_t NUMBER_OF_D_MAP_BLOCKS = NUMBER_OF_USABLE_DATABLOCKS/BLOCK_SIZE; //can map (4byte int32_t)BlockNumber -> (1byte bool)used, 512-times per D-Map Block (512Bytes)
     uint32_t D_MAP_FIRST_BLOCK = SUPERBLOCK_BLOCK_INDEX + 1;
     uint32_t D_MAP_LAST_BLOCK = D_MAP_FIRST_BLOCK + NUMBER_OF_D_MAP_BLOCKS;
 
     //FAT
     uint32_t FAT_SIZE_IN_BYTES = NUMBER_OF_USABLE_DATABLOCKS * sizeof(uint32_t); //mapping requires sizeof(uint32_t)=4bytes per block: (uint32_t)blockIndex -> (uint32_t)nextBlockIndex
-    uint32_t NUMBER_OF_FAT_BLOCKS = FAT_SIZE_IN_BYTES/BD_BLOCK_SIZE;
+    uint32_t NUMBER_OF_FAT_BLOCKS = FAT_SIZE_IN_BYTES/BLOCK_SIZE;
     uint32_t FAT_FIRST_BLOCK = D_MAP_LAST_BLOCK + 1;
     uint32_t FAT_LAST_BLOCK = FAT_FIRST_BLOCK + NUMBER_OF_FAT_BLOCKS;
 

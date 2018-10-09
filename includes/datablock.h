@@ -1,7 +1,6 @@
 #ifndef dmapblock
 #define dmapblock
 
-#include <cstdint>
 #include "constants.h"
 #include "blockdevice.h"
 
