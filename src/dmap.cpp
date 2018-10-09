@@ -27,3 +27,10 @@ Marks the specified datablock as free.
 void DMap::freeDatablock(uint32_t dataBlockIndex){
     dMapStruct->dataBlockMap[dataBlockIndex] = false;
 }
+
+/*
+Return a boolean indicating whether the specified data block is occupied or free.
+*/
+bool DMap::get(uint32_t dataBlockIndex){
+    return dMapStruct->dataBlockMap[dataBlockIndex];
+}
