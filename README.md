@@ -7,6 +7,7 @@
 - [x] Superblock definieren
 - [x] Superblock schreiben
 - [x] Superblock lesen
+- [x] Superblock in Klasse extrahieren
 
 ### Ongoing
 Julian:
@@ -14,7 +15,6 @@ Julian:
 - [ ] beliebige Structs lesen
 
 Tobi:
-- [ ] Superblock in Klasse extrahieren
 
 Henning:
 - [ ] DMAP definieren
