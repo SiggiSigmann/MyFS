@@ -13,11 +13,11 @@ struct DataStruct{
 /*
 The class DataBlock manage the datablocks of a filesystem
 */
-class DataBlock{
+class DataBlockHelper{
     private:
         DataStruct *data;
     public:
-        DataBlock();
+        DataBlockHelper();
 
 };
 

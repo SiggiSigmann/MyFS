@@ -25,11 +25,11 @@ struct InodeStruct{
 /*
 The class RootBlock manage the indoes of a filesystem
 */
-class RootBlock{
+class RootBlockHelper{
     private:
         InodeStruct *inode;
     public:
-        RootBlock();
+        RootBlockHelper();
 
 };
 

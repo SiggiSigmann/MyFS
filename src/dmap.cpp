@@ -1,5 +1,5 @@
 #include "dmap.h"
 
-DMap::DMap(unsigned int dmapSize){
+DMapHelper::DMapHelper(unsigned int dmapSize){
     dMap = new DMapStruct();
 }

@@ -1,5 +1,5 @@
 #include "rootblock.h"
 
-RootBlock::RootBlock(){
+RootBlockHelper::RootBlockHelper(){
     inode = new InodeStruct();
 }

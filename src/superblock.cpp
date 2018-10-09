@@ -1,5 +1,5 @@
 #include "dmap.h"
 
-SuperBlock::SuperBlock(unsigned int dmapSize){
+SuperBlockHelper::SuperBlockHelper(unsigned int dmapSize){
     SuperBlock = new SuperStruct();
 }

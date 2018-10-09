@@ -1,5 +1,5 @@
 #include "fat.h"
 
-Fat::Fat(){
+FatHelper::FatHelper(){
     fat = new FatStruct();
 }

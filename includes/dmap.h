@@ -13,11 +13,11 @@ struct DMapStruct{
 /*
 The class DMap manage the dmap of a filesystem
 */
-class DMap{
+class DMapHelper{
     private:
         DMapStruct *dMap;             //defines if datablock is used (0=free, 1=used)
     public:
-        DMap();
+        DMapHelper();
 
 };
 
