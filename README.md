@@ -9,22 +9,27 @@
 - [x] Superblock lesen
 
 ### Ongoing
+Julian:
 - [ ] beliebige Structs schreiben
 - [ ] beliebige Structs lesen
+
+Tobi:
+- [ ] Superblock in Klasse extrahieren
+
+Henning:
+- [ ] DMAP definieren
+- [ ] DMAP schreiben
+- [ ] DMAP lesen
 
 ### Todo
 - [ ] Inodes definieren
 - [ ] Inodes schreiben
 - [ ] Inodes lesen
 - [ ] Inodes in Klasse extrahieren
-- [ ] Superblock in Klasse extrahieren (Tobi)
 - [ ] Rootblock anlegen
 - [ ] FAT definieren
 - [ ] FAT schreiben
 - [ ] FAT lesen
-- [ ] DMAP definieren
-- [ ] DMAP schreiben
-- [ ] DMAP lesen
 - [ ] IMAP definieren
 - [ ] IMAP schreiben
 - [ ] IMAP lesen
