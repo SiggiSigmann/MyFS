@@ -9,6 +9,7 @@ Manage the superblock of the FS
 #include "constants.h"
 #include "blockdevice.h"
 
+//define which metedata the fs conatains
 struct SuperStruct {
     /*
     Superblock |D-Map | FAT | Root | Data Blocks
@@ -46,13 +47,16 @@ struct SuperStruct {
     uint32_t first_free_block;
 };
 
+/*
+The class SuperBlock manage the superblock of a filesystem
+*/
 class SuperBlock{
     private:
         SuperStruct *superBlock;
     public:
         SuperBlock();
 
-}
+};
 
 
 #endif

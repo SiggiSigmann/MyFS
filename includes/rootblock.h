@@ -8,6 +8,8 @@ Manage the rootblock of the FS
 #include <cstdint>
 #include "constants.h"
 #include "blockdevice.h"
+
+//define what values a inode must contain
 struct InodeStruct{
     char fileName[NAME_LENGTH];
     uint32_t fileSize;
@@ -20,13 +22,16 @@ struct InodeStruct{
     uint32_t data;
 };
 
+/*
+The class RootBlock manage the indoes of a filesystem
+*/
 class RootBlock{
     private:
-        Inode *inode;
+        InodeStruct *inode;
     public:
         RootBlock();
 
-}
+};
 
 
 #endif
