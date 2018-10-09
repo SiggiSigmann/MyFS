@@ -4,20 +4,34 @@
 - [x] Testrahmen
 - [x] Auf Blockdevice schreiben
 - [x] Vom Blockdevice lesen
-- [x] Superblock anlegen
+- [x] Superblock definieren
 - [x] Superblock schreiben
 - [x] Superblock lesen
 
 ### Ongoing
-- [x] beliebige Structs schreiben
-- [x] beliebige Structs lesen
+- [ ] beliebige Structs schreiben
+- [ ] beliebige Structs lesen
 
 ### Todo
 - [ ] Inodes definieren
+- [ ] Inodes schreiben
+- [ ] Inodes lesen
+- [ ] Inodes in Klasse extrahieren
 - [ ] Superblock in Klasse extrahieren (Tobi)
 - [ ] Rootblock anlegen
 - [ ] FAT definieren
+- [ ] FAT schreiben
+- [ ] FAT lesen
 - [ ] DMAP definieren
+- [ ] DMAP schreiben
+- [ ] DMAP lesen
 - [ ] IMAP definieren
-- [ ] leere Dateien anlegen
+- [ ] IMAP schreiben
+- [ ] IMAP lesen
+- [ ] (leere) Dateien anlegen
+- [ ] Dateien umbenennen
+- [ ] Metadaten von Dateien verändern
 - [ ] Dateien mit Daten befüllen
+- [ ] Dateien überschreiben
+- [ ] Dateien löschen
+- [ ] Dateien kopieren
