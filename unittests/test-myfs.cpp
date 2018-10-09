@@ -120,3 +120,26 @@ TEST_CASE( "Write/Read Superblock", "[superblock]" ) {
     bd.close();
     remove(BD_PATH);
 }
+
+TEST_CASE( "Occupy/Free DMap", "[dmap]" ) {
+    
+    remove(BD_PATH);
+    
+    BlockDevice bd;
+    bd.create(BD_PATH);
+    MyFS* myfs = new MyFS();
+    
+    SECTION("writing DMap") {
+        DMap* map = new DMap();
+        uint32_t testIndex = 45;
+        map->freeDatablock(testIndex);
+        REQUIRE(map->get(testIndex) == false);
+        map->occupyDatablock(testIndex);
+        REQUIRE(map->get(testIndex) == true);
+        map->freeDatablock(testIndex);
+        REQUIRE(map->get(testIndex) == false);
+    }
+
+    bd.close();
+    remove(BD_PATH);
+}
