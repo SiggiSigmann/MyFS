@@ -9,12 +9,12 @@
 - [x] Superblock lesen
 
 ### Ongoing
-- [x] Inode lesen
-- [x] Inode Schreiben
+- [x] beliebige Structs schreiben
+- [x] beliebige Structs lesen
 
 ### Todo
-- [ ] Superblock in Klasse extrahieren (Tobi)
 - [ ] Inodes definieren
+- [ ] Superblock in Klasse extrahieren (Tobi)
 - [ ] Rootblock anlegen
 - [ ] FAT definieren
 - [ ] DMAP definieren
