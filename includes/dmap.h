@@ -4,19 +4,19 @@
 #include <cstdint>
 #include "constants.h"
 
-//structure contains the datablock map of the File system, the index corresponds to the data block index.
-//True  = block is free
-//False = block is occupied
 
 /*
-The class DMap manages the dmap of a filesystem
+The class DMap provides managing functions for the filesystems dmap.
 */
 class DMap{
     struct DMapStruct{
+        //structure contains the datablock map of the File system, the index corresponds to the data block index.
+        //True  = block is free
+        //False = block is occupied
         bool* dataBlockMap;
     };
     private:
-        DMapStruct *dMapStruct;             //defines if datablock is used (0=free, 1=used)
+        DMapStruct *dMapStruct;
     public:
         DMap();
         ~DMap();
