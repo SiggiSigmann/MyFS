@@ -20,6 +20,7 @@ class DMap{
     public:
         DMap();
         ~DMap();
+        bool get(uint32_t dataBlockIndex);
         void occupyDatablock(uint32_t dataBlockIndex);
         void freeDatablock(uint32_t dataBlockIndex);
 };
