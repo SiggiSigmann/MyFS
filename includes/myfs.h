@@ -15,6 +15,7 @@
 
 #include "blockdevice.h"
 #include "myfs-structs.h"
+#include "dmap.h"
 
 class MyFS {
 private:
