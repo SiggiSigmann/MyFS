@@ -1,5 +1,5 @@
 #include "dmap.h"
 
-DMapHelper::DMapHelper(){
-    dMap = new DMapStruct();
+DMap::DMap(){
+    dMapStruct->dataBlockMap = new bool[NUMBER_USABLE_DATABLOCKS];
 }
