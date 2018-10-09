@@ -1,6 +1,6 @@
 # MyFS
 
-#Features
+### Features
 - [x] Testrahmen
 - [x] Auf Blockdevice schreiben
 - [x] Vom Blockdevice lesen
@@ -8,11 +8,11 @@
 - [x] Superblock schreiben
 - [x] Superblock lesen
 
-#Ongoing
+### Ongoing
 - [x] Inode lesen
 - [x] Inode Schreiben
 
-#Todo
+### Todo
 - [ ] Superblock in Klasse extrahieren (Tobi)
 - [ ] Inodes definieren
 - [ ] Rootblock anlegen
