@@ -19,6 +19,7 @@ class DMap{
         DMapStruct *dMapStruct;             //defines if datablock is used (0=free, 1=used)
     public:
         DMap();
+        ~DMap();
         void occupyDatablock(uint32_t dataBlockIndex);
         void freeDatablock(uint32_t dataBlockIndex);
 };
