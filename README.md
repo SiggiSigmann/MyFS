@@ -17,7 +17,7 @@ Julian:
 Tobi:
 
 Henning:
-- [ ] DMAP definieren
+- [x] DMAP definieren
 - [ ] DMAP schreiben
 - [ ] DMAP lesen
 
