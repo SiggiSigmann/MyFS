@@ -10,7 +10,7 @@ Manage the superblock of the FS
 
 
 //define which metedata the fs conatains
-struct SuperStruct {
+struct SuperBlockStruct {
     /*
     Superblock |D-Map | FAT | Root | Data Blocks
     */
@@ -52,7 +52,7 @@ The class SuperBlock manage the superblock of a filesystem
 */
 class SuperBlockHandler{
     private:
-        SuperStruct *superBlock;
+        SuperBlockStruct *superBlock;
     public:
         SuperBlockHandler();
 
