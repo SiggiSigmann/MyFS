@@ -14,6 +14,7 @@
 #include <cstring>
 
 #include "blockdevice.h"
+#include "constants.h"
 #include "myfs-structs.h"
 
 class MyFS {
@@ -32,35 +33,34 @@ public:
         */
 
         //general specs
-        uint32_t uSUPERBLOCK_BLOCK_INDEX = 0;
-        //important: uNUMBER_OF_USABLE_DATABLOCKS needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
-        uint32_t uNUMBER_OF_USABLE_DATABLOCKS = 1 << 18; //2^18 = 262144 blocks => 128 MiB in total
-        uint32_t uNUMBER_OF_INODES = 512; //needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
+        uint32_t uSUPERBLOCK_BLOCK_INDEX = SUPERBLOCK_BLOCK_INDEX;
+        uint32_t uNUMBER_OF_USABLE_DATABLOCKS = NUMBER_OF_USABLE_DATABLOCKS;
+        uint32_t uNUMBER_OF_INODES = NUMBER_OF_INODES;
 
         //I-Map
-        uint32_t uNUMBER_OF_I_MAP_BLOCKS = uNUMBER_OF_INODES/BD_BLOCK_SIZE; //can map (4byte int32_t)InodeNumber -> (1byte bool)used, 512-times per I-Map Block (512Bytes)
-        uint32_t uI_MAP_FIRST_BLOCK = uSUPERBLOCK_BLOCK_INDEX + 1;
-        uint32_t uI_MAP_LAST_BLOCK = uI_MAP_FIRST_BLOCK + uNUMBER_OF_I_MAP_BLOCKS;
+        uint32_t uNUMBER_OF_I_MAP_BLOCKS = NUMBER_OF_I_MAP_BLOCKS;
+        uint32_t uI_MAP_FIRST_BLOCK = I_MAP_FIRST_BLOCK;
+        uint32_t uI_MAP_LAST_BLOCK = I_MAP_LAST_BLOCK;
 
         //Inodes
-        uint32_t uNUMBER_OF_INODE_BLOCKS = uNUMBER_OF_INODES; //one block for each inode
-        uint32_t uFIRST_INODE_BLOCK = uI_MAP_LAST_BLOCK + 1;
-        uint32_t uLAST_INODE_BLOCK = uLAST_INODE_BLOCK + uNUMBER_OF_INODE_BLOCKS;
+        uint32_t uNUMBER_OF_INODE_BLOCKS = NUMBER_OF_INODE_BLOCKS;
+        uint32_t uFIRST_INODE_BLOCK = FIRST_INODE_BLOCK;
+        uint32_t uLAST_INODE_BLOCK = LAST_INODE_BLOCK;
 
         //D-Map
-        uint32_t uNUMBER_OF_D_MAP_BLOCKS = uNUMBER_OF_USABLE_DATABLOCKS/BD_BLOCK_SIZE; //can map (4byte int32_t)BlockNumber -> (1byte bool)used, 512-times per D-Map Block (512Bytes)
-        uint32_t uD_MAP_FIRST_BLOCK = uLAST_INODE_BLOCK + 1;
-        uint32_t uD_MAP_LAST_BLOCK = uD_MAP_FIRST_BLOCK + uNUMBER_OF_D_MAP_BLOCKS;
+        uint32_t uNUMBER_OF_D_MAP_BLOCKS = NUMBER_OF_D_MAP_BLOCKS; //can map (4byte int32_t)BlockNumber -> (1byte bool)used, 512-times per D-Map Block (512Bytes)
+        uint32_t uD_MAP_FIRST_BLOCK = D_MAP_FIRST_BLOCK;
+        uint32_t uD_MAP_LAST_BLOCK = D_MAP_LAST_BLOCK;
 
         //FAT
-        uint32_t uFAT_SIZE_IN_BYTES = uNUMBER_OF_USABLE_DATABLOCKS * sizeof(uint32_t); //mapping requires sizeof(uint32_t)=4bytes per block: (uint32_t)blockIndex -> (uint32_t)nextBlockIndex
-        uint32_t uNUMBER_OF_FAT_BLOCKS = uFAT_SIZE_IN_BYTES/BD_BLOCK_SIZE;
-        uint32_t uFAT_FIRST_BLOCK = uD_MAP_LAST_BLOCK + 1;
-        uint32_t uFAT_LAST_BLOCK = uFAT_FIRST_BLOCK + uNUMBER_OF_FAT_BLOCKS;
+        uint32_t uFAT_SIZE_IN_BYTES = FAT_SIZE_IN_BYTES; //mapping requires sizeof(uint32_t)=4bytes per block: (uint32_t)blockIndex -> (uint32_t)nextBlockIndex
+        uint32_t uNUMBER_OF_FAT_BLOCKS = NUMBER_OF_FAT_BLOCKS;
+        uint32_t uFAT_FIRST_BLOCK = FAT_FIRST_BLOCK;
+        uint32_t uFAT_LAST_BLOCK = FAT_LAST_BLOCK;
 
         //Data Blocks
-        uint32_t uFIRST_DATA_BLOCK = uFAT_LAST_BLOCK + 1;
-        uint32_t uLAST_DATA_BLOCK = uFIRST_DATA_BLOCK + uNUMBER_OF_USABLE_DATABLOCKS;
+        uint32_t uFIRST_DATA_BLOCK = FIRST_DATA_BLOCK;
+        uint32_t uLAST_DATA_BLOCK = LAST_DATA_BLOCK;
 
         //runtime calculated values
         uint32_t uNumber_of_free_inodes;
