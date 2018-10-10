@@ -9,13 +9,13 @@ manage the fat of the FS
 #include <stdlib.h>
 
 struct InodeStruct{
-    unsigned int testNumber;
+    uint32_t testNumber;
 };
 
 class Inode{
     public:        
-        InodeStruct* get(BlockDevice *bd, int index);
-        void create(BlockDevice *bd, int index, int testNumber);
+        InodeStruct* get(BlockDevice *bd, uint32_t index);
+        void create(BlockDevice *bd, uint32_t index, uint32_t testNumber);
 
 };
 

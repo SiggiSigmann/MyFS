@@ -27,8 +27,8 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
     SECTION("write / read To inode") {
         Inode *inodeHelper = new Inode();
 
-        int index = 10;
-        int testNumber = 1234;
+        uint32_t index = 10;
+        uint32_t testNumber = 1234;
         inodeHelper->create(bd,index,testNumber);
         
         InodeStruct* currentInode = (InodeStruct *)malloc(BLOCK_SIZE);
