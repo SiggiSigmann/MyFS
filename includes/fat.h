@@ -1,5 +1,5 @@
-#ifndef fatblock
-#define fatblock
+#ifndef fatblock_h
+#define fatblock_h
 
 #include <cstdint>
 #include "constants.h"
@@ -12,11 +12,11 @@ struct FatStruct{
 /*
 The class Fat manage the fat of a filesystem
 */
-class FatHelper{
+class FatHandler{
     private:
         FatStruct *fat;
     public:
-        FatHelper();
+        FatHandler();
 
 };
 

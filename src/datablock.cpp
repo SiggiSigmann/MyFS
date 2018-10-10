@@ -1,5 +1,5 @@
 #include "datablock.h"
 
-DataBlockHelper::DataBlockHelper(){
+DataBlockHandler::DataBlockHandler(){
     data = new DataStruct();
 }

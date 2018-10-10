@@ -11,20 +11,18 @@
 
 ### Ongoing
 Julian:
-- [ ] beliebige Structs schreiben
-- [ ] beliebige Structs lesen
+- [ ] Inodes definieren
+- [x] inodes schreiben
+- [x] inodes lesen
 
 Tobi:
 
 Henning:
-- [ ] DMAP definieren
+- [x] DMAP definieren
 - [ ] DMAP schreiben
 - [ ] DMAP lesen
 
 ### Todo
-- [ ] Inodes definieren
-- [ ] Inodes schreiben
-- [ ] Inodes lesen
 - [ ] Inodes in Klasse extrahieren
 - [ ] Rootblock anlegen
 - [ ] FAT definieren
