@@ -120,3 +120,75 @@ TEST_CASE( "Write/Read Superblock", "[superblock]" ) {
     bd.close();
     remove(BD_PATH);
 }
+
+TEST_CASE( "Occupy/Free DMap", "[dmap]" ) {
+    
+    remove(BD_PATH);
+    
+    BlockDevice bd;
+    bd.create(BD_PATH);
+    MyFS* myfs = new MyFS();
+    
+    SECTION("occupy and free DMap") {
+        DMap* map = new DMap();
+        uint32_t testIndex = 45;
+        map->freeDatablock(testIndex);
+        REQUIRE(map->get(testIndex) == false);
+        map->occupyDatablock(testIndex);
+        REQUIRE(map->get(testIndex) == true);
+        map->freeDatablock(testIndex);
+        REQUIRE(map->get(testIndex) == false);
+    }
+
+    bd.close();
+    remove(BD_PATH);
+}
+
+TEST_CASE( "read/write DMap", "[dmap]" ) {
+    
+    remove(BD_PATH);
+    
+    BlockDevice bd;
+    bd.create(BD_PATH);
+    MyFS* myfs = new MyFS();
+    
+    SECTION("read and write DMap") {
+        DMap* map = new DMap();
+        //choose 3 indices to test
+        uint32_t testIndex1 = 12;
+        uint32_t testIndex2 = 23;
+        uint32_t testIndex3 = 34;
+        //initialize them as free
+        map->freeDatablock(testIndex1);
+        map->freeDatablock(testIndex2);
+        map->freeDatablock(testIndex3);
+        //validate that
+        REQUIRE(map->get(testIndex1) == false);
+        REQUIRE(map->get(testIndex2) == false);
+        REQUIRE(map->get(testIndex3) == false);
+        //claim them as occupied
+        map->occupyDatablock(testIndex1);
+        map->occupyDatablock(testIndex2);
+        map->occupyDatablock(testIndex3);
+        //validate that
+        REQUIRE(map->get(testIndex1) == true);
+        REQUIRE(map->get(testIndex2) == true);
+        REQUIRE(map->get(testIndex3) == true);
+        //write them to the block device
+        map->writeDMap(bd);
+        //manipulate the test indices randomly
+        map->freeDatablock(testIndex1);
+        map->freeDatablock(testIndex3);
+        REQUIRE(map->get(testIndex1) == false);
+        REQUIRE(map->get(testIndex3) == false);
+        //read from the block device and hereby override the manipulated test indices
+        map->readDMap(bd);
+        //validate the test indices to be restored correctly by the block device
+        REQUIRE(map->get(testIndex1) == true);
+        REQUIRE(map->get(testIndex2) == true);
+        REQUIRE(map->get(testIndex3) == true);
+    }
+
+    bd.close();
+    remove(BD_PATH);
+}

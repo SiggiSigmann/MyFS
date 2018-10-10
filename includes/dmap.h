@@ -3,21 +3,28 @@
 
 #include <cstdint>
 #include "constants.h"
-
-//structure contains the dmp of the File system
-struct DMapStruct{
-    bool* datablockMap;
-};
+#include "blockdevice.h"
 
 /*
-The class DMap manage the dmap of a filesystem
+The class DMap provides managing functions for the filesystems dmap.
 */
-class DMapHandler{
+class DMap{
+    struct DMapStruct{
+        //structure contains the datablock map of the File system, the index corresponds to the data block index.
+        //True  = block is free
+        //False = block is occupied
+        bool* dataBlockMap;
+    };
     private:
-        DMapStruct *dMap;             //defines if datablock is used (0=free, 1=used)
+        DMapStruct *dMapStruct;
     public:
-        DMapHandler();
-
+        DMap();
+        ~DMap();
+        bool get(uint32_t dataBlockIndex);
+        void occupyDatablock(uint32_t dataBlockIndex);
+        void freeDatablock(uint32_t dataBlockIndex);
+        void writeDMap(BlockDevice bd);
+        void readDMap(BlockDevice bd);
 };
 
 #endif
