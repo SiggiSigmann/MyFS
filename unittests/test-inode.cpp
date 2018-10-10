@@ -28,12 +28,20 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         Inode *inodeHelper = new Inode();
 
         uint32_t index = 10;
-        uint32_t testNumber = 1234;
-        inodeHelper->create(bd,index,testNumber);
+        //write inode with data to block 10
+        char fileName[FILENAME_MAX] = "test";
+        inodeHelper->create(bd,index,fileName,100,100,100,100,100,100,100);
         
+        //create new inode struct to store data, size = blockSize
         InodeStruct* currentInode = (InodeStruct *)malloc(BLOCK_SIZE);
+        //read inode struct from block 10
         currentInode = inodeHelper->get(bd,index);
-        REQUIRE(testNumber==currentInode->testNumber);
+
+        REQUIRE(strcmp(fileName,currentInode->fileName) == 0);
+        REQUIRE(100==currentInode->fileSize);
+        REQUIRE(100==currentInode->mode);
+
+        delete inodeHelper;
         delete currentInode;
     }
     

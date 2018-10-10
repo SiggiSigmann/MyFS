@@ -9,13 +9,20 @@ manage the fat of the FS
 #include <stdlib.h>
 
 struct InodeStruct{
-    uint32_t testNumber;
+    char* fileName;
+    uint32_t fileSize;
+    uint32_t atime;
+    uint32_t mtime;
+    uint32_t ctime;
+    uint32_t userID;
+    uint32_t groupID;
+    uint32_t mode;
 };
 
 class Inode{
-    public:        
+    public:  
+        void create(BlockDevice *bd, uint32_t index, char* fileName,uint32_t fileSize, uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode);
         InodeStruct* get(BlockDevice *bd, uint32_t index);
-        void create(BlockDevice *bd, uint32_t index, uint32_t testNumber);
 
 };
 
