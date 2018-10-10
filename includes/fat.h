@@ -6,7 +6,7 @@
 
 //structure contains the fat of the File system
 struct FatStruct{
-    uint32_t* fatMap;
+    uint32_t fatMap[NUMBER_OF_USABLE_DATABLOCKS];
 };
 
 /*

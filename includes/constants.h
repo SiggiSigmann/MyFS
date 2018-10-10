@@ -7,4 +7,7 @@
 #define NUM_DIR_ENTRIES 64          //maximum amount of files
 #define NUM_OPEN_FILES 64           //maximum amount of open files
 
+//Own constants:
+#define NUMBER_OF_USABLE_DATABLOCKS 1<<18 //2^18 = 262144 blocks => 128 MiB in total
+
 #endif

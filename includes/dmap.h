@@ -6,7 +6,7 @@
 
 //structure contains the dmp of the File system
 struct DMapStruct{
-    bool* datablockMap;
+    bool datablockMap[NUMBER_OF_USABLE_DATABLOCKS];
 };
 
 /*
