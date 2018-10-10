@@ -34,3 +34,17 @@ Return a boolean indicating whether the specified data block is occupied or free
 bool DMap::get(uint32_t dataBlockIndex){
     return dMapStruct->dataBlockMap[dataBlockIndex];
 }
+
+/*
+Writes the DMap to the block device.
+*/
+void DMap::writeDMap(BlockDevice bd){
+
+}
+
+/*
+Reads the DMap from the block device into the dmap data structure.
+*/
+void DMap::readDMap(BlockDevice bd){
+
+}

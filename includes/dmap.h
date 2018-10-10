@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include "constants.h"
+#include "blockdevice.h"
 
 /*
 The class DMap provides managing functions for the filesystems dmap.
@@ -22,8 +23,8 @@ class DMap{
         bool get(uint32_t dataBlockIndex);
         void occupyDatablock(uint32_t dataBlockIndex);
         void freeDatablock(uint32_t dataBlockIndex);
-        void writeDMap();
-        void readDMap();
+        void writeDMap(BlockDevice bd);
+        void readDMap(BlockDevice bd);
 };
 
 #endif
