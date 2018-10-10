@@ -2,8 +2,8 @@
 Manage the rootblock of the FS
 */
 
-#ifndef rootblock
-#define rootblock
+#ifndef rootblock_h
+#define rootblock_h
 
 #include "constants.h"
 #include <cstdint>

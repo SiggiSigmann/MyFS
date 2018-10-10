@@ -2,8 +2,8 @@
 Manage the superblock of the FS
 */
 
-#ifndef superblock
-#define superblock
+#ifndef superblock_h
+#define superblock_h
 
 #include <cstdint>
 #include "constants.h"

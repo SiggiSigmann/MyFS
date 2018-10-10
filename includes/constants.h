@@ -1,5 +1,5 @@
-#ifndef constants
-#define constants
+#ifndef constants_h
+#define constants_h
 
 //Requirements:
 #define NAME_LENGTH 255 

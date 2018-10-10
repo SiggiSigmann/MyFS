@@ -1,5 +1,5 @@
-#ifndef fatblock
-#define fatblock
+#ifndef fatblock_h
+#define fatblock_h
 
 #include <cstdint>
 #include "constants.h"
