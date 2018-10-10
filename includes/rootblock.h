@@ -2,8 +2,8 @@
 Manage the rootblock of the FS
 */
 
-#ifndef rootblock
-#define rootblock
+#ifndef rootblock_h
+#define rootblock_h
 
 #include "constants.h"
 #include <cstdint>
@@ -24,11 +24,11 @@ struct InodeStruct{
 /*
 The class RootBlock manage the indoes of a filesystem
 */
-class RootBlockHelper{
+class RootBlockHandler{
     private:
         InodeStruct *inode;
     public:
-        RootBlockHelper();
+        RootBlockHandler();
 
 };
 
