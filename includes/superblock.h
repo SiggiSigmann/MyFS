@@ -50,11 +50,11 @@ struct SuperStruct {
 /*
 The class SuperBlock manage the superblock of a filesystem
 */
-class SuperBlockHelper{
+class SuperBlockHandler{
     private:
         SuperStruct *superBlock;
     public:
-        SuperBlockHelper();
+        SuperBlockHandler();
 
 };
 

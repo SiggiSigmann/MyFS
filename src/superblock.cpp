@@ -1,5 +1,5 @@
 #include "superblock.h"
 
-SuperBlockHelper::SuperBlockHelper(){
+SuperBlockHandler::SuperBlockHandler(){
     superBlock = new SuperStruct();
 }

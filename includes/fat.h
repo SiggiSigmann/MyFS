@@ -12,11 +12,11 @@ struct FatStruct{
 /*
 The class Fat manage the fat of a filesystem
 */
-class FatHelper{
+class FatHandler{
     private:
         FatStruct *fat;
     public:
-        FatHelper();
+        FatHandler();
 
 };
 
