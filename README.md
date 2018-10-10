@@ -8,6 +8,9 @@
 - [x] Superblock schreiben
 - [x] Superblock lesen
 - [x] Superblock in Klasse extrahieren
+- [x] DMAP definieren
+- [x] DMAP schreiben
+- [x] DMAP lesen
 
 ### Ongoing
 Julian:
@@ -18,9 +21,6 @@ Julian:
 Tobi:
 
 Henning:
-- [x] DMAP definieren
-- [ ] DMAP schreiben
-- [ ] DMAP lesen
 
 ### Todo
 - [ ] Inodes in Klasse extrahieren
