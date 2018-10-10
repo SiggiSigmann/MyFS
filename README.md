@@ -11,6 +11,7 @@
 
 ### Ongoing
 Julian:
+- [ ] Inodes definieren
 - [x] inodes schreiben
 - [x] inodes lesen
 
@@ -22,9 +23,6 @@ Henning:
 - [ ] DMAP lesen
 
 ### Todo
-- [ ] Inodes definieren
-- [ ] Inodes schreiben
-- [ ] Inodes lesen
 - [ ] Inodes in Klasse extrahieren
 - [ ] Rootblock anlegen
 - [ ] FAT definieren
