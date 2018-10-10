@@ -1,5 +1,5 @@
-#ifndef dmapblock-h
-#define dmapblock-h
+#ifndef dmapblock_h
+#define dmapblock_h
 
 #include "constants.h"
 #include "blockdevice.h"
