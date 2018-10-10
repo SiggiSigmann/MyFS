@@ -11,8 +11,6 @@
 
 ### Ongoing
 Julian:
-- [ ] beliebige Structs schreiben
-- [ ] beliebige Structs lesen
 
 Tobi:
 
