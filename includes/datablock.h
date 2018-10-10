@@ -1,5 +1,5 @@
-#ifndef dmapblock
-#define dmapblock
+#ifndef dmapblock-h
+#define dmapblock-h
 
 #include "constants.h"
 #include "blockdevice.h"
@@ -12,11 +12,11 @@ struct DataStruct{
 /*
 The class DataBlock manage the datablocks of a filesystem
 */
-class DataBlockHelper{
+class DataBlockHandler{
     private:
         DataStruct *data;
     public:
-        DataBlockHelper();
+        DataBlockHandler();
 
 };
 

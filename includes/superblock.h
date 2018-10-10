@@ -2,8 +2,8 @@
 Manage the superblock of the FS
 */
 
-#ifndef superblock
-#define superblock
+#ifndef superblock_h
+#define superblock_h
 
 #include <cstdint>
 #include "constants.h"
@@ -49,11 +49,11 @@ struct SuperStruct {
 /*
 The class SuperBlock manage the superblock of a filesystem
 */
-class SuperBlockHelper{
+class SuperBlockHandler{
     private:
         SuperStruct *superBlock;
     public:
-        SuperBlockHelper();
+        SuperBlockHandler();
 
 };
 
