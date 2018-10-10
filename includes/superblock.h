@@ -2,8 +2,8 @@
 Manage the superblock of the FS
 */
 
-#ifndef superblock
-#define superblock
+#ifndef superblock_h
+#define superblock_h
 
 #include <cstdint>
 #include "constants.h"
@@ -19,7 +19,6 @@ struct SuperStruct {
     uint32_t SUPERBLOCK_BLOCK_INDEX = 0;
 
     //important: NUMBER_OF_USABLE_DATABLOCKS needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
-    uint32_t NUMBER_OF_USABLE_DATABLOCKS = 1 << 18; //2^18 = 262144 blocks => 128 MiB in total
     uint32_t NUMBER_OF_INODES = NUM_DIR_ENTRIES; //needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
 
     //D-Map
@@ -50,11 +49,11 @@ struct SuperStruct {
 /*
 The class SuperBlock manage the superblock of a filesystem
 */
-class SuperBlockHelper{
+class SuperBlockHandler{
     private:
         SuperStruct *superBlock;
     public:
-        SuperBlockHelper();
+        SuperBlockHandler();
 
 };
 
