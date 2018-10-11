@@ -192,3 +192,29 @@ TEST_CASE( "read/write DMap", "[dmap]" ) {
     bd.close();
     remove(BD_PATH);
 }
+
+TEST_CASE( "Test FAT", "[fat]" ) {
+    
+    remove(BD_PATH);
+    
+    BlockDevice bd;
+    bd.create(BD_PATH);
+    MyFS* myfs = new MyFS();
+    
+    SECTION("test updating FAT") {
+        FatHandler* fat = new FatHandler();
+        REQUIRE(fat->get(12) == 0);
+        REQUIRE(fat->get(23) == 0);
+        REQUIRE(fat->get(34) == 0);
+        fat->set(12,23);
+        fat->set(23,34);
+        fat->set(34,END_OF_FILE_ENTRY);
+        REQUIRE(fat->get(12) == 23);
+        REQUIRE(fat->get(23) == 34);
+        REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+        
+    }
+
+    bd.close();
+    remove(BD_PATH);
+}

@@ -6,7 +6,7 @@
 #include "constants.h"
 
 //structure containing the FAT of the File system
-struct FatStruct{
+struct Fat{
     uint32_t* fatMap;
 };
 
@@ -15,7 +15,7 @@ This class manages the FAT of a filesystem
 */
 class FatHandler{
     private:
-        FatStruct *fat;
+        Fat *fat;
     public:
         FatHandler();
         ~FatHandler();
