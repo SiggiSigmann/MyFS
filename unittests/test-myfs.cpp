@@ -203,15 +203,18 @@ TEST_CASE( "Test FAT", "[fat]" ) {
     
     SECTION("test updating FAT") {
         FatHandler* fat = new FatHandler();
+        //assure the fat entries are empty
         REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+        //insert some associated values: 12 -> 23 -> 34 -> EOF
         fat->set(12,23);
         fat->set(23,34);
         fat->set(34,END_OF_FILE_ENTRY);
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+        //clear the entries again
         fat->set(12,EMPTY_FAT_ENTRY);
         fat->set(23,EMPTY_FAT_ENTRY);
         fat->set(34,EMPTY_FAT_ENTRY);
@@ -222,15 +225,18 @@ TEST_CASE( "Test FAT", "[fat]" ) {
 
     SECTION("test deleting multiple FAT entries") {
         FatHandler* fat = new FatHandler();
+        //assure the fat entries are empty
         REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+        //insert some associated values: 12 -> 23 -> 34 -> EOF
         fat->set(12,23);
         fat->set(23,34);
         fat->set(34,END_OF_FILE_ENTRY);
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+        //clear the entries again
         fat->deleteAll(12);
         REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
@@ -239,21 +245,27 @@ TEST_CASE( "Test FAT", "[fat]" ) {
 
     SECTION("read/write FAT"){
         FatHandler* fat = new FatHandler();
+        //assure the fat entries are empty
         REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
         fat->set(12,23);
         fat->set(23,34);
         fat->set(34,END_OF_FILE_ENTRY);
+        //insert some associated values: 12 -> 23 -> 34 -> EOF
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+        //save the FAT on the block device
         fat->writeFat(bd);
+        //clear the entries again
         fat->deleteAll(12);
         REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+        //read the saved FAT from the block device
         fat->readFat(bd);
+        //validate it was restored correctly
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
