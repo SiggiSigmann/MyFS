@@ -20,14 +20,14 @@ FatHandler::~FatHandler(){
 Returns the successor of the given block index.
 */
 uint32_t FatHandler::get(uint32_t blockIndex){
-    return 0;
+    return fat->fatMap[blockIndex];
 }
 
 /*
 Sets the successor of the given block index.
 */
-void FatHandler::set(uint32_t blockIndex){
-
+void FatHandler::set(uint32_t blockIndex, uint32_t value){
+    fat->fatMap[blockIndex] = value;
 }
 
 /*
