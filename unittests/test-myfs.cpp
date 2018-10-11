@@ -13,6 +13,7 @@
 
 #include "helper.hpp"
 #include "blockdevice.h"
+#include "imap.h"
 #include "myfs.h"
 
 // TODO: Implement your tests here!
@@ -269,6 +270,27 @@ TEST_CASE( "Test FAT", "[fat]" ) {
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+    }
+
+     SECTION("read/write Imap"){
+        IMapHandler* imap = new IMapHandler();
+        imap->create();
+        imap->write(bd);
+
+        for(int i=0; i<NUM_DIR_ENTRIES;i++){
+            imap->setIMapEntry(i, 1);
+        }
+
+        for(int i=0; i<NUM_DIR_ENTRIES;i++){
+            REQUIRE( imap->getIMapEntry(i)==1);
+        }
+
+        imap->read(bd);
+
+        for(int i=0; i<NUM_DIR_ENTRIES;i++){
+            REQUIRE( imap->getIMapEntry(i)==0);
+        }
+       
     }
 
     bd.close();
