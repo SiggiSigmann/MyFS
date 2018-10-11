@@ -32,8 +32,12 @@ void RootBlock::create(BlockDevice*bd){
 
     //create inodes for rootblock
     for(int i;i < NUM_DIR_ENTRIES; i++){
-        createInode(bd,I_MAP_FIRST_BLOCK+i,false, (char*)"empty",0,0,0,0,0,0,0,0);
+        
+        char fileName[FILENAME_MAX] = "empty";
+        createInode(bd,I_MAP_FIRST_BLOCK+i,false, fileName,0,0,0,0,0,0,0,0);
+        printf("Create inode at %i \n",I_MAP_FIRST_BLOCK+i);
+
     }
-    printf("Created %i inodees starting from %i \n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
+    printf("Created %i inodes starting from %i \n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
 
 }

@@ -43,6 +43,7 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         rootb->create(bd);
         delete rootb;
         free(currentInode);
+
     }
     
     bd->close();
