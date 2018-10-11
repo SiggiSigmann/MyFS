@@ -7,6 +7,7 @@ Initializes the FAT.
 FatHandler::FatHandler(){
     fat = new Fat();
     fat->fatMap = new uint32_t[FAT_SIZE_IN_BYTES];
+    memset4(fat->fatMap, EMPTY_FAT_ENTRY, FAT_SIZE_IN_BYTES);
 }
 
 /*

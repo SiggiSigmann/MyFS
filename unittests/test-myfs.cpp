@@ -203,9 +203,9 @@ TEST_CASE( "Test FAT", "[fat]" ) {
     
     SECTION("test updating FAT") {
         FatHandler* fat = new FatHandler();
-        REQUIRE(fat->get(12) == 0);
-        REQUIRE(fat->get(23) == 0);
-        REQUIRE(fat->get(34) == 0);
+        REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
         fat->set(12,23);
         fat->set(23,34);
         fat->set(34,END_OF_FILE_ENTRY);
