@@ -5,7 +5,7 @@
 Initialize the DMap.
 */
 DMap::DMap(){
-    dMapStruct->dataBlockMap = new bool[NUMBER_USABLE_DATABLOCKS];
+    dMapStruct->dataBlockMap = new bool[NUMBER_OF_USABLE_DATABLOCKS];
 }
 
 /*
