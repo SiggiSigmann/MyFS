@@ -21,13 +21,13 @@ Julian:
 Tobi:
 
 Henning:
+- [ ] FAT definieren
+- [ ] FAT schreiben
+- [ ] FAT lesen
 
 ### Todo
 - [ ] Inodes in Klasse extrahieren
 - [ ] Rootblock anlegen
-- [ ] FAT definieren
-- [ ] FAT schreiben
-- [ ] FAT lesen
 - [ ] IMAP definieren
 - [ ] IMAP schreiben
 - [ ] IMAP lesen
