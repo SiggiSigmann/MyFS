@@ -1,4 +1,5 @@
 #include "fat.h"
+#include "myfs.h"
 
 /*
 Initializes the FAT.
@@ -34,12 +35,12 @@ void FatHandler::set(uint32_t blockIndex, uint32_t value){
 Writes the FAT to the block device.
 */
 void FatHandler::writeFat(BlockDevice bd){
-
+    writeBytes(bd, FAT_FIRST_BLOCK, (char* )fat->fatMap, FAT_SIZE_IN_BYTES);
 }
 
 /*
 Reads the FAT from the block device into the FAT data structure.
 */
 void FatHandler::readFat(BlockDevice bd){
-
+    fat->fatMap = (uint32_t* ) readBytes(bd, FAT_FIRST_BLOCK, FAT_SIZE_IN_BYTES);
 }
