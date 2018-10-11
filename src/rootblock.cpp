@@ -16,9 +16,8 @@ void RootBlock::createInode(BlockDevice *bd, uint32_t index, bool used, char* fi
     newInode->userID = userID;
     newInode->groupID = groupID;
     newInode->mode = mode;
-
-
     bd->write(index, (char *)newInode);
+    free(newInode);
 
 }
 
@@ -27,4 +26,14 @@ InodeStruct* RootBlock::getInode(BlockDevice *bd, uint32_t index){
     InodeStruct* currentInode = (InodeStruct *)malloc(BLOCK_SIZE);
     bd->read(index, (char *)currentInode);
     return currentInode;
+}
+
+void RootBlock::create(BlockDevice*bd){
+
+    //create inodes for rootblock
+    for(int i;i < NUM_DIR_ENTRIES; i++){
+        createInode(bd,I_MAP_FIRST_BLOCK+i,false, (char*)"empty",0,0,0,0,0,0,0,0);
+    }
+    printf("Created %i inodees starting from %i \n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
+
 }
