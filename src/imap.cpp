@@ -33,9 +33,7 @@ void IMapHandler::write(BlockDevice bd){
 Reads the IMap from the block device into the dmap data structure.
 */
 void IMapHandler::read(BlockDevice bd){
-    char *buffer = (char*)malloc(BLOCK_SIZE);
-    bd.read(I_MAP_FIRST_BLOCK,buffer);
-    iMapStruct = (IMapStruct*)buffer;
+    bd.read(I_MAP_FIRST_BLOCK,(char*) iMapStruct);
 }
 
 void IMapHandler::setIMapEntry(uint32_t index, bool value){
