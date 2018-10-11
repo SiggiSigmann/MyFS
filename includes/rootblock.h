@@ -19,10 +19,10 @@ struct InodeStruct{
     uint32_t mode;
 };
 
-class Inode{
+class RootBlock{
     public:  
-        void create(BlockDevice *bd, uint32_t index, char* fileName,uint32_t fileSize, uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode);
-        InodeStruct* get(BlockDevice *bd, uint32_t index);
+        void createInode(BlockDevice *bd, uint32_t index, char* fileName,uint32_t fileSize, uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode);
+        InodeStruct* getInode(BlockDevice *bd, uint32_t index);
 
 };
 

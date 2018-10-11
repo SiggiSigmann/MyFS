@@ -1,4 +1,4 @@
-#include "inode.h"
+#include "rootblock.h"
 
 #include "blockdevice.h"
 #include <string.h>
