@@ -1,7 +1,19 @@
 #include "fat.h"
 
+/*
+Initializes the FAT.
+*/
 FatHandler::FatHandler(){
     fat = new FatStruct();
+    fat->fatMap = new uint32_t[FAT_SIZE_IN_BYTES];
+}
+
+/*
+Clears up the FAT's allocated memory.
+*/
+FatHandler::~FatHandler(){
+    delete [] fat->fatMap;
+    delete fat;
 }
 
 /*

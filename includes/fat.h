@@ -18,6 +18,7 @@ class FatHandler{
         FatStruct *fat;
     public:
         FatHandler();
+        ~FatHandler();
         uint32_t get(uint32_t blockIndex);
         void set(uint32_t blockIndex);
         void writeFat(BlockDevice bd);
