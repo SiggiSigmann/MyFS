@@ -237,6 +237,28 @@ TEST_CASE( "Test FAT", "[fat]" ) {
         REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
     }
 
+    SECTION("read/write FAT"){
+        FatHandler* fat = new FatHandler();
+        REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+        fat->set(12,23);
+        fat->set(23,34);
+        fat->set(34,END_OF_FILE_ENTRY);
+        REQUIRE(fat->get(12) == 23);
+        REQUIRE(fat->get(23) == 34);
+        REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+        fat->writeFat(bd);
+        fat->deleteAll(12);
+        REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+        fat->readFat(bd);
+        REQUIRE(fat->get(12) == 23);
+        REQUIRE(fat->get(23) == 34);
+        REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+    }
+
     bd.close();
     remove(BD_PATH);
 }
