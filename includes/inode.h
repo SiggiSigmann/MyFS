@@ -2,14 +2,17 @@
 manage the fat of the FS
 */
 
-#ifndef inode
-#define inode
+#ifndef inode_h
+#define inode_h
 #include "myfs.h"
+#include "constants.h"
 #include "blockdevice.h"
 #include <stdlib.h>
 
 struct InodeStruct{
-    char* fileName;
+    char fileName[NAME_LENGTH];
+    bool used
+    uint32_t firstDataBlock:
     uint32_t fileSize;
     uint32_t atime;
     uint32_t mtime;
