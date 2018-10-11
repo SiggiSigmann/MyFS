@@ -409,3 +409,13 @@ void MyFS::readSuperblock(BlockDevice bd) {
 
     delete [] buffer;
 }
+
+/*
+Extension for the original memset function (only applies on 1byte arrays):
+Fills the first 'size' values of a specified array with 'value' starting from the given pointer.
+*/
+void memset4(uint32_t* ptr, uint32_t value, uint32_t size){
+    for(uint32_t i = 0; i < size; i++){
+        ptr[i] = value;
+    }
+}

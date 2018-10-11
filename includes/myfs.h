@@ -120,5 +120,6 @@ public:
 };
 void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size);
 char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes);
+void memset4(uint32_t* ptr, uint32_t value, uint32_t size);
 
 #endif /* myfs_h */
