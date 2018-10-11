@@ -23,6 +23,7 @@ class FatHandler{
         void set(uint32_t blockIndex, uint32_t value);
         void writeFat(BlockDevice bd);
         void readFat(BlockDevice bd);
+        void deleteAll(uint32_t firstBlockIndex);
 };
 
 #endif

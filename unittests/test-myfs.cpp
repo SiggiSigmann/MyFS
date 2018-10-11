@@ -212,7 +212,29 @@ TEST_CASE( "Test FAT", "[fat]" ) {
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
-        
+        fat->set(12,EMPTY_FAT_ENTRY);
+        fat->set(23,EMPTY_FAT_ENTRY);
+        fat->set(34,EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+    }
+
+    SECTION("test deleting multiple FAT entries") {
+        FatHandler* fat = new FatHandler();
+        REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
+        fat->set(12,23);
+        fat->set(23,34);
+        fat->set(34,END_OF_FILE_ENTRY);
+        REQUIRE(fat->get(12) == 23);
+        REQUIRE(fat->get(23) == 34);
+        REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
+        fat->deleteAll(12);
+        REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
+        REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
     }
 
     bd.close();
