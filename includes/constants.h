@@ -41,4 +41,7 @@
 #define FIRST_DATA_BLOCK (FAT_LAST_BLOCK + 1)
 #define LAST_DATA_BLOCK (FIRST_DATA_BLOCK + NUMBER_OF_USABLE_DATABLOCKS)
 
+//indicates the last block of a file in the FAT
+#define END_OF_FILE_ENTRY NUMBER_USABLE_DATABLOCKS+1
+
 #endif
