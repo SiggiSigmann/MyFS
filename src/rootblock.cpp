@@ -6,6 +6,8 @@
 
 void RootBlock::createInode(BlockDevice *bd, uint32_t index, char* fileName,uint32_t fileSize, uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
     InodeStruct *newInode = (InodeStruct *)malloc(BLOCK_SIZE);
+     newInode->uses = false;
+    newInode->firstDataBlock = firstDataBlock
     newInode->fileName = fileName;
     newInode->fileSize = fileSize;
     newInode->atime = atime;

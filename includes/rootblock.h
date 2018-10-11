@@ -17,6 +17,7 @@ struct InodeStruct{
     uint32_t userID;
     uint32_t groupID;
     uint32_t mode;
+    
 };
 
 class RootBlock{
