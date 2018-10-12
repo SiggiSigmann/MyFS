@@ -14,6 +14,9 @@ IMapHandler::~IMapHandler(){
     free(iMapStruct);
 }
 
+/*
+Fill the imap with default values (0 => unsued)
+*/
 void IMapHandler::create(){
     *iMapStruct = IMapStruct();
     for(int i=0; i<NUM_DIR_ENTRIES;i++){
@@ -36,10 +39,16 @@ void IMapHandler::read(BlockDevice bd){
     bd.read(I_MAP_FIRST_BLOCK,(char*) iMapStruct);
 }
 
+/*
+Set the imap entry at the place index to value
+*/
 void IMapHandler::setIMapEntry(uint32_t index, bool value){
     iMapStruct->imap[index] = value;
 }
 
+/*
+Get the value of the imap at the place index
+*/
 bool IMapHandler::getIMapEntry(uint32_t index){
     return iMapStruct->imap[index];
 }
