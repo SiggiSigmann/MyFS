@@ -6,19 +6,21 @@
 
 //create new Inode
 void RootBlock::createInode(BlockDevice *bd, uint32_t index, bool used, char* fileName, uint32_t firstDataBlock, uint32_t fileSize, uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
-    InodeStruct *newInode = (InodeStruct *)malloc(BLOCK_SIZE);
-    newInode->used = false;
-    newInode->firstDataBlock = firstDataBlock;
-    newInode->fileName = fileName;
-    newInode->fileSize = fileSize;
-    newInode->atime = atime;
-    newInode->mtime = mtime;
-    newInode->ctime = ctime;
-    newInode->userID = userID;
-    newInode->groupID = groupID;
-    newInode->mode = mode;
-    bd->write(index, (char *)newInode);
-    free(newInode);
+    //create new inodeStruct
+    InodeStruct *inode = (InodeStruct *)malloc(BLOCK_SIZE);
+    inode->used = false;
+    inode->firstDataBlock = firstDataBlock;
+    inode->fileName = fileName;
+    inode->fileSize = fileSize;
+    inode->atime = atime;
+    inode->mtime = mtime;
+    inode->ctime = ctime;
+    inode->userID = userID;
+    inode->groupID = groupID;
+    inode->mode = mode;
+    //write inode to block device
+    bd->write(index, (char *)inode);
+    free(inode);
 
 }
 //gets inode from blockdevice
@@ -35,9 +37,9 @@ void RootBlock::create(BlockDevice*bd){
         
         char fileName[FILENAME_MAX] = "empty";
         createInode(bd,I_MAP_FIRST_BLOCK+i,false, fileName,0,0,0,0,0,0,0,0);
-        printf("Create inode at %i \n",I_MAP_FIRST_BLOCK+i);
+        //printf("Create inode at %i \n",I_MAP_FIRST_BLOCK+i);
 
     }
-    printf("Created %i inodes starting from %i \n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
+    printf("Created %i inodes starting from %i  \n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
 
 }

@@ -33,28 +33,37 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         rootb->createInode(bd,index,true,fileName,1,100,100,100,100,100,100,100);
         
         //create new inode struct to store data, size = blockSize
-        InodeStruct* testInode = (InodeStruct *)malloc(BLOCK_SIZE);
+        InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
         //read inode struct from block 10
-        testInode = rootb->getInode(bd,index);
+        inode = rootb->getInode(bd,index);
 
-        REQUIRE(strcmp(fileName,testInode->fileName) == 0);
-        REQUIRE(100==testInode->fileSize);
-        REQUIRE(100==testInode->mode);
+        REQUIRE(strcmp(fileName,inode->fileName) == 0);
+        REQUIRE(100==inode->fileSize);
+        REQUIRE(100==inode->mode);
+        free(inode);
+
+
         //create rootblock with 64 inodes
         rootb->create(bd);
         //get first inode
-        InodeStruct* testInode2 = (InodeStruct *)malloc(BLOCK_SIZE);
-        testInode2 = rootb->getInode(bd,I_MAP_FIRST_BLOCK);
+        InodeStruct* firstInode = (InodeStruct *)malloc(BLOCK_SIZE);
+        firstInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK);
+        
         //test first inode in rootblock
-        REQUIRE(false==testInode2->used);
-        REQUIRE(strcmp(testInode2->fileName,"empty") == 0);
-        
-      
-        
+        REQUIRE(false==firstInode->used);
+        REQUIRE(strcmp(firstInode->fileName,"empty") == 0);
+        free(firstInode);
+
+        //get last inode
+        InodeStruct* lastInode = (InodeStruct *)malloc(BLOCK_SIZE);
+        lastInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK+NUM_DIR_ENTRIES);
+        //test last inode in rootblock
+        REQUIRE(false==lastInode->used);
+        REQUIRE(strcmp(lastInode->fileName,"empty") == 0);
+        free(lastInode);
+
 
         delete rootb;
-        free(testInode);
-        free(testInode2);
 
 
     }
