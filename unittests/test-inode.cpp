@@ -44,11 +44,12 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         rootb->create(bd);
         //get first inode
         InodeStruct* testInode2 = (InodeStruct *)malloc(BLOCK_SIZE);
-        testInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK);
+        testInode2 = rootb->getInode(bd,I_MAP_FIRST_BLOCK);
         //test first inode in rootblock
-        REQUIRE(false==testInode->used);
-        REQUIRE(strcmp(testInode->fileName,"empty") == 0);
-        print
+        REQUIRE(false==testInode2->used);
+        REQUIRE(strcmp(testInode2->fileName,"empty") == 0);
+        
+      
         
 
         delete rootb;
