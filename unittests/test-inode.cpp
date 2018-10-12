@@ -30,7 +30,7 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         uint32_t index = 1000;
         //write inode with data to block 10
         char fileName[FILENAME_MAX] = "test";
-        rootb->createInode(bd,index,true,fileName,1,100,100,100,100,100,100,100);
+        rootb->createInode(bd,index,fileName,1,100,100,100,100,100,100,100);
         
         //create new inode struct to store data, size = blockSize
         InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
@@ -50,7 +50,7 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         firstInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK);
         
         //test first inode in rootblock
-        REQUIRE(false==firstInode->used);
+        REQUIRE(0 ==firstInode->firstDataBlock);
         REQUIRE(strcmp(firstInode->fileName,"empty") == 0);
         free(firstInode);
 
@@ -58,7 +58,7 @@ TEST_CASE( "Test Inode helper", "[inode]" ) {
         InodeStruct* lastInode = (InodeStruct *)malloc(BLOCK_SIZE);
         lastInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK+NUM_DIR_ENTRIES);
         //test last inode in rootblock
-        REQUIRE(false==lastInode->used);
+        REQUIRE(0 ==lastInode->firstDataBlock);
         REQUIRE(strcmp(lastInode->fileName,"empty") == 0);
         free(lastInode);
 
