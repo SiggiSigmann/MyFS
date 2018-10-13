@@ -272,23 +272,45 @@ TEST_CASE( "Test FAT", "[fat]" ) {
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
     }
 
+    bd.close();
+    remove(BD_PATH);
+}
+
+
+TEST_CASE( "read/write IMap", "[imap]" ) {
+    
+    remove(BD_PATH);
+    
+    BlockDevice bd;
+    bd.create(BD_PATH);
+    MyFS* myfs = new MyFS();
+    
      SECTION("read/write Imap"){
         IMapHandler* imap = new IMapHandler();
-        imap->create();
+        imap->init();
+        //mark the first entry as occupied for later comparison purposes
+        imap->occupyIMapEntry(0);
         imap->write(bd);
-
-        for(int i=0; i<NUM_DIR_ENTRIES;i++){
-            imap->setIMapEntry(i, 1);
+        //occupy all imap entries and validate that
+        for(int i = 0; i < NUM_DIR_ENTRIES; i++){
+            imap->occupyIMapEntry(i);
+            REQUIRE(imap->getIMapEntry(i)==true);
         }
-
-        for(int i=0; i<NUM_DIR_ENTRIES;i++){
-            REQUIRE( imap->getIMapEntry(i)==1);
+        //free half of the imap entries and validate that
+        for (int i = NUM_DIR_ENTRIES/2; i < NUM_DIR_ENTRIES; i++){
+            imap->freeIMapEntry(i);
+            REQUIRE(imap->getIMapEntry(i)==false);
         }
-
+        //Now the first half should be occupied, the second should be free
+        for (int i = 0; i < NUM_DIR_ENTRIES/2; i++){
+            REQUIRE(imap->getIMapEntry(i)==true);
+        }
+        //read the initially written imap's values into the imap
         imap->read(bd);
-
-        for(int i=0; i<NUM_DIR_ENTRIES;i++){
-            REQUIRE( imap->getIMapEntry(i)==0);
+        //assure it was written/read correctly
+        REQUIRE(imap->getIMapEntry(0)==true);
+        for(int i = 1; i < NUM_DIR_ENTRIES; i++){
+            REQUIRE(imap->getIMapEntry(i)==false);
         }
        
     }
