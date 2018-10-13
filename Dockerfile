@@ -18,5 +18,4 @@ COPY src /MyFS/src
 COPY unittests /MyFS/unittests
 
 WORKDIR /MyFS/
-CMD rm *.o
 CMD make && ./unittest
