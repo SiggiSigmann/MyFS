@@ -19,10 +19,11 @@ class IMapHandler{
     public:
         IMapHandler();
         ~IMapHandler();
-        void create();
+        void init();
         void write(BlockDevice bd);
         void read(BlockDevice bd);
-        void setIMapEntry(uint32_t index,  bool value);
+        void occupyIMapEntry(uint32_t index);
+        void freeIMapEntry(uint32_t index);
         bool getIMapEntry(uint32_t index);
 };
 

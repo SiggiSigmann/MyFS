@@ -1,7 +1,7 @@
 #include "imap.h"
 
 /*
-Initialize the IMap.
+Allocates Memory for the IMap.
 */
 IMapHandler::IMapHandler(){
     iMapStruct = (IMapStruct*) malloc(BLOCK_SIZE);
@@ -15,9 +15,9 @@ IMapHandler::~IMapHandler(){
 }
 
 /*
-Fill the imap with default values (0 => unsued)
+Initializes the imap with default values (0 => unsued)
 */
-void IMapHandler::create(){
+void IMapHandler::init(){
     *iMapStruct = IMapStruct();
     for(int i=0; i<NUM_DIR_ENTRIES;i++){
         iMapStruct->imap[i]=0;
@@ -40,14 +40,21 @@ void IMapHandler::read(BlockDevice bd){
 }
 
 /*
-Set the imap entry at the place index to value
+Set the imap entry at the position index to occupied (true)
 */
-void IMapHandler::setIMapEntry(uint32_t index, bool value){
-    iMapStruct->imap[index] = value;
+void IMapHandler::occupyIMapEntry(uint32_t index){
+    iMapStruct->imap[index] = true;
 }
 
 /*
-Get the value of the imap at the place index
+Set the imap entry at the position index to free (false)
+*/
+void IMapHandler::freeIMapEntry(uint32_t index){
+    iMapStruct->imap[index] = false;
+}
+
+/*
+Get the value of the imap at the position index
 */
 bool IMapHandler::getIMapEntry(uint32_t index){
     return iMapStruct->imap[index];
