@@ -4,9 +4,9 @@
 #include <string.h>
 #include <iostream>
 
-//create new Inode
-void RootBlock::createInode(BlockDevice *bd, uint32_t index, char* fileName, uint32_t firstDataBlock, uint32_t fileSize, uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
-    //create new inodeStruct
+//create a new Inode directly on the block device
+void RootBlock::createInode(BlockDevice *bd, uint32_t index, char* fileName, uint32_t firstDataBlock, uint32_t fileSize,
+        uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
     InodeStruct *inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode->firstDataBlock = firstDataBlock;
     inode->fileName = fileName;
@@ -19,26 +19,24 @@ void RootBlock::createInode(BlockDevice *bd, uint32_t index, char* fileName, uin
     inode->mode = mode;
     //write inode to block device
     bd->write(index, (char *)inode);
+    //delete the inode in memory
     free(inode);
-
 }
-//gets inode from blockdevice
+
+//reads and returns the demanded inode from the blockdevice
 InodeStruct* RootBlock::getInode(BlockDevice *bd, uint32_t index){
-    //create struct the with the size of Block_Size
+    //create struct with the size of BLOCK_SIZE
     InodeStruct* currentInode = (InodeStruct *)malloc(BLOCK_SIZE);
     bd->read(index, (char *)currentInode);
     return currentInode;
 }
-//create rootblock, creates NUM_DIR_ENTRIES Inodes starting from I_MAP_FIRST_BLOCKS
+
+//creates the rootblock including all Inodes and writes them on the block device
 void RootBlock::create(BlockDevice*bd){
     //create inodes for rootblock
     for(int i;i <= NUM_DIR_ENTRIES; i++){
-        
         char fileName[FILENAME_MAX] = "empty";
         createInode(bd,I_MAP_FIRST_BLOCK+i, fileName,0,0,0,0,0,0,0,0);
-        //printf("Create inode at %i \n",I_MAP_FIRST_BLOCK+i);
-
     }
-    printf("Created %i inodes starting from %i  \n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
-
+    // printf("Created %i inodes starting from %i\n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
 }
