@@ -1,29 +1,16 @@
-#ifndef fatblock_h
-#define fatblock_h
-
-#include <cstdint>
-#include "blockdevice.h"
-#include "constants.h"
-
-//structure containing the FAT of the File system
-struct Fat{
-    uint32_t* fatMap;
-};
-
 /*
-This class manages the FAT of a filesystem
+manage the fat of the FS
 */
-class FatHandler{
+
+#ifndef fat
+#define fat
+
+class Fat{
     private:
-        Fat *fat;
+        unsigned int* fat;
     public:
-        FatHandler();
-        ~FatHandler();
-        uint32_t get(uint32_t blockIndex);
-        void set(uint32_t blockIndex, uint32_t value);
-        void writeFat(BlockDevice bd);
-        void readFat(BlockDevice bd);
-        void deleteAll(uint32_t firstBlockIndex);
-};
+        Fat(unsigned int fatSize);
+
+}
 
 #endif

@@ -23,13 +23,13 @@ private:
     uint32_t size;
     
 public:
-    BlockDevice(uint32_t blockSize = 512);
-    void resize(uint32_t blockSize);
+    BlockDevice(u_int32_t blockSize = 512);
+    void resize(u_int32_t blockSize);
     int open(const char* path);
     int create(const char* path);
     int close();
-    int read(uint32_t blockNo, char *buffer);
-    int write(uint32_t blockNo, char *buffer);
+    int read(u_int32_t blockNo, char *buffer);
+    int write(u_int32_t blockNo, char *buffer);
     uint32_t getSize();
 };
 
