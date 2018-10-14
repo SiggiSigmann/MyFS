@@ -4,8 +4,7 @@ From ubuntu:16.04
 RUN apt-get update &&\
     apt-get install build-essential=12.1ubuntu2 \
                     fuse=2.9.4-1ubuntu3.1 \
-                    gcc=4:5.3.1-1ubuntu1 \
-                    git=1:2.7.4-0ubuntu1.4 \
+                    gcc=4:5.3.1-1ubuntu1 \ 
                     libfuse-dev=2.9.4-1ubuntu3.1 \
                     libfuse2=2.9.4-1ubuntu3.1 \
                     make=4.1-6 \
