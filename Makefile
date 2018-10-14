@@ -79,6 +79,11 @@ UNITTEST_OBJS = $(OBJDIR)/main.o \
 	$(OBJDIR)/rootblock.o \
 	$(OBJDIR)/test-rootblock.o \
 	$(OBJDIR)/blockdevice.o \
+	$(OBJDIR)/imap.o \
+	$(OBJDIR)/dmap.o \
+	$(OBJDIR)/fat.o \
+	$(OBJDIR)/rootblock.o \
+	$(OBJDIR)/datablock.o \
 	$(OBJDIR)/test-blockdevice.o \
 	$(OBJDIR)/myfs.o \
 	$(OBJDIR)/test-myfs.o \

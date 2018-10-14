@@ -324,43 +324,43 @@ void MyFS::writeSuperblock(BlockDevice bd) {
     uint32_t* ptrBuffer = (uint32_t*) buffer;
 
     //general specs
-    *ptrBuffer++ = MyFS::superblock.SUPERBLOCK_BLOCK_INDEX;
-    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_USABLE_DATABLOCKS;
-    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_INODES;
+    *ptrBuffer++ = MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX;
+    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_USABLE_DATABLOCKS;
+    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_INODES;
 
     //I-Map
-    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_I_MAP_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.I_MAP_FIRST_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.I_MAP_LAST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_I_MAP_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.uI_MAP_FIRST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uI_MAP_LAST_BLOCK;
 
     //Inodes
-    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_INODE_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.FIRST_INODE_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.LAST_INODE_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_INODE_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.uFIRST_INODE_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uLAST_INODE_BLOCK;
 
     //D-Map
-    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_D_MAP_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.D_MAP_FIRST_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.D_MAP_LAST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_D_MAP_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.uD_MAP_FIRST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uD_MAP_LAST_BLOCK;
 
     //FAT
-    *ptrBuffer++ = MyFS::superblock.FAT_SIZE_IN_BYTES;
-    *ptrBuffer++ = MyFS::superblock.NUMBER_OF_FAT_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.FAT_FIRST_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.FAT_LAST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uFAT_SIZE_IN_BYTES;
+    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_FAT_BLOCKS;
+    *ptrBuffer++ = MyFS::superblock.uFAT_FIRST_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uFAT_LAST_BLOCK;
 
     //Data Blocks
-    *ptrBuffer++ = MyFS::superblock.FIRST_DATA_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.LAST_DATA_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uFIRST_DATA_BLOCK;
+    *ptrBuffer++ = MyFS::superblock.uLAST_DATA_BLOCK;
 
     //runtime calculated values
-    *ptrBuffer++ = MyFS::superblock.number_of_free_inodes;
-    *ptrBuffer++ = MyFS::superblock.first_free_inode;
-    *ptrBuffer++ = MyFS::superblock.number_of_free_blocks;
-    *ptrBuffer++ = MyFS::superblock.first_free_block;
+    *ptrBuffer++ = MyFS::superblock.uNumber_of_free_inodes;
+    *ptrBuffer++ = MyFS::superblock.uFirst_free_inode;
+    *ptrBuffer++ = MyFS::superblock.uNumber_of_free_blocks;
+    *ptrBuffer++ = MyFS::superblock.uFirst_free_block;
 
     //Write the Superblock
-    writeBytes(bd, MyFS::superblock.SUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
+    writeBytes(bd, MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
     delete [] buffer;
 }
 
@@ -368,44 +368,54 @@ void MyFS::writeSuperblock(BlockDevice bd) {
 Reads the Superblock from the BlockDevice into the Superblock struct.
 */
 void MyFS::readSuperblock(BlockDevice bd) {
-    char* buffer = readBytes(bd, MyFS::superblock.SUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
+    char* buffer = readBytes(bd, MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
     uint32_t* ptrBuffer = (uint32_t*) buffer;
     
     //general specs
-    MyFS::superblock.SUPERBLOCK_BLOCK_INDEX = *ptrBuffer++;
-    MyFS::superblock.NUMBER_OF_USABLE_DATABLOCKS = *ptrBuffer++;
-    MyFS::superblock.NUMBER_OF_INODES = *ptrBuffer++;
+    MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX = *ptrBuffer++;
+    MyFS::superblock.uNUMBER_OF_USABLE_DATABLOCKS = *ptrBuffer++;
+    MyFS::superblock.uNUMBER_OF_INODES = *ptrBuffer++;
 
     //I-Map
-    MyFS::superblock.NUMBER_OF_I_MAP_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.I_MAP_FIRST_BLOCK = *ptrBuffer++;
-    MyFS::superblock.I_MAP_LAST_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uNUMBER_OF_I_MAP_BLOCKS = *ptrBuffer++;
+    MyFS::superblock.uI_MAP_FIRST_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uI_MAP_LAST_BLOCK = *ptrBuffer++;
 
     //Inodes
-    MyFS::superblock.NUMBER_OF_INODE_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.FIRST_INODE_BLOCK = *ptrBuffer++;
-    MyFS::superblock.LAST_INODE_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uNUMBER_OF_INODE_BLOCKS = *ptrBuffer++;
+    MyFS::superblock.uFIRST_INODE_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uLAST_INODE_BLOCK = *ptrBuffer++;
 
     //D-Map
-    MyFS::superblock.NUMBER_OF_D_MAP_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.D_MAP_FIRST_BLOCK = *ptrBuffer++;
-    MyFS::superblock.D_MAP_LAST_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uNUMBER_OF_D_MAP_BLOCKS = *ptrBuffer++;
+    MyFS::superblock.uD_MAP_FIRST_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uD_MAP_LAST_BLOCK = *ptrBuffer++;
 
     //FAT
-    MyFS::superblock.FAT_SIZE_IN_BYTES = *ptrBuffer++;
-    MyFS::superblock.NUMBER_OF_FAT_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.FAT_FIRST_BLOCK = *ptrBuffer++;
-    MyFS::superblock.FAT_LAST_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uFAT_SIZE_IN_BYTES = *ptrBuffer++;
+    MyFS::superblock.uNUMBER_OF_FAT_BLOCKS = *ptrBuffer++;
+    MyFS::superblock.uFAT_FIRST_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uFAT_LAST_BLOCK = *ptrBuffer++;
 
     //Data Blocks
-    MyFS::superblock.FIRST_DATA_BLOCK = *ptrBuffer++;
-    MyFS::superblock.LAST_DATA_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uFIRST_DATA_BLOCK = *ptrBuffer++;
+    MyFS::superblock.uLAST_DATA_BLOCK = *ptrBuffer++;
 
     //runtime calculated values
-    MyFS::superblock.number_of_free_inodes = *ptrBuffer++;
-    MyFS::superblock.first_free_inode = *ptrBuffer++;
-    MyFS::superblock.number_of_free_blocks = *ptrBuffer++;
-    MyFS::superblock.first_free_block = *ptrBuffer++;
+    MyFS::superblock.uNumber_of_free_inodes = *ptrBuffer++;
+    MyFS::superblock.uFirst_free_inode = *ptrBuffer++;
+    MyFS::superblock.uNumber_of_free_blocks = *ptrBuffer++;
+    MyFS::superblock.uFirst_free_block = *ptrBuffer++;
 
     delete [] buffer;
+}
+
+/*
+Extension for the original memset function (only applies on 1byte arrays):
+Fills the first 'size' values of a specified array with 'value' starting from the given pointer.
+*/
+void memset4(uint32_t* ptr, uint32_t value, uint32_t size){
+    for(uint32_t i = 0; i < size; i++){
+        ptr[i] = value;
+    }
 }
