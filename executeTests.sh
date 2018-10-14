@@ -25,6 +25,7 @@ fi
 }
 
 #variables
+force=0
 verbose=0
 volume="-v obj:/MyFS/obj "
 suppressOutput="|& /dev/null"
@@ -64,6 +65,7 @@ while getopts fhv opt; do #watch for arguments f, h and v
             quiet="" #disable suppressed output by -q
             ;;
         f)  #omit the volume when force flag is set to force full recompilation
+            force=1
             volume=""
             ;;
         *) #for any invalid parameters -> show help
@@ -77,10 +79,22 @@ done
 log "docker build -t test-image ."
 eval "docker build ${quiet} -t test-image . ${suppressOutput}"
 
+if [ $force -eq 1 ]
+then
+    #prepare legacy cleaning
+    log "docker rm cleaner"
+    eval "docker rm cleaner ${suppressOutput}"
+    #clear all legacy files independently of the os's docker abstraction solution
+    log "docker run --name cleaner -v obj:/MyFS/obj test-image rm -rf obj && ls -lah obj"
+    eval "docker run --name cleaner -v obj:/MyFS/obj test-image rm -rf obj ${suppressOutput} && ls -lah obj ${suppressOutput}"
+    #tidy up legacy cleaning container
+    log "docker rm cleaner"
+    eval "docker rm cleaner ${suppressOutput}"
+fi
+
 #run the container
 #using the 'obj' dir as volume enables the caching of linking objects to save compile time
 #when using docker toolbox the volume 'obj' is located on the disk of the virtual machine (linux) hosting the docker environment and will persist forever by default
-
 log "docker run --name test-container ${volume} test-image"
 docker run --name test-container ${volume} test-image
 
