@@ -16,9 +16,7 @@ struct InodeStruct{
     uint32_t groupID;
     uint32_t mode;
 };
-/*
-The class RootBlock manage the indoes of a filesystem
-*/
+
 class RootBlock{
     public:  
         void createInode(BlockDevice *bd, uint32_t index, char* fileName, uint32_t firstDataBlock, uint32_t fileSize,

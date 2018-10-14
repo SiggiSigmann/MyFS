@@ -21,12 +21,12 @@
 
 #undef DEBUG
 
-BlockDevice::BlockDevice(uint32_t blockSize) {
+BlockDevice::BlockDevice(u_int32_t blockSize) {
     assert(blockSize % BD_BLOCK_SIZE == 0);
     this->blockSize= blockSize;
 }
 
-void BlockDevice::resize(uint32_t blockSize) {
+void BlockDevice::resize(u_int32_t blockSize) {
     assert(blockSize % BD_BLOCK_SIZE == 0);
     this->blockSize= blockSize;
 }
@@ -82,7 +82,7 @@ int BlockDevice::close() {
 }
 
 // this method returns 0 if successful, -1 otherwise
-int BlockDevice::read(uint32_t blockNo, char *buffer) {
+int BlockDevice::read(u_int32_t blockNo, char *buffer) {
 #ifdef DEBUG
     fprintf(stderr, "BlockDevice: Reading block %d\n", blockNo);
 #endif
@@ -97,7 +97,7 @@ int BlockDevice::read(uint32_t blockNo, char *buffer) {
     return 0;
 }
 
-int BlockDevice::write(uint32_t blockNo, char *buffer) {
+int BlockDevice::write(u_int32_t blockNo, char *buffer) {
 #ifdef DEBUG
     fprintf(stderr, "BlockDevice: Writing block %d\n", blockNo);
 #endif
