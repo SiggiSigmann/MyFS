@@ -31,7 +31,7 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
         //write inode with data to block 10
         //char fileName[NAME_LENGTH] = "empty";
         char* fileName = new char[NAME_LENGTH];
-        strcpy(fileName,"empty");
+        strcpy(fileName,EMPTY_INODE_STRING);
         rootb->createInode(bd,index,fileName,1,100,100,100,100,100,100,100);
         //create new inode struct to store data, size = blockSize
         InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
@@ -47,18 +47,19 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
         rootb->init(bd);
         //get first inode
         InodeStruct* firstInode = (InodeStruct *)malloc(BLOCK_SIZE);
-        firstInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK);
+        firstInode = rootb->getInode(bd,FIRST_INODE_BLOCK);
         
         //test first inode in rootblock
-        REQUIRE(0 ==firstInode->firstDataBlock);
+        REQUIRE(EMPTY_INODE_VALUE ==firstInode->firstDataBlock);
         REQUIRE(strcmp(firstInode->fileName,fileName) == 0);
         free(firstInode);
 
         //get last inode
         InodeStruct* lastInode = (InodeStruct *)malloc(BLOCK_SIZE);
-        lastInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK+NUM_DIR_ENTRIES);
+        //needs to be changed to LAST_INODE_BLOCK
+        lastInode = rootb->getInode(bd,FIRST_INODE_BLOCK+NUM_DIR_ENTRIES-1);
         //test last inode in rootblock
-        REQUIRE(0 ==lastInode->firstDataBlock);
+        REQUIRE(EMPTY_INODE_VALUE ==lastInode->firstDataBlock);
         REQUIRE(strcmp(lastInode->fileName,fileName) == 0);
         free(lastInode);
 
