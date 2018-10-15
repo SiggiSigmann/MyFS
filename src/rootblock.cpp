@@ -35,7 +35,7 @@ InodeStruct* RootBlock::getInode(BlockDevice *bd, uint32_t index){
 void RootBlock::create(BlockDevice*bd){
     //create inodes for rootblock
     for(int i;i <= NUM_DIR_ENTRIES; i++){
-        char fileName[FILENAME_MAX] = "empty";
+        char fileName[NAME_LENGTH] = "empty";
         createInode(bd,I_MAP_FIRST_BLOCK+i, fileName,0,0,0,0,0,0,0,0);
     }
     // printf("Created %i inodes starting from %i\n",NUM_DIR_ENTRIES,I_MAP_FIRST_BLOCK);
