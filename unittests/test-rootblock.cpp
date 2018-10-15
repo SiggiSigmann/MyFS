@@ -18,7 +18,7 @@
 
 #define BD_PATH "/tmp/block.bin"
 
-TEST_CASE( "Test Rootblock", "[RootbLock]" ) {
+TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
     BlockDevice *bd = new BlockDevice(BLOCK_SIZE);
 
     remove(BD_PATH);
