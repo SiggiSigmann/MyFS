@@ -41,7 +41,7 @@ void RootBlock::init(BlockDevice*bd){
         strcpy(fileName,EMPTY_INODE_STRING);
         createInode(bd,FIRST_INODE_BLOCK+i, fileName,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE);
         //printf("Created Inode %i \n",FIRST_INODE_BLOCK+i);
-        delete fileName;
+        delete[] fileName;
     }
     //printf("Created %i inodes starting from %i\n",NUM_DIR_ENTRIES,FIRST_INODE_BLOCK);
 
