@@ -63,7 +63,7 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
         REQUIRE(strcmp(lastInode->fileName,fileName) == 0);
         free(lastInode);
 
-
+        delete[] fileName;
         delete rootb;
 
 
