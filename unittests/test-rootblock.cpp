@@ -44,7 +44,7 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
 
 
         //create rootblock with 64 inodes
-        rootb->create(bd);
+        rootb->init(bd);
         //get first inode
         InodeStruct* firstInode = (InodeStruct *)malloc(BLOCK_SIZE);
         firstInode = rootb->getInode(bd,I_MAP_FIRST_BLOCK);

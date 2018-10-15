@@ -32,7 +32,7 @@ InodeStruct* RootBlock::getInode(BlockDevice *bd, uint32_t index){
 }
 
 //creates the rootblock including all Inodes and writes them on the block device
-void RootBlock::create(BlockDevice*bd){
+void RootBlock::init(BlockDevice*bd){
     //create inodes for rootblock
     for(int i;i <= NUM_DIR_ENTRIES; i++){
         char fileName[NAME_LENGTH] = "empty";
