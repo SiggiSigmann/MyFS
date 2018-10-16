@@ -2,10 +2,10 @@
 #define constants_h
 
 //Requirements:
-#define NAME_LENGTH 255 
-#define BLOCK_SIZE 512
-#define NUM_DIR_ENTRIES 64                 //maximum amount of files
-#define NUM_OPEN_FILES 64                  //maximum amount of open files
+#define NAME_LENGTH (255) 
+#define BLOCK_SIZE (512)
+#define NUM_DIR_ENTRIES (64)                 //maximum amount of files
+#define NUM_OPEN_FILES (64)                  //maximum amount of open files
 
 //TODO add your own constants here
 
@@ -13,7 +13,7 @@
 #define SUPERBLOCK_BLOCK_INDEX (1)
 //important: NUMBER_OF_USABLE_DATABLOCKS needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
 #define NUMBER_OF_USABLE_DATABLOCKS (1 << 18) //2^18 = 262144 blocks => 128 MiB in total
-#define NUMBER_OF_INODES (512) //needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
+#define NUMBER_OF_INODES (NUM_DIR_ENTRIES) //needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
 
 //I-Map
 #define NUMBER_OF_I_MAP_BLOCKS (NUMBER_OF_INODES/BD_BLOCK_SIZE) //can map (4byte int32_t)InodeNumber -> (1byte bool)used, 512-times per I-Map Block (512Bytes)
@@ -41,7 +41,7 @@
 #define LAST_DATA_BLOCK (FIRST_DATA_BLOCK + NUMBER_OF_USABLE_DATABLOCKS)
 
 //indicates the last block of a file in the FAT
-#define END_OF_FILE_ENTRY NUMBER_OF_USABLE_DATABLOCKS + 1
-#define EMPTY_FAT_ENTRY END_OF_FILE_ENTRY + 1
+#define END_OF_FILE_ENTRY (NUMBER_OF_USABLE_DATABLOCKS + 1)
+#define EMPTY_FAT_ENTRY (END_OF_FILE_ENTRY + 1)
 
 #endif
