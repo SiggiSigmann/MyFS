@@ -14,7 +14,7 @@
 #define SUPERBLOCK_BLOCK_INDEX (1)
 //important: NUMBER_OF_USABLE_DATABLOCKS needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
 #define NUMBER_OF_USABLE_DATABLOCKS (1 << 18) //2^18 = 262144 blocks => 128 MiB in total
-#define NUMBER_OF_INODES (NUM_DIR_ENTRIES) //needs to be a multiple of BD_BLOCK_SIZE, to become perfectly mappable
+#define NUMBER_OF_INODES (NUM_DIR_ENTRIES)
 
 //I-Map
 #if ((NUMBER_OF_INODES%BD_BLOCK_SIZE) != 0)
