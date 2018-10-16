@@ -18,9 +18,9 @@
 
 //I-Map
 #if ((NUMBER_OF_INODES%BD_BLOCK_SIZE) != 0)
-#define NUMBER_OF_I_MAP_BLOCKS ((NUMBER_OF_INODES/BD_BLOCK_SIZE)+1)//one more block than else case to store non-perfect-mappable inodes (inode numbers that differ multiples of BD_BLOCK_SIZE)
+#define NUMBER_OF_I_MAP_BLOCKS ((NUMBER_OF_INODES/BD_BLOCK_SIZE)+1) //one more block than else case to store non-perfect-mappable inodes (inode numbers that differ multiples of BD_BLOCK_SIZE)
 #else
-#define NUMBER_OF_I_MAP_BLOCKS (NUMBER_OF_INODES/BD_BLOCK_SIZE)//can map (4byte int32_t)InodeNumber -> (1byte bool)used, 512-times per I-Map Block (512Bytes)
+#define NUMBER_OF_I_MAP_BLOCKS (NUMBER_OF_INODES/BD_BLOCK_SIZE) //can map (4byte int32_t)InodeNumber -> (1byte bool)used, 512-times per I-Map Block (512Bytes)
 #endif
 #define I_MAP_FIRST_BLOCK (SUPERBLOCK_BLOCK_INDEX + 1)
 #define I_MAP_LAST_BLOCK (I_MAP_FIRST_BLOCK + NUMBER_OF_I_MAP_BLOCKS - 1)
