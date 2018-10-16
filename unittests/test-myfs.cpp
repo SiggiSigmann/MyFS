@@ -55,67 +55,67 @@ TEST_CASE( "Write/Read Superblock", "[superblock]" ) {
     
     SECTION("writing Superblock") {
         //copy Superblock (deep copy)
-        MyFS::Superblock originalSuperblock = myfs->superblock;
-        originalSuperblock.uNumber_of_free_inodes = 21;
+        SuperblockStruct* originalSuperblock = myfs->superblock->superblockStruct;
+        originalSuperblock->uNumber_of_free_inodes = 21;
 
         //fill superblock struct with custom values
-        myfs->superblock.uSUPERBLOCK_BLOCK_INDEX = 2;
-        myfs->superblock.uNUMBER_OF_USABLE_DATABLOCKS = 3;
-        myfs->superblock.uNUMBER_OF_INODES = 4;
-        myfs->superblock.uNUMBER_OF_I_MAP_BLOCKS = 5;
-        myfs->superblock.uI_MAP_FIRST_BLOCK = 6;
-        myfs->superblock.uI_MAP_LAST_BLOCK = 7;
-        myfs->superblock.uNUMBER_OF_INODE_BLOCKS = 8;
-        myfs->superblock.uFIRST_INODE_BLOCK = 9;
-        myfs->superblock.uLAST_INODE_BLOCK = 10;
-        myfs->superblock.uNUMBER_OF_D_MAP_BLOCKS = 11;
-        myfs->superblock.uD_MAP_FIRST_BLOCK = 12;
-        myfs->superblock.uD_MAP_LAST_BLOCK = 13;
-        myfs->superblock.uFAT_SIZE_IN_BYTES = 14;
-        myfs->superblock.uNUMBER_OF_FAT_BLOCKS = 15;
-        myfs->superblock.uFAT_FIRST_BLOCK = 16;
-        myfs->superblock.uFAT_LAST_BLOCK = 17;
-        myfs->superblock.uFIRST_DATA_BLOCK = 18;
-        myfs->superblock.uLAST_DATA_BLOCK = 19;
-        myfs->superblock.uNumber_of_free_inodes = 20;
-        myfs->superblock.uFirst_free_inode = 21;
-        myfs->superblock.uNumber_of_free_blocks = 22;
-        myfs->superblock.uFirst_free_block = 23;
+        myfs->superblock->superblockStruct->uSUPERBLOCK_BLOCK_INDEX = 2;
+        myfs->superblock->superblockStruct->uNUMBER_OF_USABLE_DATABLOCKS = 3;
+        myfs->superblock->superblockStruct->uNUMBER_OF_INODES = 4;
+        myfs->superblock->superblockStruct->uNUMBER_OF_I_MAP_BLOCKS = 5;
+        myfs->superblock->superblockStruct->uI_MAP_FIRST_BLOCK = 6;
+        myfs->superblock->superblockStruct->uI_MAP_LAST_BLOCK = 7;
+        myfs->superblock->superblockStruct->uNUMBER_OF_INODE_BLOCKS = 8;
+        myfs->superblock->superblockStruct->uFIRST_INODE_BLOCK = 9;
+        myfs->superblock->superblockStruct->uLAST_INODE_BLOCK = 10;
+        myfs->superblock->superblockStruct->uNUMBER_OF_D_MAP_BLOCKS = 11;
+        myfs->superblock->superblockStruct->uD_MAP_FIRST_BLOCK = 12;
+        myfs->superblock->superblockStruct->uD_MAP_LAST_BLOCK = 13;
+        myfs->superblock->superblockStruct->uFAT_SIZE_IN_BYTES = 14;
+        myfs->superblock->superblockStruct->uNUMBER_OF_FAT_BLOCKS = 15;
+        myfs->superblock->superblockStruct->uFAT_FIRST_BLOCK = 16;
+        myfs->superblock->superblockStruct->uFAT_LAST_BLOCK = 17;
+        myfs->superblock->superblockStruct->uFIRST_DATA_BLOCK = 18;
+        myfs->superblock->superblockStruct->uLAST_DATA_BLOCK = 19;
+        myfs->superblock->superblockStruct->uNumber_of_free_inodes = 20;
+        myfs->superblock->superblockStruct->uFirst_free_inode_index = 21;
+        myfs->superblock->superblockStruct->uNumber_of_free_blocks = 22;
+        myfs->superblock->superblockStruct->uFirst_free_block_index = 23;
         //write Superblock
-        myfs->writeSuperblock(bd);
+        myfs->superblock->writeSuperblock(bd);
 
         //modify Superblock
-        myfs->superblock.uNumber_of_free_inodes = 1337;
+        myfs->superblock->superblockStruct->uNumber_of_free_inodes = 1337;
 
         //read Superblock
-        myfs->readSuperblock(bd);
+        myfs->superblock->readSuperblock(bd);
 
         //validate that the deep copy is still unchanged
-        REQUIRE(originalSuperblock.uNumber_of_free_inodes == 21);
+        REQUIRE(originalSuperblock->uNumber_of_free_inodes == 21);
         
         //validate the superblock custom values
-        REQUIRE(myfs->superblock.uSUPERBLOCK_BLOCK_INDEX == 2);
-        REQUIRE(myfs->superblock.uNUMBER_OF_USABLE_DATABLOCKS == 3);
-        REQUIRE(myfs->superblock.uNUMBER_OF_INODES == 4);
-        REQUIRE(myfs->superblock.uNUMBER_OF_I_MAP_BLOCKS == 5);
-        REQUIRE(myfs->superblock.uI_MAP_FIRST_BLOCK == 6);
-        REQUIRE(myfs->superblock.uI_MAP_LAST_BLOCK == 7);
-        REQUIRE(myfs->superblock.uNUMBER_OF_INODE_BLOCKS == 8);
-        REQUIRE(myfs->superblock.uFIRST_INODE_BLOCK == 9);
-        REQUIRE(myfs->superblock.uLAST_INODE_BLOCK == 10);
-        REQUIRE(myfs->superblock.uNUMBER_OF_D_MAP_BLOCKS == 11);
-        REQUIRE(myfs->superblock.uD_MAP_FIRST_BLOCK == 12);
-        REQUIRE(myfs->superblock.uD_MAP_LAST_BLOCK == 13);
-        REQUIRE(myfs->superblock.uFAT_SIZE_IN_BYTES == 14);
-        REQUIRE(myfs->superblock.uNUMBER_OF_FAT_BLOCKS == 15);
-        REQUIRE(myfs->superblock.uFAT_FIRST_BLOCK == 16);
-        REQUIRE(myfs->superblock.uFAT_LAST_BLOCK == 17);
-        REQUIRE(myfs->superblock.uFIRST_DATA_BLOCK == 18);
-        REQUIRE(myfs->superblock.uLAST_DATA_BLOCK == 19);
-        REQUIRE(myfs->superblock.uNumber_of_free_inodes == 20);
-        REQUIRE(myfs->superblock.uFirst_free_inode == 21);
-        REQUIRE(myfs->superblock.uNumber_of_free_blocks == 22);
-        REQUIRE(myfs->superblock.uFirst_free_block == 23);
+        REQUIRE(myfs->superblock->superblockStruct->uSUPERBLOCK_BLOCK_INDEX == 2);
+        REQUIRE(myfs->superblock->superblockStruct->uNUMBER_OF_USABLE_DATABLOCKS == 3);
+        REQUIRE(myfs->superblock->superblockStruct->uNUMBER_OF_INODES == 4);
+        REQUIRE(myfs->superblock->superblockStruct->uNUMBER_OF_I_MAP_BLOCKS == 5);
+        REQUIRE(myfs->superblock->superblockStruct->uI_MAP_FIRST_BLOCK == 6);
+        REQUIRE(myfs->superblock->superblockStruct->uI_MAP_LAST_BLOCK == 7);
+        REQUIRE(myfs->superblock->superblockStruct->uNUMBER_OF_INODE_BLOCKS == 8);
+        REQUIRE(myfs->superblock->superblockStruct->uFIRST_INODE_BLOCK == 9);
+        REQUIRE(myfs->superblock->superblockStruct->uLAST_INODE_BLOCK == 10);
+        REQUIRE(myfs->superblock->superblockStruct->uNUMBER_OF_D_MAP_BLOCKS == 11);
+        REQUIRE(myfs->superblock->superblockStruct->uD_MAP_FIRST_BLOCK == 12);
+        REQUIRE(myfs->superblock->superblockStruct->uD_MAP_LAST_BLOCK == 13);
+        REQUIRE(myfs->superblock->superblockStruct->uFAT_SIZE_IN_BYTES == 14);
+        REQUIRE(myfs->superblock->superblockStruct->uNUMBER_OF_FAT_BLOCKS == 15);
+        REQUIRE(myfs->superblock->superblockStruct->uFAT_FIRST_BLOCK == 16);
+        REQUIRE(myfs->superblock->superblockStruct->uFAT_LAST_BLOCK == 17);
+        REQUIRE(myfs->superblock->superblockStruct->uFIRST_DATA_BLOCK == 18);
+        REQUIRE(myfs->superblock->superblockStruct->uLAST_DATA_BLOCK == 19);
+        REQUIRE(myfs->superblock->superblockStruct->uNumber_of_free_inodes == 20);
+        REQUIRE(myfs->superblock->superblockStruct->uFirst_free_inode_index == 21);
+        REQUIRE(myfs->superblock->superblockStruct->uNumber_of_free_blocks == 22);
+        REQUIRE(myfs->superblock->superblockStruct->uFirst_free_block_index == 23);
     }
 
     bd.close();

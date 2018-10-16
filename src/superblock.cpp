@@ -1,0 +1,132 @@
+#include "superblock.h"
+#include "myfs.h"
+
+/*
+Initialize the Superblock.
+*/
+Superblock::Superblock(){
+    superblockStruct = new SuperblockStruct();
+    superblockStruct->uNumber_of_free_inodes = NUMBER_OF_INODES;
+    superblockStruct->uFirst_free_inode = 0;
+    superblockStruct->uNumber_of_free_blocks = uNUMBER_OF_USABLE_DATABLOCKS;
+    superblockStruct->uFirst_free_block_index = 0;
+}
+
+/*
+Clear the memory allocated by the Superblock.
+*/
+Superblock::~Superblock(){
+    delete superblockStruct;
+}
+
+/*
+Writes the Superblock to the BlockDevice.
+*/
+void Superblock::writeSuperblock(BlockDevice bd){
+    char* buffer = new char[BD_BLOCK_SIZE];
+    //Serialization of the Superblock
+    uint32_t* ptrBuffer = (uint32_t*) buffer;
+
+    //general specs
+    *ptrBuffer++ = superblockStruct->uSUPERBLOCK_BLOCK_INDEX;
+    *ptrBuffer++ = superblockStruct->uNUMBER_OF_USABLE_DATABLOCKS;
+    *ptrBuffer++ = superblockStruct->uNUMBER_OF_INODES;
+
+    //I-Map
+    *ptrBuffer++ = superblockStruct->uNUMBER_OF_I_MAP_BLOCKS;
+    *ptrBuffer++ = superblockStruct->uI_MAP_FIRST_BLOCK;
+    *ptrBuffer++ = superblockStruct->uI_MAP_LAST_BLOCK;
+
+    //Inodes
+    *ptrBuffer++ = superblockStruct->uNUMBER_OF_INODE_BLOCKS;
+    *ptrBuffer++ = superblockStruct->uFIRST_INODE_BLOCK;
+    *ptrBuffer++ = superblockStruct->uLAST_INODE_BLOCK;
+
+    //D-Map
+    *ptrBuffer++ = superblockStruct->uNUMBER_OF_D_MAP_BLOCKS;
+    *ptrBuffer++ = superblockStruct->uD_MAP_FIRST_BLOCK;
+    *ptrBuffer++ = superblockStruct->uD_MAP_LAST_BLOCK;
+
+    //FAT
+    *ptrBuffer++ = superblockStruct->uFAT_SIZE_IN_BYTES;
+    *ptrBuffer++ = superblockStruct->uNUMBER_OF_FAT_BLOCKS;
+    *ptrBuffer++ = superblockStruct->uFAT_FIRST_BLOCK;
+    *ptrBuffer++ = superblockStruct->uFAT_LAST_BLOCK;
+
+    //Data Blocks
+    *ptrBuffer++ = superblockStruct->uFIRST_DATA_BLOCK;
+    *ptrBuffer++ = superblockStruct->uLAST_DATA_BLOCK;
+
+    //runtime calculated values
+    *ptrBuffer++ = superblockStruct->uNumber_of_free_inodes;
+    *ptrBuffer++ = superblockStruct->uFirst_free_inode;
+    *ptrBuffer++ = superblockStruct->uNumber_of_free_blocks;
+    *ptrBuffer++ = superblockStruct->uFirst_free_block;
+
+    //Write the Superblock
+    writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
+    delete [] buffer;
+}
+
+/*
+Reads the Superblock from the block device into the Superblock data structure.
+*/
+void Superblock::readSuperblock(BlockDevice bd){
+    char* buffer = readBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
+    uint32_t* ptrBuffer = (uint32_t*) buffer;
+    
+    //general specs
+    superblockStruct->uSUPERBLOCK_BLOCK_INDEX = *ptrBuffer++;
+    superblockStruct->uNUMBER_OF_USABLE_DATABLOCKS = *ptrBuffer++;
+    superblockStruct->uNUMBER_OF_INODES = *ptrBuffer++;
+
+    //I-Map
+    superblockStruct->uNUMBER_OF_I_MAP_BLOCKS = *ptrBuffer++;
+    superblockStruct->uI_MAP_FIRST_BLOCK = *ptrBuffer++;
+    superblockStruct->uI_MAP_LAST_BLOCK = *ptrBuffer++;
+
+    //Inodes
+    superblockStruct->uNUMBER_OF_INODE_BLOCKS = *ptrBuffer++;
+    superblockStruct->uFIRST_INODE_BLOCK = *ptrBuffer++;
+    superblockStruct->uLAST_INODE_BLOCK = *ptrBuffer++;
+
+    //D-Map
+    superblockStruct->uNUMBER_OF_D_MAP_BLOCKS = *ptrBuffer++;
+    superblockStruct->uD_MAP_FIRST_BLOCK = *ptrBuffer++;
+    superblockStruct->uD_MAP_LAST_BLOCK = *ptrBuffer++;
+
+    //FAT
+    superblockStruct->uFAT_SIZE_IN_BYTES = *ptrBuffer++;
+    superblockStruct->uNUMBER_OF_FAT_BLOCKS = *ptrBuffer++;
+    superblockStruct->uFAT_FIRST_BLOCK = *ptrBuffer++;
+    superblockStruct->uFAT_LAST_BLOCK = *ptrBuffer++;
+
+    //Data Blocks
+    superblockStruct->uFIRST_DATA_BLOCK = *ptrBuffer++;
+    superblockStruct->uLAST_DATA_BLOCK = *ptrBuffer++;
+
+    //runtime calculated values
+    superblockStruct->uNumber_of_free_inodes = *ptrBuffer++;
+    superblockStruct->uFirst_free_inode = *ptrBuffer++;
+    superblockStruct->uNumber_of_free_blocks = *ptrBuffer++;
+    superblockStruct->uFirst_free_block = *ptrBuffer++;
+
+    delete [] buffer;    
+}
+
+
+void updateNumberOfFreeInodes(uint32_t newNumber){
+    super->uNumber_of_free_inodes = newNumber;
+}
+
+void updateFirstFreeInodeIndex(uint32_t newIndex){
+    super->uFirst_free_inode_index = newIndex;
+}
+
+void updateNumberOfFreeBlocks(uint32_t newNumber){
+    super->uNumber_of_free_blocks = newNumber;
+}
+
+void updateFirstFreeBlockIndex(uint32_t newIndex){
+    super->uFirst_free_block_index = newIndex;
+}

@@ -6,7 +6,6 @@ Manage the rootblock of the FS
 #define rootblock_h
 
 #include "constants.h"
-#include <cstdint>
 
 //define what values a inode must contain
 struct InodeStruct{

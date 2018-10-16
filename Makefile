@@ -76,6 +76,7 @@ TSRCDIR = unittests
 
 # object files for target unittests TODO: add new object files here
 UNITTEST_OBJS = $(OBJDIR)/main.o \
+	$(OBJDIR)/superblock.o \
 	$(OBJDIR)/blockdevice.o \
 	$(OBJDIR)/imap.o \
 	$(OBJDIR)/dmap.o \
