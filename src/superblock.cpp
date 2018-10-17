@@ -114,20 +114,18 @@ void Superblock::readSuperblock(BlockDevice bd){
     delete [] buffer;    
 }
 
- /*
-void updateNumberOfFreeInodes(uint32_t newNumber){
-    super->uNumber_of_free_inodes = newNumber;
+void Superblock::updateNumberOfFreeInodes(uint32_t newNumber){
+    superblockStruct->uNumber_of_free_inodes = newNumber;
 }
 
-void updateFirstFreeInodeIndex(uint32_t newIndex){
-    super->uFirst_free_inode_index = newIndex;
+void Superblock::updateFirstFreeInodeIndex(uint32_t newIndex){
+    superblockStruct->uFirst_free_inode_index = newIndex;
 }
 
-void updateNumberOfFreeBlocks(uint32_t newNumber){
-    super->uNumber_of_free_blocks = newNumber;
+void Superblock::updateNumberOfFreeBlocks(uint32_t newNumber){
+    superblockStruct->uNumber_of_free_blocks = newNumber;
 }
 
-void updateFirstFreeBlockIndex(uint32_t newIndex){
-    super->uFirst_free_block_index = newIndex;
+void Superblock::updateFirstFreeBlockIndex(uint32_t newIndex){
+    superblockStruct->uFirst_free_block_index = newIndex;
 }
-*/

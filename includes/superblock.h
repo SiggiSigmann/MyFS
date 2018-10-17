@@ -57,12 +57,10 @@ class Superblock{
         SuperblockStruct *superblockStruct;
         Superblock();
         ~Superblock();
-        /*
         void updateNumberOfFreeInodes(uint32_t newNumber);
         void updateFirstFreeInodeIndex(uint32_t newIndex);
         void updateNumberOfFreeBlocks(uint32_t newNumber);
         void updateFirstFreeBlockIndex(uint32_t newIndex);
-        */
         void writeSuperblock(BlockDevice bd);
         void readSuperblock(BlockDevice bd);
 };
