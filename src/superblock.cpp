@@ -7,8 +7,8 @@ Initialize the Superblock.
 Superblock::Superblock(){
     superblockStruct = new SuperblockStruct();
     superblockStruct->uNumber_of_free_inodes = NUMBER_OF_INODES;
-    superblockStruct->uFirst_free_inode = 0;
-    superblockStruct->uNumber_of_free_blocks = uNUMBER_OF_USABLE_DATABLOCKS;
+    superblockStruct->uFirst_free_inode_index = 0;
+    superblockStruct->uNumber_of_free_blocks = NUMBER_OF_USABLE_DATABLOCKS;
     superblockStruct->uFirst_free_block_index = 0;
 }
 
@@ -59,9 +59,9 @@ void Superblock::writeSuperblock(BlockDevice bd){
 
     //runtime calculated values
     *ptrBuffer++ = superblockStruct->uNumber_of_free_inodes;
-    *ptrBuffer++ = superblockStruct->uFirst_free_inode;
+    *ptrBuffer++ = superblockStruct->uFirst_free_inode_index;
     *ptrBuffer++ = superblockStruct->uNumber_of_free_blocks;
-    *ptrBuffer++ = superblockStruct->uFirst_free_block;
+    *ptrBuffer++ = superblockStruct->uFirst_free_block_index;
 
     //Write the Superblock
     writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
@@ -107,14 +107,14 @@ void Superblock::readSuperblock(BlockDevice bd){
 
     //runtime calculated values
     superblockStruct->uNumber_of_free_inodes = *ptrBuffer++;
-    superblockStruct->uFirst_free_inode = *ptrBuffer++;
+    superblockStruct->uFirst_free_inode_index = *ptrBuffer++;
     superblockStruct->uNumber_of_free_blocks = *ptrBuffer++;
-    superblockStruct->uFirst_free_block = *ptrBuffer++;
-
+    superblockStruct->uFirst_free_block_index = *ptrBuffer++;
+    //
     delete [] buffer;    
 }
 
-
+ /*
 void updateNumberOfFreeInodes(uint32_t newNumber){
     super->uNumber_of_free_inodes = newNumber;
 }
@@ -130,3 +130,4 @@ void updateNumberOfFreeBlocks(uint32_t newNumber){
 void updateFirstFreeBlockIndex(uint32_t newIndex){
     super->uFirst_free_block_index = newIndex;
 }
+*/
