@@ -9,7 +9,7 @@ RUN apt-get update &&\
                     libfuse2=2.9.4-1ubuntu3.1 \
                     make=4.1-6 \
                     pkg-config=0.29.1-0ubuntu1 \
-                    -y
+                    vim-common \
 
 COPY CMakeLists.txt Makefile /MyFS/
 COPY includes /MyFS/includes/

@@ -2,17 +2,35 @@
 //  mk.myfs.cpp
 //  myfs
 //
-//  Created by Oliver Waldhorst on 07.09.17.
-//  Copyright © 2017 Oliver Waldhorst. All rights reserved.
-//
+//  Created by Oliveriltus Waldhorst on 07.09.17.
+
 
 #include "myfs.h"
 #include "blockdevice.h"
 #include "macros.h"
+#include <iostream>
+#include "constants.h"
+
+
 
 int main(int argc, char *argv[]) {
+    //std::cout << argc << std::endl;
+    //for (int i = 0; i < argc; ++i) {
+    //    std::cout << argv[i] << std::endl;
+    //}
 
-    // TODO: Implement file system generation & copying of files here
+    if(argc > 1){
+        BlockDevice* bd = new BlockDevice(BLOCK_SIZE);
+        bd->create(argv[1]);
+
+
+
+
+
+
+
+        return 0;
+    }
     
-    return 0;
+    return -1;
 }
