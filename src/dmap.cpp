@@ -5,7 +5,11 @@
 Initialize the DMap.
 */
 DMap::DMap(){
+    dMapStruct = new DMapStruct();
     dMapStruct->dataBlockMap = new bool[NUMBER_OF_USABLE_DATABLOCKS];
+    for(int i =0; i<NUMBER_OF_USABLE_DATABLOCKS; i++){
+        dMapStruct->dataBlockMap[i]=0;
+    }
 }
 
 /*
