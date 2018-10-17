@@ -1,5 +1,6 @@
 #ifndef constants_h
 #define constants_h
+#include <cstdint>
 
 //Requirements:
 #define NAME_LENGTH (255) 

@@ -25,11 +25,13 @@ TARGETS = mount.myfs mkfs.myfs unittest
 
 # object files for target mkfs.myfs TODO: add new object files here
 MKFS_MYFS_OBJS = $(OBJDIR)/blockdevice.o \
+$(OBJDIR)/superblock.o \
 	$(OBJDIR)/myfs.o \
 	$(OBJDIR)/mkfs.myfs.o
 
 # object files for target mount.myfs TODO: add new object files here
 MOUNT_MYFS_OBJS = $(OBJDIR)/blockdevice.o \
+	$(OBJDIR)/superblock.o \
 	$(OBJDIR)/myfs.o \
 	$(OBJDIR)/wrap.o \
 	$(OBJDIR)/mount.myfs.o
@@ -76,6 +78,7 @@ TSRCDIR = unittests
 
 # object files for target unittests TODO: add new object files here
 UNITTEST_OBJS = $(OBJDIR)/main.o \
+	$(OBJDIR)/superblock.o \
 	$(OBJDIR)/blockdevice.o \
 	$(OBJDIR)/imap.o \
 	$(OBJDIR)/dmap.o \

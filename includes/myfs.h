@@ -15,6 +15,7 @@
 
 #include "blockdevice.h"
 #include "constants.h"
+#include "superblock.h"
 
 #include "dmap.h"
 #include "fat.h"
@@ -23,57 +24,17 @@ class MyFS {
 private:
     static MyFS *_instance;
     FILE *logFile;
-    
+
 public:
     static MyFS *Instance();
-    
+
     // TODO: Add attributes of your file system here
-    
-    struct Superblock {
-        /*
-        Superblock | I-Map | Inodes | D-Map | FAT | Data Blocks
-        */
 
-        //general specs
-        uint32_t uSUPERBLOCK_BLOCK_INDEX = SUPERBLOCK_BLOCK_INDEX;
-        uint32_t uNUMBER_OF_USABLE_DATABLOCKS = NUMBER_OF_USABLE_DATABLOCKS;
-        uint32_t uNUMBER_OF_INODES = NUMBER_OF_INODES;
-
-        //I-Map
-        uint32_t uNUMBER_OF_I_MAP_BLOCKS = NUMBER_OF_I_MAP_BLOCKS;
-        uint32_t uI_MAP_FIRST_BLOCK = I_MAP_FIRST_BLOCK;
-        uint32_t uI_MAP_LAST_BLOCK = I_MAP_LAST_BLOCK;
-
-        //Inodes
-        uint32_t uNUMBER_OF_INODE_BLOCKS = NUMBER_OF_INODE_BLOCKS;
-        uint32_t uFIRST_INODE_BLOCK = FIRST_INODE_BLOCK;
-        uint32_t uLAST_INODE_BLOCK = LAST_INODE_BLOCK;
-
-        //D-Map
-        uint32_t uNUMBER_OF_D_MAP_BLOCKS = NUMBER_OF_D_MAP_BLOCKS; //can map (4byte int32_t)BlockNumber -> (1byte bool)used, 512-times per D-Map Block (512Bytes)
-        uint32_t uD_MAP_FIRST_BLOCK = D_MAP_FIRST_BLOCK;
-        uint32_t uD_MAP_LAST_BLOCK = D_MAP_LAST_BLOCK;
-
-        //FAT
-        uint32_t uFAT_SIZE_IN_BYTES = FAT_SIZE_IN_BYTES; //mapping requires sizeof(uint32_t)=4bytes per block: (uint32_t)blockIndex -> (uint32_t)nextBlockIndex
-        uint32_t uNUMBER_OF_FAT_BLOCKS = NUMBER_OF_FAT_BLOCKS;
-        uint32_t uFAT_FIRST_BLOCK = FAT_FIRST_BLOCK;
-        uint32_t uFAT_LAST_BLOCK = FAT_LAST_BLOCK;
-
-        //Data Blocks
-        uint32_t uFIRST_DATA_BLOCK = FIRST_DATA_BLOCK;
-        uint32_t uLAST_DATA_BLOCK = LAST_DATA_BLOCK;
-
-        //runtime calculated values
-        uint32_t uNumber_of_free_inodes;
-        uint32_t uFirst_free_inode;
-        uint32_t uNumber_of_free_blocks;
-        uint32_t uFirst_free_block;
-    } superblock;
+    Superblock* superblock;
 
     MyFS();
     ~MyFS();
-    
+
     // --- Methods called by FUSE ---
     // For Documentation see https://libfuse.github.io/doxygen/structfuse__operations.html
     int fuseGetattr(const char *path, struct stat *statbuf);
@@ -113,7 +74,7 @@ public:
     int fuseTruncate(const char *path, off_t offset, struct fuse_file_info *fileInfo);
     int fuseCreate(const char *, mode_t, struct fuse_file_info *);
     void fuseDestroy();
-    
+
     // TODO: Add methods of your file system here
     void writeSuperblock(BlockDevice bd);
     void readSuperblock(BlockDevice bd);

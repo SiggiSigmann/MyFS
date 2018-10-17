@@ -31,10 +31,11 @@ MyFS* MyFS::Instance() {
 
 MyFS::MyFS() {
     this->logFile= stderr;
+    superblock = new Superblock();
 }
 
 MyFS::~MyFS() {
-    
+    delete superblock;
 }
 
 int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
@@ -314,100 +315,6 @@ char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
         delete [] remainderBlockBytes;
     }
     return readBuffer;
-}
-/*
-Writes the Superblock to the BlockDevice.
-*/
-void MyFS::writeSuperblock(BlockDevice bd) {
-    char* buffer = new char[BD_BLOCK_SIZE];
-    //Serialization of the Superblock
-    uint32_t* ptrBuffer = (uint32_t*) buffer;
-
-    //general specs
-    *ptrBuffer++ = MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX;
-    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_USABLE_DATABLOCKS;
-    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_INODES;
-
-    //I-Map
-    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_I_MAP_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.uI_MAP_FIRST_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.uI_MAP_LAST_BLOCK;
-
-    //Inodes
-    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_INODE_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.uFIRST_INODE_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.uLAST_INODE_BLOCK;
-
-    //D-Map
-    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_D_MAP_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.uD_MAP_FIRST_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.uD_MAP_LAST_BLOCK;
-
-    //FAT
-    *ptrBuffer++ = MyFS::superblock.uFAT_SIZE_IN_BYTES;
-    *ptrBuffer++ = MyFS::superblock.uNUMBER_OF_FAT_BLOCKS;
-    *ptrBuffer++ = MyFS::superblock.uFAT_FIRST_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.uFAT_LAST_BLOCK;
-
-    //Data Blocks
-    *ptrBuffer++ = MyFS::superblock.uFIRST_DATA_BLOCK;
-    *ptrBuffer++ = MyFS::superblock.uLAST_DATA_BLOCK;
-
-    //runtime calculated values
-    *ptrBuffer++ = MyFS::superblock.uNumber_of_free_inodes;
-    *ptrBuffer++ = MyFS::superblock.uFirst_free_inode;
-    *ptrBuffer++ = MyFS::superblock.uNumber_of_free_blocks;
-    *ptrBuffer++ = MyFS::superblock.uFirst_free_block;
-
-    //Write the Superblock
-    writeBytes(bd, MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
-    delete [] buffer;
-}
-
-/*
-Reads the Superblock from the BlockDevice into the Superblock struct.
-*/
-void MyFS::readSuperblock(BlockDevice bd) {
-    char* buffer = readBytes(bd, MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
-    uint32_t* ptrBuffer = (uint32_t*) buffer;
-    
-    //general specs
-    MyFS::superblock.uSUPERBLOCK_BLOCK_INDEX = *ptrBuffer++;
-    MyFS::superblock.uNUMBER_OF_USABLE_DATABLOCKS = *ptrBuffer++;
-    MyFS::superblock.uNUMBER_OF_INODES = *ptrBuffer++;
-
-    //I-Map
-    MyFS::superblock.uNUMBER_OF_I_MAP_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.uI_MAP_FIRST_BLOCK = *ptrBuffer++;
-    MyFS::superblock.uI_MAP_LAST_BLOCK = *ptrBuffer++;
-
-    //Inodes
-    MyFS::superblock.uNUMBER_OF_INODE_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.uFIRST_INODE_BLOCK = *ptrBuffer++;
-    MyFS::superblock.uLAST_INODE_BLOCK = *ptrBuffer++;
-
-    //D-Map
-    MyFS::superblock.uNUMBER_OF_D_MAP_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.uD_MAP_FIRST_BLOCK = *ptrBuffer++;
-    MyFS::superblock.uD_MAP_LAST_BLOCK = *ptrBuffer++;
-
-    //FAT
-    MyFS::superblock.uFAT_SIZE_IN_BYTES = *ptrBuffer++;
-    MyFS::superblock.uNUMBER_OF_FAT_BLOCKS = *ptrBuffer++;
-    MyFS::superblock.uFAT_FIRST_BLOCK = *ptrBuffer++;
-    MyFS::superblock.uFAT_LAST_BLOCK = *ptrBuffer++;
-
-    //Data Blocks
-    MyFS::superblock.uFIRST_DATA_BLOCK = *ptrBuffer++;
-    MyFS::superblock.uLAST_DATA_BLOCK = *ptrBuffer++;
-
-    //runtime calculated values
-    MyFS::superblock.uNumber_of_free_inodes = *ptrBuffer++;
-    MyFS::superblock.uFirst_free_inode = *ptrBuffer++;
-    MyFS::superblock.uNumber_of_free_blocks = *ptrBuffer++;
-    MyFS::superblock.uFirst_free_block = *ptrBuffer++;
-
-    delete [] buffer;
 }
 
 /*
