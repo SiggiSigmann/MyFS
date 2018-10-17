@@ -6,7 +6,7 @@
 #define BLOCK_SIZE (512)
 #define NUM_DIR_ENTRIES (64) //maximum amount of files
 #define NUM_OPEN_FILES (64) //maximum amount of open files
-#define BD_BLOCK_SIZE 512
+#define BD_BLOCK_SIZE (512)
 
 //TODO add your own constants here
 
