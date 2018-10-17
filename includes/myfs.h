@@ -15,7 +15,7 @@
 
 #include "blockdevice.h"
 #include "constants.h"
-#include "myfs-structs.h"
+
 #include "dmap.h"
 #include "fat.h"
 

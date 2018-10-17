@@ -13,8 +13,7 @@
 
 #include <stdio.h>
 #include <cstdint>
-
-#define BD_BLOCK_SIZE 512
+#include "constants.h"
 
 class BlockDevice {
 private:
