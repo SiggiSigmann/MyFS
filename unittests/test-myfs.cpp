@@ -54,10 +54,6 @@ TEST_CASE( "Write/Read Superblock", "[superblock]" ) {
     MyFS* myfs = new MyFS();
     
     SECTION("writing Superblock") {
-        //copy Superblock (deep copy)
-        SuperblockStruct* originalSuperblock = myfs->superblock->superblockStruct;
-        originalSuperblock->uNumber_of_free_inodes = 21;
-
         //fill superblock struct with custom values
         myfs->superblock->superblockStruct->uSUPERBLOCK_BLOCK_INDEX = 2;
         myfs->superblock->superblockStruct->uNUMBER_OF_USABLE_DATABLOCKS = 3;
@@ -89,9 +85,6 @@ TEST_CASE( "Write/Read Superblock", "[superblock]" ) {
 
         //read Superblock
         myfs->superblock->readSuperblock(bd);
-
-        //validate that the deep copy is still unchanged
-        REQUIRE(originalSuperblock->uNumber_of_free_inodes == 21);
         
         //validate the superblock custom values
         REQUIRE(myfs->superblock->superblockStruct->uSUPERBLOCK_BLOCK_INDEX == 2);
