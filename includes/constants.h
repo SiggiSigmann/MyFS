@@ -7,7 +7,7 @@
 #define BLOCK_SIZE (512)
 #define NUM_DIR_ENTRIES (64) //maximum amount of files
 #define NUM_OPEN_FILES (64) //maximum amount of open files
-#define BD_BLOCK_SIZE 512
+#define BD_BLOCK_SIZE (512)
 
 //TODO add your own constants here
 
@@ -29,6 +29,8 @@
 #define NUMBER_OF_INODE_BLOCKS (NUMBER_OF_INODES) //one block for each inode
 #define FIRST_INODE_BLOCK (I_MAP_LAST_BLOCK + 1)
 #define LAST_INODE_BLOCK (FIRST_INODE_BLOCK + NUMBER_OF_INODE_BLOCKS - 1)
+#define EMPTY_INODE_VALUE -1
+#define EMPTY_INODE_STRING "empty"
 
 //D-Map
 #if ((NUMBER_OF_USABLE_DATABLOCKS%BD_BLOCK_SIZE) != 0)
@@ -56,6 +58,5 @@
 //indicates the last block of a file in the FAT
 #define END_OF_FILE_ENTRY (NUMBER_OF_USABLE_DATABLOCKS + 1)
 #define EMPTY_FAT_ENTRY (END_OF_FILE_ENTRY + 1)
-
 
 #endif
