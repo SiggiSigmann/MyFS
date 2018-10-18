@@ -17,6 +17,7 @@ Clear the memory allocated by the DMap.
 */
 DMap::~DMap(){
     delete[] dMapStruct->dataBlockMap;
+    delete dMapStruct;
 }
 
 /*
