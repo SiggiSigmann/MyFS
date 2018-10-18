@@ -1,3 +1,4 @@
 docker build -t test-machine .
 docker run -it test-machine bash
 docker kill $(docker ps -q)
+docker build -t test-machine . && docker run -it test-machine bash
