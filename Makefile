@@ -8,13 +8,13 @@ SRCDIR = src
 OBJDIR = obj
 
 # c compiler flags
-CFLAGS = -g -Wall -I$(HEADERDIR) -DFUSE_USE_VERSION=26 `pkg-config fuse --cflags`
+CFLAGS = -fprofile-arcs -ftest-coverage -g -Wall -I$(HEADERDIR) -DFUSE_USE_VERSION=26 `pkg-config fuse --cflags`
 
 # c++ compiler flags
-CPPFLAGS = -std=gnu++11 -g -Wall -I$(HEADERDIR) -DFUSE_USE_VERSION=26 `pkg-config fuse --cflags`
+CPPFLAGS = -fprofile-arcs -ftest-coverage -std=gnu++11 -g -Wall -I$(HEADERDIR) -DFUSE_USE_VERSION=26 `pkg-config fuse --cflags`
 
 # linker flags
-LINKFLAGS = -g -Wall
+LINKFLAGS = -fprofile-arcs -ftest-coverage -g -Wall
 #LINKFLAGS = -Wall -L/usr/local/lib -losxfuse
 
 # libraries
