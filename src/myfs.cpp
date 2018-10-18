@@ -271,7 +271,7 @@ void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
 
     // write all perfect blocks
     for(int i = 0; i < numberOfBlocks; i++) {
-        bd.write(i, bytes + i * BD_BLOCK_SIZE);
+        bd.write(i+firstBlockIndex, bytes + i * BD_BLOCK_SIZE);
     }
 
     // write remainding bytes (as one block), if necessary
@@ -300,7 +300,7 @@ char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
 
     // read all perfect blocks
     for(int i = 0; i < numberOfBlocks; i++) {
-        bd.read(i, readBuffer + i * BD_BLOCK_SIZE);
+        bd.read(i+firstBlockIndex, readBuffer + i * BD_BLOCK_SIZE);
     }
 
     // read remainding bytes (as one block), if necessary
