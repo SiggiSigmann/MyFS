@@ -12,7 +12,7 @@
 //TODO add your own constants here
 
 //general specs
-#define SUPERBLOCK_BLOCK_INDEX (1)
+#define SUPERBLOCK_BLOCK_INDEX (0)
 #define NUMBER_OF_USABLE_DATABLOCKS (1 << 18)//2^18 = 262144 blocks => 128 MiB in total
 #define NUMBER_OF_INODES (NUM_DIR_ENTRIES)
 
