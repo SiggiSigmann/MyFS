@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 
         IMapHandler* imap = new IMapHandler();
         imap->init();
-        imap->write(*bd);
+        imap->write(bd);
 
         RootBlock* rootblock = new RootBlock();
         rootblock->init(bd);
