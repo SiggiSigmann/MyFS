@@ -49,6 +49,9 @@ int main(int argc, char *argv[]) {
         for(uint32_t i = 0; i < BLOCK_SIZE; i++){
             emptyblock[i] = 0;
         }
+
+        printf("%x\n", NUMBER_OF_USABLE_DATABLOCKS);
+
         for(uint32_t i = 0; i < NUMBER_OF_USABLE_DATABLOCKS; i++){
             bd->write(FIRST_DATA_BLOCK+i,emptyblock);
         }
