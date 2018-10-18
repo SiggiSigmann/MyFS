@@ -4,7 +4,11 @@
 Allocates Memory for the IMap.
 */
 IMapHandler::IMapHandler(){
-    iMapStruct = (IMapStruct*) malloc(BLOCK_SIZE);
+    char* data = (char*) malloc(BLOCK_SIZE);
+    iMapStruct = (IMapStruct*) data;
+    for(int i = 0; i<BLOCK_SIZE;i++){
+        data[i] = 0;
+    }
 }
 
 /*
@@ -27,16 +31,16 @@ void IMapHandler::init(){
 /*
 Writes the IMap to the block device.
 */
-void IMapHandler::write(BlockDevice bd){
-    bd.write(I_MAP_FIRST_BLOCK, (char *) iMapStruct);
+void IMapHandler::write(BlockDevice* bd){
+    bd->write(I_MAP_FIRST_BLOCK, (char *) iMapStruct);
 
 }
 
 /*
 Reads the IMap from the block device into the dmap data structure.
 */
-void IMapHandler::read(BlockDevice bd){
-    bd.read(I_MAP_FIRST_BLOCK,(char*) iMapStruct);
+void IMapHandler::read(BlockDevice* bd){
+    bd->read(I_MAP_FIRST_BLOCK,(char*) iMapStruct);
 }
 
 /*
