@@ -15,6 +15,8 @@
 #include "imap.h"
 #include "rootblock.h"
 #include "superblock.h"
+#include <libgen.h>
+
 
 #include <sys/stat.h> //contains stat
 
@@ -97,13 +99,13 @@ int main(int argc, char *argv[]) {
             emptyblock[i] = 0;
         }
 
-
         //fill empty FS with datablocks
         for(uint32_t i = 0; i < NUMBER_OF_USABLE_DATABLOCKS; i++){
             bd->write(FIRST_DATA_BLOCK+i,emptyblock);
         }
 
         for(int i = 2;i<argc;i++){                                      //write each file to FS
+            printf("Nr%i. filename:'%s' basename:'%s'\n",i,argv[i],basename(argv[i]));
 
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
@@ -115,7 +117,7 @@ int main(int argc, char *argv[]) {
                 return -(EIO);
             }
 
-            if(superblock->getNumberOfFreeBlocks() >= sb.st_blocks){ //check if enough space (datablocks) ar free
+            if(superblock->getNumberOfFreeBlocks() <= sb.st_blocks){ //check if enough space (datablocks) ar free
                 printf("not enough space in FS\n");
                 return -(EIO);
             }
@@ -130,37 +132,55 @@ int main(int argc, char *argv[]) {
             uint32_t firstDataBlock;
             char* filecontent = (char*) malloc(BLOCK_SIZE);                         //buffer to store one block of a file
             for(int k = 0;k<sb.st_blocks;k++){
-                //superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDataBlock(indexFreeDB));
+                
+                indexFreeDB = superblock->getFirstFreeBlockIndex();
 
                 //copy content of file to FS
                 inputfile->read(k,filecontent);
+
+                printf("%i write index:%x adress:%x\n",k, indexFreeDB,indexFreeDB+FIRST_DATA_BLOCK*0x200);
                 bd->write(FIRST_DATA_BLOCK+indexFreeDB, filecontent);
 
                 dmap->occupyDatablock(indexFreeDB);
 
                 if(k==0){
+                    printf("fat start\n");
                     firstDataBlock = indexFreeDB;
                     fat->set(indexFreeDB, superblock->getFirstFreeBlockIndex());
                 }else if(k==sb.st_blocks-1){
+                    printf("fat end\n");
                     fat->set(indexFreeDB, END_OF_FILE_ENTRY);
                 }else{
                     fat->set(indexFreeDB, superblock->getFirstFreeBlockIndex());
                 }
 
-                indexFreeDB = superblock->getFirstFreeBlockIndex();
+                superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(indexFreeDB));
+
 
             }
 
+            inputfile->close();
+            delete inputfile;
+
             free(filecontent);
 
-            //get inode index
             uint32_t inodeIndex = superblock->getFirstFreeInodeIndex();
-            //superblock->updateFirstFreeInodeIndex(imap->getNextFreeInpde(indexFreeDB));
-
-            //set imap
             imap->occupyIMapEntry(inodeIndex);
+                       
             //rootblock->updateInode(); //todo
+
+            //get inode index
+
+            superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(indexFreeDB));
+
+
         }
+
+        superblock->writeSuperblock(*bd);
+        dmap->writeDMap(*bd);
+        fat->writeFat(*bd);
+        imap->write(bd);
+        rootblock->init(bd);
 
         free(emptyblock);
 
