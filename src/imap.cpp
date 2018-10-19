@@ -63,3 +63,17 @@ Get the value of the imap at the position index
 bool IMapHandler::getIMapEntry(uint32_t index){
     return iMapStruct->imap[index];
 }
+
+uint32_t IMapHandler::getNextFreeInode(uint32_t lastindex){
+    for(uint32_t i = lastindex; i<NUM_DIR_ENTRIES;i++){
+        if(iMapStruct->imap[i] == 0){
+            return i;
+        }
+    }
+    for(uint32_t i = 0; i<lastindex;i++){
+        if(iMapStruct->imap[i] == 0){
+            return i;
+        }
+    }
+    return -1;
+}
