@@ -15,6 +15,7 @@
 #include "imap.h"
 #include "rootblock.h"
 #include "superblock.h"
+#include <sys/stat.h>
 #include <libgen.h>
 
 
@@ -122,6 +123,9 @@ int main(int argc, char *argv[]) {
                 return -(EIO);
             }
 
+            //TDOD: calculate blocks
+            printf("blocksize:%d blockcount:%d toalesize:%d\n",sb.st_blksize,sb.st_blocks, sb.st_size);
+
             BlockDevice* inputfile = new BlockDevice();             //open inputfile to read blocks
             inputfile->open(argv[i]);
 
@@ -138,23 +142,25 @@ int main(int argc, char *argv[]) {
                 //copy content of file to FS
                 inputfile->read(k,filecontent);
 
-                printf("%i write index:%x adress:%x\n",k, indexFreeDB,indexFreeDB+FIRST_DATA_BLOCK*0x200);
+                printf("%i write index:%x adress:%x\n",k, indexFreeDB,(indexFreeDB+FIRST_DATA_BLOCK)*0x200);
                 bd->write(FIRST_DATA_BLOCK+indexFreeDB, filecontent);
 
                 dmap->occupyDatablock(indexFreeDB);
 
+                superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(indexFreeDB));
+
                 if(k==0){
-                    printf("fat start\n");
+                    printf("fat start %d\n",indexFreeDB);
                     firstDataBlock = indexFreeDB;
                     fat->set(indexFreeDB, superblock->getFirstFreeBlockIndex());
                 }else if(k==sb.st_blocks-1){
-                    printf("fat end\n");
+                    printf("fat end %d\n",indexFreeDB);
                     fat->set(indexFreeDB, END_OF_FILE_ENTRY);
                 }else{
                     fat->set(indexFreeDB, superblock->getFirstFreeBlockIndex());
                 }
 
-                superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(indexFreeDB));
+                
 
 
             }
@@ -171,7 +177,7 @@ int main(int argc, char *argv[]) {
 
             //get inode index
 
-            superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(indexFreeDB));
+            superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(inodeIndex));
 
 
         }
