@@ -55,3 +55,17 @@ Reads the DMap from the block device into the dmap data structure.
 void DMap::readDMap(BlockDevice bd){
     dMapStruct->dataBlockMap = (bool *) readBytes(bd, D_MAP_FIRST_BLOCK, BLOCK_SIZE * NUMBER_OF_D_MAP_BLOCKS);
 }
+
+uint32_t DMap::getNextFreeDatablock(uint32_t lastindex){
+    for(uint32_t i = lastindex; i<NUMBER_OF_USABLE_DATABLOCKS;i++){
+        if(dMapStruct->dataBlockMap[i] == 0){
+            return i;
+        }
+    }
+    for(uint32_t i = 0; i<lastindex;i++){
+        if(dMapStruct->dataBlockMap[i] == 0){
+            return i;
+        }
+    }
+    return -1;
+}

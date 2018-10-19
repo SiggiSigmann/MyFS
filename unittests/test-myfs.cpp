@@ -125,6 +125,11 @@ TEST_CASE( "Occupy/Free DMap", "[dmap]" ) {
     
     SECTION("occupy and free DMap") {
         DMap* map = new DMap();
+
+        map->occupyDatablock(0);
+        REQUIRE(map->get(0) == true);
+        REQUIRE(map->getNextFreeDatablock(0)==1);
+
         uint32_t testIndex = 45;
         map->freeDatablock(testIndex);
         REQUIRE(map->get(testIndex) == false);

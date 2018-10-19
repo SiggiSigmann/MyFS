@@ -25,6 +25,7 @@ class DMap{
         void freeDatablock(uint32_t dataBlockIndex);
         void writeDMap(BlockDevice bd);
         void readDMap(BlockDevice bd);
+        uint32_t getNextFreeDatablock(uint32_t lastindex);
 };
 
 #endif
