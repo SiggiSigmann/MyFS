@@ -16,6 +16,7 @@ COPY CMakeLists.txt Makefile /MyFS/
 COPY includes /MyFS/includes/
 COPY src /MyFS/src
 COPY unittests /MyFS/unittests
+COPY makefiles.sh /MyFS/makefiles.sh
 
 WORKDIR /MyFS/
 
