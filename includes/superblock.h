@@ -58,9 +58,14 @@ class Superblock{
         Superblock();
         ~Superblock();
         void updateNumberOfFreeInodes(uint32_t newNumber);
+        uint32_t getNumberOfFreeInodes();
         void updateFirstFreeInodeIndex(uint32_t newIndex);
+        uint32_t getFirstFreeInodeIndex();
         void updateNumberOfFreeBlocks(uint32_t newNumber);
+        uint32_t getNumberOfFreeBlocks();
         void updateFirstFreeBlockIndex(uint32_t newIndex);
+        uint32_t getFirstFreeBlockIndex();
+
         void writeSuperblock(BlockDevice bd);
         void readSuperblock(BlockDevice bd);
 };
