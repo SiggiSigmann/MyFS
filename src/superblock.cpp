@@ -137,7 +137,7 @@ void Superblock::updateFirstFreeInodeIndex(uint32_t newIndex){
 }
 
 uint32_t Superblock::getNumberOfFreeBlocks(){
-    return  superblockStruct->uFirst_free_inode_index;
+    return  superblockStruct->uNumber_of_free_blocks;
 }
 
 void Superblock::updateNumberOfFreeBlocks(uint32_t newNumber){
@@ -145,7 +145,7 @@ void Superblock::updateNumberOfFreeBlocks(uint32_t newNumber){
 }
 
 uint32_t Superblock::getFirstFreeBlockIndex(){
-    return   superblockStruct->uNumber_of_free_blocks;
+    return   superblockStruct->uFirst_free_block_index;
 }
 
 void Superblock::updateFirstFreeBlockIndex(uint32_t newIndex){
@@ -153,5 +153,5 @@ void Superblock::updateFirstFreeBlockIndex(uint32_t newIndex){
 }
 
 uint32_t Superblock::getFirstFreeInodeIndex(){
-    return superblockStruct->uFirst_free_block_index;
+    return superblockStruct->uFirst_free_inode_index;
 }
