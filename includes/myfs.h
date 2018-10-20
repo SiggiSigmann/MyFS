@@ -15,22 +15,29 @@
 
 #include "blockdevice.h"
 #include "constants.h"
-#include "superblock.h"
 
 #include "dmap.h"
 #include "fat.h"
+#include "imap.h"
+#include "rootblock.h"
+#include "superblock.h"
 
 class MyFS {
 private:
     static MyFS *_instance;
     FILE *logFile;
 
+    BlockDevice* bd;
+    Superblock* superblock;
+    DMap* dmap;
+    FatHandler* fat;
+    IMapHandler* imap;
+    RootBlock* rootblock;
+
 public:
     static MyFS *Instance();
 
     // TODO: Add attributes of your file system here
-
-    Superblock* superblock;
 
     MyFS();
     ~MyFS();

@@ -20,12 +20,6 @@
 #include "myfs.h"
 #include "myfs-info.h"
 
-#include "dmap.h"
-#include "fat.h"
-#include "imap.h"
-#include "rootblock.h"
-#include "superblock.h"
-
 MyFS* MyFS::_instance = NULL;
 
 MyFS* MyFS::Instance() {
@@ -37,11 +31,22 @@ MyFS* MyFS::Instance() {
 
 MyFS::MyFS() {
     this->logFile= stderr;
+    bd = new BlockDevice();
     superblock = new Superblock();
+    dmap = new DMap();
+    fat = new FatHandler();
+    imap = new IMapHandler();
+    rootblock = new RootBlock();
 }
 
 MyFS::~MyFS() {
+    bd->close();
+    delete bd;
     delete superblock;
+    delete dmap;
+    delete fat;
+    delete imap;
+    delete rootblock;
 }
 
 int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
@@ -238,10 +243,15 @@ void* MyFS::fuseInit(struct fuse_conn_info *conn) {
         LOGM();
         
         // you can get the containfer file name here:
-        LOGF("Container file name: %s", ((MyFsInfo *) fuse_get_context()->private_data)->contFile);
+        char* containerName = (((MyFsInfo *) fuse_get_context()->private_data))->contFile;
+        LOGF("Container file name: %s", containerName);
+
+        bd->open(containerName);
+        superblock->readSuperblock(bd);
+        dmap->readDMap(bd);
+        fat->readFat(bd);
+        imap->read(bd);
         
-        // TODO: Implement your initialization methods here!
-       
     }
     
     RETURN(0);
