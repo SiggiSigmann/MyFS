@@ -20,6 +20,12 @@
 #include "myfs.h"
 #include "myfs-info.h"
 
+#include "dmap.h"
+#include "fat.h"
+#include "imap.h"
+#include "rootblock.h"
+#include "superblock.h"
+
 MyFS* MyFS::_instance = NULL;
 
 MyFS* MyFS::Instance() {
@@ -235,6 +241,7 @@ void* MyFS::fuseInit(struct fuse_conn_info *conn) {
         LOGF("Container file name: %s", ((MyFsInfo *) fuse_get_context()->private_data)->contFile);
         
         // TODO: Implement your initialization methods here!
+       
     }
     
     RETURN(0);
