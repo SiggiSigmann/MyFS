@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
         }
 
         for(int i = 2;i<argc;i++){                                      //write each file to FS
-            printf("Nr%i. filename:'%s' basename:'%s'\n",i,argv[i],basename(argv[i]));
+            printf("=====Nr%i. filename:'%s' basename:'%s'\n",i,argv[i],basename(argv[i]));
 
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
@@ -124,7 +124,14 @@ int main(int argc, char *argv[]) {
             }
 
             //TDOD: calculate blocks
-            printf("blocksize:%d blockcount:%d toalesize:%d\n",sb.st_blksize,sb.st_blocks, sb.st_size);
+            
+
+            uint32_t neededBlocks = sb.st_size / BLOCK_SIZE;
+            if(sb.st_size % BLOCK_SIZE != 0){
+                neededBlocks++;
+            }
+
+            printf("blocksize:%d blockcount:%d toalesize:%d real:%d\n",sb.st_blksize,sb.st_blocks, sb.st_size, neededBlocks);
 
             BlockDevice* inputfile = new BlockDevice();             //open inputfile to read blocks
             inputfile->open(argv[i]);
@@ -135,7 +142,7 @@ int main(int argc, char *argv[]) {
             uint32_t indexFreeDB = superblock->getFirstFreeBlockIndex();
             uint32_t firstDataBlock;
             char* filecontent = (char*) malloc(BLOCK_SIZE);                         //buffer to store one block of a file
-            for(int k = 0;k<sb.st_blocks;k++){
+            for(int k = 0;k<neededBlocks;k++){
                 
                 indexFreeDB = superblock->getFirstFreeBlockIndex();
 
@@ -152,8 +159,8 @@ int main(int argc, char *argv[]) {
                 if(k==0){
                     printf("fat start %d\n",indexFreeDB);
                     firstDataBlock = indexFreeDB;
-                    fat->set(indexFreeDB, superblock->getFirstFreeBlockIndex());
-                }else if(k==sb.st_blocks-1){
+                }
+                if(k==neededBlocks-1){
                     printf("fat end %d\n",indexFreeDB);
                     fat->set(indexFreeDB, END_OF_FILE_ENTRY);
                 }else{
