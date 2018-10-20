@@ -228,6 +228,8 @@ void MyFS::fuseDestroy() {
     LOGM();
 }
 
+
+//init Fuse File System and load bin file.
 void* MyFS::fuseInit(struct fuse_conn_info *conn) {
     // Open logfile
     this->logFile= fopen(((MyFsInfo *) fuse_get_context()->private_data)->logFile, "w+");
