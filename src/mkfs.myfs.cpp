@@ -116,7 +116,6 @@ int main(int argc, char *argv[]) {
             if(sb.st_size % BLOCK_SIZE != 0){
                 neededBlocks++;
             }
-            printf("=====Nr%i. filename:'%s' basename:'%s'\n",i-2,argv[i],basenameOfFile);
 
             //check if a inode is free
             if(superblock->getNumberOfFreeInodes()<1){    //check if a inode is free
@@ -137,23 +136,16 @@ int main(int argc, char *argv[]) {
                 break;
             }
 
-            //TDOD: calculate blocks
-            
-
-
-
-            printf("blocksize:%d blockcount:%d toalesize:%d real:%d\n",sb.st_blksize,sb.st_blocks, sb.st_size, neededBlocks);
-
+            //open file to read
             BlockDevice* inputfile = new BlockDevice();             //open inputfile to read blocks
             inputfile->open(argv[i]);
-
-          
 
             //write blocks, occupy blocks fill fat
             uint32_t firstDataBlock;
             uint32_t indexFreeDB;
             char* filecontent = (char*) malloc(BLOCK_SIZE);                         //buffer to store one block of a file
             for(int k = 0;k<neededBlocks;k++){
+                //empty buffer
                 for(int j =0; j<BLOCK_SIZE; j++){
                     filecontent[j]=0;
                 }
@@ -161,14 +153,13 @@ int main(int argc, char *argv[]) {
 
                 //copy content of file to FS
                 inputfile->read(k,filecontent);
-
-                printf("%s\n\n",filecontent);
                 bd->write(FIRST_DATA_BLOCK+indexFreeDB, filecontent);
 
+                //modify dmap
                 dmap->occupyDatablock(indexFreeDB);
-
                 superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(indexFreeDB));
 
+                //modify fat
                 if(k==0){
                     printf("fat start %d\n",indexFreeDB);
                     firstDataBlock = indexFreeDB;
@@ -181,32 +172,30 @@ int main(int argc, char *argv[]) {
                 }
             }
 
+            //calculate free blocks
             superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-neededBlocks);
 
             inputfile->close();
             delete inputfile;
-
             free(filecontent);
 
+            //modify imap
             uint32_t inodeIndex = superblock->getFirstFreeInodeIndex();
             imap->occupyIMapEntry(inodeIndex);
-                       
-            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,sb.st_mode);
-
-            //get inode index
-
             superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(inodeIndex));
             superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
 
+            //write inode           
+            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,sb.st_mode);
         }
 
+        //write modifed FS blocks to FS
         superblock->writeSuperblock(*bd);
         dmap->writeDMap(*bd);
         fat->writeFat(*bd);
         imap->write(bd);
 
         free(emptyblock);
-
         delete bd;
         delete superblock;
         delete dmap;

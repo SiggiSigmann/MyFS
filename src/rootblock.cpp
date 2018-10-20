@@ -89,7 +89,6 @@ void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileN
     inode->userID = userID;
     inode->groupID = groupID;
     inode->mode = mode;
-    printf("name:%s firstDataBlock:%x, fileSize:%x, atime:%x, mtime:%x, ctime:%x, userID:%x, groupID:%x, mode:%x\n",fileName, firstDataBlock, fileSize, atime,  mtime,  ctime,  userID,  groupID,  mode);
     bd->write(FIRST_INODE_BLOCK + relativeIndex, (char*)inode);
     free(inode);
 }
