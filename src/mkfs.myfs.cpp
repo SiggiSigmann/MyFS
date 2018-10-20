@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
             char* basenameOfFile = basename(argv[i]);
 
             //calculate needed blocks
-            int neededBlocks = sb.st_size / BLOCK_SIZE;
+            uint32_t neededBlocks = sb.st_size / BLOCK_SIZE;
             if(sb.st_size % BLOCK_SIZE != 0){
                 neededBlocks++;
             }
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
             }
 
             //check if the filename is free
-            if(rootblock->checkFilenameOccupied(bd, basenameOfFile)!=-1){
+            if(rootblock->checkFilenameOccupied(bd, basenameOfFile)!=(uint32_t)-1){
                 printf("name already in use\n");
                 //return -(EEXIST);
                 break;
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
             uint32_t firstDataBlock;
             uint32_t indexFreeDB;
             char* filecontent = (char*) malloc(BLOCK_SIZE);                         //buffer to store one block of a file
-            for(int k = 0;k<neededBlocks;k++){
+            for(uint32_t k = 0;k<neededBlocks;k++){
                 //empty buffer
                 for(int j =0; j<BLOCK_SIZE; j++){
                     filecontent[j]=0;
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
             superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
 
             //write inode           
-            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,sb.S_IFREG);
+            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,444);
         }
 
         //write modifed FS blocks to FS
