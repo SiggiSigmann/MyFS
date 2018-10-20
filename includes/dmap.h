@@ -23,8 +23,8 @@ class DMap{
         bool get(uint32_t dataBlockIndex);
         void occupyDatablock(uint32_t dataBlockIndex);
         void freeDatablock(uint32_t dataBlockIndex);
-        void writeDMap(BlockDevice bd);
-        void readDMap(BlockDevice bd);
+        void writeDMap(BlockDevice* bd);
+        void readDMap(BlockDevice* bd);
         uint32_t getNextFreeDatablock(uint32_t lastindex);
 };
 

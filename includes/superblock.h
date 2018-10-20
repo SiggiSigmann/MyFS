@@ -66,8 +66,8 @@ class Superblock{
         void updateFirstFreeBlockIndex(uint32_t newIndex);
         uint32_t getFirstFreeBlockIndex();
 
-        void writeSuperblock(BlockDevice bd);
-        void readSuperblock(BlockDevice bd);
+        void writeSuperblock(BlockDevice* bd);
+        void readSuperblock(BlockDevice* bd);
 };
 
 #endif

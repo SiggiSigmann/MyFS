@@ -32,10 +32,10 @@ TEST_CASE( "Write/Read bytes", "[blockdevice]" ) {
         gen_random(writeBuffer, NUM_TESTBYTES);
         
         // write all bytes
-        writeBytes(bd, 0, writeBuffer, NUM_TESTBYTES);
+        writeBytes(&bd, 0, writeBuffer, NUM_TESTBYTES);
 
         // read all bytes
-        char* readBuffer = readBytes(bd, 0, NUM_TESTBYTES);
+        char* readBuffer = readBytes(&bd, 0, NUM_TESTBYTES);
 
         REQUIRE(memcmp(writeBuffer, readBuffer, NUM_TESTBYTES) == 0);
     }
@@ -78,13 +78,13 @@ TEST_CASE( "Write/Read Superblock", "[superblock]" ) {
         myfs->superblock->superblockStruct->uNumber_of_free_blocks = 22;
         myfs->superblock->superblockStruct->uFirst_free_block_index = 23;
         //write Superblock
-        myfs->superblock->writeSuperblock(bd);
+        myfs->superblock->writeSuperblock(&bd);
 
         //modify Superblock
         myfs->superblock->superblockStruct->uNumber_of_free_inodes = 1337;
 
         //read Superblock
-        myfs->superblock->readSuperblock(bd);
+        myfs->superblock->readSuperblock(&bd);
         
         //validate the superblock custom values
         REQUIRE(myfs->superblock->superblockStruct->uSUPERBLOCK_BLOCK_INDEX == 2);
@@ -174,14 +174,14 @@ TEST_CASE( "read/write DMap", "[dmap]" ) {
         REQUIRE(map->get(testIndex2) == true);
         REQUIRE(map->get(testIndex3) == true);
         //write them to the block device
-        map->writeDMap(bd);
+        map->writeDMap(&bd);
         //manipulate the test indices randomly
         map->freeDatablock(testIndex1);
         map->freeDatablock(testIndex3);
         REQUIRE(map->get(testIndex1) == false);
         REQUIRE(map->get(testIndex3) == false);
         //read from the block device and hereby override the manipulated test indices
-        map->readDMap(bd);
+        map->readDMap(&bd);
         //validate the test indices to be restored correctly by the block device
         REQUIRE(map->get(testIndex1) == true);
         REQUIRE(map->get(testIndex2) == true);
@@ -256,14 +256,14 @@ TEST_CASE( "Test FAT", "[fat]" ) {
         REQUIRE(fat->get(23) == 34);
         REQUIRE(fat->get(34) == END_OF_FILE_ENTRY);
         //save the FAT on the block device
-        fat->writeFat(bd);
+        fat->writeFat(&bd);
         //clear the entries again
         fat->deleteAll(12);
         REQUIRE(fat->get(12) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(23) == EMPTY_FAT_ENTRY);
         REQUIRE(fat->get(34) == EMPTY_FAT_ENTRY);
         //read the saved FAT from the block device
-        fat->readFat(bd);
+        fat->readFat(&bd);
         //validate it was restored correctly
         REQUIRE(fat->get(12) == 23);
         REQUIRE(fat->get(23) == 34);

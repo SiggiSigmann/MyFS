@@ -263,7 +263,7 @@ int MyFS::fuseGetxattr(const char *path, const char *name, char *value, size_t s
 /*
 Writes 'size' bytes to the block device, starting at index 'firstBlockIndex'
 */
-void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
+void writeBytes(BlockDevice* bd, int firstBlockIndex, char* bytes, int size) {
     // number of perfect blocks
     int numberOfBlocks = size / BD_BLOCK_SIZE;
 
@@ -271,7 +271,7 @@ void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
 
     // write all perfect blocks
     for(int i = 0; i < numberOfBlocks; i++) {
-        bd.write(i+firstBlockIndex, bytes + i * BD_BLOCK_SIZE);
+        bd->write(i+firstBlockIndex, bytes + i * BD_BLOCK_SIZE);
     }
 
     // write remainding bytes (as one block), if necessary
@@ -282,7 +282,7 @@ void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
         memcpy(remainderBlockBytes, bytes + (numberOfBlocks * BD_BLOCK_SIZE), remainder);
         //set the boilerplate values to zero
         memset(remainderBlockBytes+remainder, 0, BD_BLOCK_SIZE-remainder);
-        bd.write(numberOfBlocks, remainderBlockBytes);
+        bd->write(numberOfBlocks, remainderBlockBytes);
         //cleanup the temporary buffer
         delete [] remainderBlockBytes;
     }
@@ -291,7 +291,7 @@ void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size) {
 /*
 Reads 'numberOfBytes' bytes from the block device, starting at index 'firstBlockIndex'
 */
-char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
+char* readBytes(BlockDevice* bd, int firstBlockIndex, int numberOfBytes) {
     char* readBuffer = new char[numberOfBytes];
     // number of perfect blocks
     int numberOfBlocks = numberOfBytes / BD_BLOCK_SIZE;
@@ -300,7 +300,7 @@ char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
 
     // read all perfect blocks
     for(int i = 0; i < numberOfBlocks; i++) {
-        bd.read(i+firstBlockIndex, readBuffer + i * BD_BLOCK_SIZE);
+        bd->read(i+firstBlockIndex, readBuffer + i * BD_BLOCK_SIZE);
     }
 
     // read remainding bytes (as one block), if necessary
@@ -308,7 +308,7 @@ char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes) {
         //bd.read only accepts buffers of size BD_BLOCK_SIZE, so we need to temporarily create one
         char* remainderBlockBytes = new char[BD_BLOCK_SIZE];
         //read the entire block containing the remainding bytes (obviously the block after the last perfect block)
-        bd.read(numberOfBlocks, remainderBlockBytes);
+        bd->read(numberOfBlocks, remainderBlockBytes);
         //append all remainding bytes after the perfect blocks
         memcpy(readBuffer + (numberOfBlocks*BD_BLOCK_SIZE), remainderBlockBytes, remainder);
         //cleanup the temporary buffer

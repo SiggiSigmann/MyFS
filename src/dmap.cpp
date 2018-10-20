@@ -44,7 +44,7 @@ bool DMap::get(uint32_t dataBlockIndex){
 /*
 Writes the DMap to the block device.
 */
-void DMap::writeDMap(BlockDevice bd){
+void DMap::writeDMap(BlockDevice* bd){
     writeBytes(bd, D_MAP_FIRST_BLOCK, (char *) dMapStruct->dataBlockMap, BLOCK_SIZE * NUMBER_OF_D_MAP_BLOCKS);
 
 }
@@ -52,7 +52,7 @@ void DMap::writeDMap(BlockDevice bd){
 /*
 Reads the DMap from the block device into the dmap data structure.
 */
-void DMap::readDMap(BlockDevice bd){
+void DMap::readDMap(BlockDevice* bd){
     dMapStruct->dataBlockMap = (bool *) readBytes(bd, D_MAP_FIRST_BLOCK, BLOCK_SIZE * NUMBER_OF_D_MAP_BLOCKS);
 }
 

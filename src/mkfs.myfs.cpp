@@ -33,13 +33,13 @@ int main(int argc, char *argv[]) {
         bd->create(argv[1]);
 
         Superblock* superblock = new Superblock();
-        superblock->writeSuperblock(*bd);
+        superblock->writeSuperblock(bd);
 
         DMap* dmap = new DMap();
-        dmap->writeDMap(*bd);
+        dmap->writeDMap(bd);
 
         FatHandler* fat = new FatHandler();
-        fat->writeFat(*bd);
+        fat->writeFat(bd);
 
         IMapHandler* imap = new IMapHandler();
         imap->init();
@@ -76,13 +76,13 @@ int main(int argc, char *argv[]) {
         bd->create(argv[1]);
 
         Superblock* superblock = new Superblock();
-        superblock->writeSuperblock(*bd);
+        superblock->writeSuperblock(bd);
 
         DMap* dmap = new DMap();
-        dmap->writeDMap(*bd);
+        dmap->writeDMap(bd);
 
         FatHandler* fat = new FatHandler();
-        fat->writeFat(*bd);
+        fat->writeFat(bd);
 
         IMapHandler* imap = new IMapHandler();
         imap->init();
@@ -190,9 +190,9 @@ int main(int argc, char *argv[]) {
         }
 
         //write modifed FS blocks to FS
-        superblock->writeSuperblock(*bd);
-        dmap->writeDMap(*bd);
-        fat->writeFat(*bd);
+        superblock->writeSuperblock(bd);
+        dmap->writeDMap(bd);
+        fat->writeFat(bd);
         imap->write(bd);
 
         free(emptyblock);

@@ -22,7 +22,7 @@ Superblock::~Superblock(){
 /*
 Writes the Superblock to the BlockDevice.
 */
-void Superblock::writeSuperblock(BlockDevice bd){
+void Superblock::writeSuperblock(BlockDevice* bd){
     char* buffer = new char[BD_BLOCK_SIZE];
     for(int i = 0; i<BLOCK_SIZE;i++){
         buffer[i] = 0;
@@ -74,14 +74,13 @@ void Superblock::writeSuperblock(BlockDevice bd){
     *ptrBuffer++ = superblockStruct->uFirst_free_block_index;
 
     //Write the Superblock
-    bd.write(superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer);    
-    //writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
+    writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
     delete [] buffer;
 }
 /*
 Reads the Superblock from the block device into the Superblock data structure.
 */
-void Superblock::readSuperblock(BlockDevice bd){
+void Superblock::readSuperblock(BlockDevice* bd){
     char* buffer = readBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
     uint32_t* ptrBuffer = (uint32_t*) buffer;
     
