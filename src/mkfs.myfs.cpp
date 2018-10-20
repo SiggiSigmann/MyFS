@@ -133,7 +133,8 @@ int main(int argc, char *argv[]) {
             //check if the filename is free
             if(rootblock->checkFilenameOccupied(bd, basenameOfFile)!=-1){
                 printf("name already in use\n");
-                return -(EEXIST);
+                //return -(EEXIST);
+                break;
             }
 
             //TDOD: calculate blocks
@@ -176,11 +177,9 @@ int main(int argc, char *argv[]) {
                 }else{
                     fat->set(indexFreeDB, superblock->getFirstFreeBlockIndex());
                 }
-
-                
-
-
             }
+
+            superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-neededBlocks);
 
             inputfile->close();
             delete inputfile;
@@ -195,7 +194,7 @@ int main(int argc, char *argv[]) {
             //get inode index
 
             superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(inodeIndex));
-
+            superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
 
         }
 
