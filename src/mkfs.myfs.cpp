@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
             superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
 
             //write inode           
-            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,sb.st_mode);
+            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,sb.S_IFREG);
         }
 
         //write modifed FS blocks to FS
