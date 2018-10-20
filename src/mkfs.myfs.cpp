@@ -154,13 +154,15 @@ int main(int argc, char *argv[]) {
             uint32_t indexFreeDB;
             char* filecontent = (char*) malloc(BLOCK_SIZE);                         //buffer to store one block of a file
             for(int k = 0;k<neededBlocks;k++){
-                
+                for(int j =0; j<BLOCK_SIZE; j++){
+                    filecontent[j]=0;
+                }
                 indexFreeDB = superblock->getFirstFreeBlockIndex();
 
                 //copy content of file to FS
                 inputfile->read(k,filecontent);
 
-                printf("%i write index:%x adress:%x\n",k, indexFreeDB,(indexFreeDB+FIRST_DATA_BLOCK)*0x200);
+                printf("%s\n\n",filecontent);
                 bd->write(FIRST_DATA_BLOCK+indexFreeDB, filecontent);
 
                 dmap->occupyDatablock(indexFreeDB);
