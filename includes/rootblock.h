@@ -1,6 +1,5 @@
 #ifndef rootblock_h
 #define rootblock_h
-#include "myfs.h"
 #include "blockdevice.h"
 #include <stdlib.h>
 #include "constants.h"
