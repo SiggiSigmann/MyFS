@@ -18,9 +18,6 @@
 #include <sys/stat.h>
 #include <libgen.h>
 
-
-#include <sys/stat.h> //contains stat
-
 void initFS(char* fileName){}
 
 int main(int argc, char *argv[]) {
@@ -105,31 +102,44 @@ int main(int argc, char *argv[]) {
             bd->write(FIRST_DATA_BLOCK+i,emptyblock);
         }
 
-        for(int i = 2;i<argc;i++){                                      //write each file to FS
-            printf("=====Nr%i. filename:'%s' basename:'%s'\n",i,argv[i],basename(argv[i]));
-
+        //
+        for(int i = 2;i<argc;i++){
+        
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
                  return -(EIO);
             }
+            char* basenameOfFile = basename(argv[i]);
 
+            //calculate needed blocks
+            int neededBlocks = sb.st_size / BLOCK_SIZE;
+            if(sb.st_size % BLOCK_SIZE != 0){
+                neededBlocks++;
+            }
+            printf("=====Nr%i. filename:'%s' basename:'%s'\n",i-2,argv[i],basenameOfFile);
+
+            //check if a inode is free
             if(superblock->getNumberOfFreeInodes()<1){    //check if a inode is free
                 printf("not possibel to add more files then 62\n");
                 return -(EIO);
             }
 
-            if(superblock->getNumberOfFreeBlocks() <= sb.st_blocks){ //check if enough space (datablocks) ar free
+            //check if enough blocks are free
+            if(superblock->getNumberOfFreeBlocks() <= neededBlocks){ //check if enough space (datablocks) ar free
                 printf("not enough space in FS\n");
                 return -(EIO);
+            }
+
+            //check if the filename is free
+            if(rootblock->checkFilenameOccupied(bd, basenameOfFile)!=-1){
+                printf("name already in use\n");
+                return -(EEXIST);
             }
 
             //TDOD: calculate blocks
             
 
-            uint32_t neededBlocks = sb.st_size / BLOCK_SIZE;
-            if(sb.st_size % BLOCK_SIZE != 0){
-                neededBlocks++;
-            }
+
 
             printf("blocksize:%d blockcount:%d toalesize:%d real:%d\n",sb.st_blksize,sb.st_blocks, sb.st_size, neededBlocks);
 
@@ -139,8 +149,8 @@ int main(int argc, char *argv[]) {
           
 
             //write blocks, occupy blocks fill fat
-            uint32_t indexFreeDB = superblock->getFirstFreeBlockIndex();
             uint32_t firstDataBlock;
+            uint32_t indexFreeDB;
             char* filecontent = (char*) malloc(BLOCK_SIZE);                         //buffer to store one block of a file
             for(int k = 0;k<neededBlocks;k++){
                 
@@ -180,7 +190,7 @@ int main(int argc, char *argv[]) {
             uint32_t inodeIndex = superblock->getFirstFreeInodeIndex();
             imap->occupyIMapEntry(inodeIndex);
                        
-            //rootblock->updateInode(); //todo
+            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,sb.st_mode);
 
             //get inode index
 
@@ -193,7 +203,6 @@ int main(int argc, char *argv[]) {
         dmap->writeDMap(*bd);
         fat->writeFat(*bd);
         imap->write(bd);
-        rootblock->init(bd);
 
         free(emptyblock);
 
