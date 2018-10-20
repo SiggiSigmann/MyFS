@@ -2,8 +2,8 @@
 //  mk.myfs.cpp
 //  myfs
 //
-//  Created by Oliveriltus Waldhorst on 07.09.17.
-
+//  Created by Oliver Waldhorst on 07.09.17.
+//  Copyright © 2017 Oliver Waldhorst. All rights reserved.
 
 #include "myfs.h"
 #include "blockdevice.h"
