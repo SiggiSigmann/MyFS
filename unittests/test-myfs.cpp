@@ -283,7 +283,7 @@ TEST_CASE( "read/write IMap", "[imap]" ) {
         imap->init();
         //mark the first entry as occupied for later comparison purposes
         imap->occupyIMapEntry(0);
-        imap->write(bd);
+        imap->write(&bd);
         //occupy all imap entries and validate that
         for(int i = 0; i < NUM_DIR_ENTRIES; i++){
             imap->occupyIMapEntry(i);
@@ -299,7 +299,7 @@ TEST_CASE( "read/write IMap", "[imap]" ) {
             REQUIRE(imap->getIMapEntry(i)==true);
         }
         //read the initially written imap's values into the imap
-        imap->read(bd);
+        imap->read(&bd);
         //assure it was written/read correctly
         REQUIRE(imap->getIMapEntry(0)==true);
         for(int i = 1; i < NUM_DIR_ENTRIES; i++){

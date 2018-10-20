@@ -12,7 +12,7 @@
 //TODO add your own constants here
 
 //general specs
-#define SUPERBLOCK_BLOCK_INDEX (1)
+#define SUPERBLOCK_BLOCK_INDEX (0)
 #define NUMBER_OF_USABLE_DATABLOCKS (1 << 18)//2^18 = 262144 blocks => 128 MiB in total
 #define NUMBER_OF_INODES (NUM_DIR_ENTRIES)
 
@@ -56,7 +56,7 @@
 #define LAST_DATA_BLOCK (FIRST_DATA_BLOCK + NUMBER_OF_USABLE_DATABLOCKS - 1)
 
 //indicates the last block of a file in the FAT
-#define END_OF_FILE_ENTRY (NUMBER_OF_USABLE_DATABLOCKS + 1)
+#define END_OF_FILE_ENTRY (NUMBER_OF_USABLE_DATABLOCKS)
 #define EMPTY_FAT_ENTRY (END_OF_FILE_ENTRY + 1)
 
 #endif

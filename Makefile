@@ -25,7 +25,11 @@ TARGETS = mount.myfs mkfs.myfs unittest
 
 # object files for target mkfs.myfs TODO: add new object files here
 MKFS_MYFS_OBJS = $(OBJDIR)/blockdevice.o \
-$(OBJDIR)/superblock.o \
+	$(OBJDIR)/superblock.o \
+	$(OBJDIR)/imap.o \
+	$(OBJDIR)/dmap.o \
+	$(OBJDIR)/fat.o \
+	$(OBJDIR)/rootblock.o \
 	$(OBJDIR)/myfs.o \
 	$(OBJDIR)/mkfs.myfs.o
 

@@ -24,6 +24,9 @@ Writes the Superblock to the BlockDevice.
 */
 void Superblock::writeSuperblock(BlockDevice bd){
     char* buffer = new char[BD_BLOCK_SIZE];
+    for(int i = 0; i<BLOCK_SIZE;i++){
+        buffer[i] = 0;
+    }
     //Serialization of the Superblock
     uint32_t* ptrBuffer = (uint32_t*) buffer;
 
@@ -31,31 +34,38 @@ void Superblock::writeSuperblock(BlockDevice bd){
     *ptrBuffer++ = superblockStruct->uSUPERBLOCK_BLOCK_INDEX;
     *ptrBuffer++ = superblockStruct->uNUMBER_OF_USABLE_DATABLOCKS;
     *ptrBuffer++ = superblockStruct->uNUMBER_OF_INODES;
+    printf("Superblock %x - %x\n",superblockStruct->uSUPERBLOCK_BLOCK_INDEX*512,superblockStruct->uSUPERBLOCK_BLOCK_INDEX*512);
 
     //I-Map
     *ptrBuffer++ = superblockStruct->uNUMBER_OF_I_MAP_BLOCKS;
     *ptrBuffer++ = superblockStruct->uI_MAP_FIRST_BLOCK;
     *ptrBuffer++ = superblockStruct->uI_MAP_LAST_BLOCK;
+    printf("Imap %x - %x\n",superblockStruct->uI_MAP_FIRST_BLOCK*512,superblockStruct->uI_MAP_LAST_BLOCK*512);
+
 
     //Inodes
     *ptrBuffer++ = superblockStruct->uNUMBER_OF_INODE_BLOCKS;
     *ptrBuffer++ = superblockStruct->uFIRST_INODE_BLOCK;
     *ptrBuffer++ = superblockStruct->uLAST_INODE_BLOCK;
+    printf("Inodes %x - %x\n",superblockStruct->uFIRST_INODE_BLOCK*512,superblockStruct->uLAST_INODE_BLOCK*512);
 
-    //D-Map
+    // //D-Map
     *ptrBuffer++ = superblockStruct->uNUMBER_OF_D_MAP_BLOCKS;
     *ptrBuffer++ = superblockStruct->uD_MAP_FIRST_BLOCK;
     *ptrBuffer++ = superblockStruct->uD_MAP_LAST_BLOCK;
+    printf("D-Map %x - %x\n",superblockStruct->uD_MAP_FIRST_BLOCK*512,superblockStruct->uD_MAP_LAST_BLOCK*512);
 
-    //FAT
+    // //FAT
     *ptrBuffer++ = superblockStruct->uFAT_SIZE_IN_BYTES;
     *ptrBuffer++ = superblockStruct->uNUMBER_OF_FAT_BLOCKS;
     *ptrBuffer++ = superblockStruct->uFAT_FIRST_BLOCK;
     *ptrBuffer++ = superblockStruct->uFAT_LAST_BLOCK;
+    printf("FAT %x - %x\n",superblockStruct->uFAT_FIRST_BLOCK*512,superblockStruct->uFAT_LAST_BLOCK*512);
 
-    //Data Blocks
+    // //Data Blocks
     *ptrBuffer++ = superblockStruct->uFIRST_DATA_BLOCK;
     *ptrBuffer++ = superblockStruct->uLAST_DATA_BLOCK;
+    printf("Data Blocks %x - %x\n",superblockStruct->uFIRST_DATA_BLOCK*512,superblockStruct->uLAST_DATA_BLOCK*512);
 
     //runtime calculated values
     *ptrBuffer++ = superblockStruct->uNumber_of_free_inodes;
@@ -64,10 +74,10 @@ void Superblock::writeSuperblock(BlockDevice bd){
     *ptrBuffer++ = superblockStruct->uFirst_free_block_index;
 
     //Write the Superblock
-    writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
+    bd.write(superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer);    
+    //writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
     delete [] buffer;
 }
-
 /*
 Reads the Superblock from the block device into the Superblock data structure.
 */

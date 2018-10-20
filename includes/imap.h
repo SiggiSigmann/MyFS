@@ -20,8 +20,8 @@ class IMapHandler{
         IMapHandler();
         ~IMapHandler();
         void init();
-        void write(BlockDevice bd);
-        void read(BlockDevice bd);
+        void write(BlockDevice* bd);
+        void read(BlockDevice* bd);
         void occupyIMapEntry(uint32_t index);
         void freeIMapEntry(uint32_t index);
         bool getIMapEntry(uint32_t index);
