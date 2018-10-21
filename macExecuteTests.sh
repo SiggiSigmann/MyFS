@@ -1,15 +1,21 @@
 #/bin/sh
-#check if docker is available
-docker ps > /dev/null
+#check if docker is installed
+which docker |& /dev/null
 if [ $? -ne 0 ]
 then
-    echo "Docker is not running, aborting.."
+    echo "Docker is not installed, aborting.." >&2
+    exit
+fi
+#check if docker is ready to use
+docker ps |& /dev/null
+if [ $? -ne 0 ]
+then
+    echo "Docker is not running, aborting.." >&2
     exit
 fi
 
-
-#build the image silently
-docker build -q -t test-machine . > /dev/null
+#build the image
+docker build -t test-machine .
 
 #run the container
 #using the 'obj' dir as volume enables the caching of linking objects to save compile time
