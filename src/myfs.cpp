@@ -49,6 +49,10 @@ MyFS::~MyFS() {
     delete rootblock;
 }
 
+/**
+ * path:    path to the file
+ * statbuf: will be filles with metadata from the file in path
+ */
 int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
     LOGM();
     
@@ -63,18 +67,19 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
     }else{
         InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
 
-        char* name = (char*)malloc(NAME_LENGTH);
+        //copy path in name to make it not constant
+        char* name = (char*)malloc(NAME_LENGTH); 
         strcpy(name,path);
 
         inode = rootblock->getInodeByName(bd,name);
 
-        //statbuf->st_dev;
-        //statbuf->st_ino;
+        //statbuf->st_dev = 0;
+        //statbuf->st_ino = 0;
         statbuf->st_mode = inode->mode;
-        //statbuf->st_nlink;
+        //statbuf->st_nlink = 0;
         statbuf->st_uid = inode->userID;
         statbuf->st_gid = inode->groupID;
-        //statbuf->st_rdev;
+        //statbuf->st_rdev = 0;
         statbuf->st_size = inode->fileSize*BLOCK_SIZE;
         statbuf->st_blksize = BLOCK_SIZE;
         statbuf->st_blocks = inode->fileSize;
@@ -83,6 +88,7 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
         statbuf->st_ctime = inode->ctime;        
 
         free(inode);
+        free(name);
     }
    
     RETURN(0);
