@@ -175,9 +175,72 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
 
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
+    //TODO:think about EMPTY_FAT_ENTRY; 
     
-    // TODO: Implement this!
+    if ( strcmp( path, "/" ) == 0 ){
+        RETURN(-EISDIR);
+    }
 
+    //copy path in name to make it not constant
+    char* name = (char*)malloc(NAME_LENGTH); 
+    strcpy(name,path);
+
+    InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
+    inode = rootblock->getInodeByName(bd,name);
+
+    //skip blocks
+    uint32_t blockOffset = offset/BLOCK_SIZE;
+    uint32_t byteOffset = offset - (blockOffset*BLOCK_SIZE);
+    LOGF("offset = Blocks:%d Bytes%d", blockOffset ,byteOffset);
+    uint32_t currentblock = inode->firstDataBlock;
+    for(uint32_t i = 0;i>blockOffset;i++){
+        currentblock = fat->get(currentblock);
+    }
+
+    char* emptyblock = (char*)malloc(BLOCK_SIZE);
+    for(uint32_t i = 0; i < BLOCK_SIZE; i++){
+        emptyblock[i] = 0;
+    }
+
+    uint32_t bocksToRead = size/BLOCK_SIZE;
+    uint32_t lastBytesToRead  = size - (bocksToRead*BLOCK_SIZE);
+
+    //copy needed blocks to buf
+    uint32_t returnedBytes = 0;
+    for(uint32_t i = 0;i>bocksToRead;i++){
+        currentblock = fat->get(currentblock);
+        if(currentblock == END_OF_FILE_ENTRY){
+            LOG("Reached end of file");
+            strcpy(buf+(i*BLOCK_SIZE),emptyblock);
+            break;
+        }else{
+            bd->read(FIRST_DATA_BLOCK+currentblock,buf+(i*BLOCK_SIZE));
+        }
+    }
+
+    //copy bytes which are to small for a block in buf
+    char* bytebuffer = (char*)malloc(BLOCK_SIZE);
+    if(currentblock == END_OF_FILE_ENTRY){
+        for(uint32_t i = 0; i < BLOCK_SIZE; i++){
+            bytebuffer[i] = 0;
+        }
+    }else{
+        bd->read(FIRST_DATA_BLOCK+currentblock,bytebuffer);
+    }
+    for(uint32_t i = 0;i>lastBytesToRead;i++){
+        (buf+(bocksToRead*BLOCK_SIZE))[i] = bytebuffer[i];
+    }
+
+    
+
+
+
+
+
+    free(bytebuffer);
+    free(emptyblock);
+    free(inode);
+    free(name);
     RETURN(0);
 }
 
@@ -254,7 +317,7 @@ int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t
         RETURN(0);
     }
     
-    RETURN(ENOTDIR);
+    RETURN(-ENOTDIR);
     
     // <<< My new code
 }
