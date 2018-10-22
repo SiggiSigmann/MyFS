@@ -40,4 +40,4 @@ make -f Makefile
 echo execute
 ./mkfs.myfs test.bin test/file1.txt file2.txt file3.txt
 
-xxd -c 32 test.bin > hex.txt
+#xxd -c 32 test.bin > hex.txt
