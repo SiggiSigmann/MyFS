@@ -183,7 +183,7 @@ int MyFS::fuseRemovexattr(const char *path, const char *name) {
 int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
     
-    // TODO: Implement this!
+    // TODO: Implement this! //we don't need this
     
     RETURN(0);
 }
@@ -201,7 +201,7 @@ int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t
 int MyFS::fuseReleasedir(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
     
-    // TODO: Implement this!
+    // TODO: Implement this! //we don't need this
     
     RETURN(0);
 }
