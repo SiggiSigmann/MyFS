@@ -102,9 +102,9 @@ int main(int argc, char *argv[]) {
             bd->write(FIRST_DATA_BLOCK+i,emptyblock);
         }
 
-        //
+        //write files in FS
         for(int i = 2;i<argc;i++){
-        
+            //todo: check if file exists
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
                  return -(EIO);
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
             superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
 
             //write inode           
-            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,444);
+            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,S_IFREG | 0444);
         }
 
         //write modifed FS blocks to FS
