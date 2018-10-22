@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
             //todo: check if file exists
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
-                print("unable to read metadata from file\n");
+                printf("unable to read metadata from file\n");
                 break;
             }
             char* basenameOfFile = basename(argv[i]);

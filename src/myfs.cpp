@@ -234,19 +234,21 @@ int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("\tPath:%s\n",path);
-    //ToDO: eheck if we need a check for dir exists
-    filler( buf, ".", NULL, 0 );
-    filler( buf, "..", NULL, 0 );
-    for(uint32_t i = 0; i<NUM_DIR_ENTRIES;i++){
-        if(imap->getIMapEntry(i)){
-            filler(buf, rootblock->getFileName(bd, i), NULL, 0 );
+    if(strcmp( path, "/" ) == 0){
+           LOGF("\tPath:%s\n",path);
+        //ToDO: eheck if we need a check for dir exists
+        filler( buf, ".", NULL, 0 );
+        filler( buf, "..", NULL, 0 );
+        for(uint32_t i = 0; i<NUM_DIR_ENTRIES;i++){
+            if(imap->getIMapEntry(i)){
+                filler(buf, rootblock->getFileName(bd, i), NULL, 0 );
+            }
         }
+    
+        RETURN(0);
     }
     
-    RETURN(0);
-    
-    RETURN(0);
+    RETURN(ENOTDIR);
     
     // <<< My new code
 }
