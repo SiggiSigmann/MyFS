@@ -163,9 +163,14 @@ int MyFS::fuseUtime(const char *path, struct utimbuf *ubuf) {
 int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
     
-    // TODO: Implement this!
+    if(numberOfOpendFiles<NUM_OPEN_FILES){
+        numberOfOpendFiles++;
+        RETURN(0);
+    }
+
+    RETURN(-EMFILE);
     
-    RETURN(0);
+    
 }
 
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
@@ -197,7 +202,9 @@ int MyFS::fuseFlush(const char *path, struct fuse_file_info *fileInfo) {
 int MyFS::fuseRelease(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
     
-    // TODO: Implement this!
+    if(numberOfOpendFiles>0){
+        numberOfOpendFiles--;
+    }
     
     RETURN(0);
 }
@@ -235,8 +242,7 @@ int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
 int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
     if(strcmp( path, "/" ) == 0){
-           LOGF("\tPath:%s\n",path);
-        //ToDO: eheck if we need a check for dir exists
+        LOGF("\tPath:%s\n",path);
         filler( buf, ".", NULL, 0 );
         filler( buf, "..", NULL, 0 );
         for(uint32_t i = 0; i<NUM_DIR_ENTRIES;i++){

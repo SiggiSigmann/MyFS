@@ -24,11 +24,14 @@
 
 #include <unistd.h>
 #include <sys/types.h>
+#include <errno.h>
 
 class MyFS {
 private:
     static MyFS *_instance;
     FILE *logFile;
+
+    uint32_t numberOfOpendFiles = 0;
 
     BlockDevice* bd;
     Superblock* superblock;
