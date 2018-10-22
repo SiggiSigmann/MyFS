@@ -69,9 +69,9 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
 
         //copy path in name to make it not constant
         char* name = (char*)malloc(NAME_LENGTH); 
-        strcpy(name,path);
+        strcpy(name,path+1);
 
-        inode = rootblock->getInodeByName(bd,name+1);
+        inode = rootblock->getInodeByName(bd,name);
 
         if(inode == NULL){
             LOG("HILFE");
@@ -91,13 +91,9 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
         statbuf->st_atime = inode->atime;
         statbuf->st_mtime = inode->mtime;
         statbuf->st_ctime = inode->ctime;        
-        LOG("auftercopy");
         free(inode);
-        LOG("1afterfree");
         free(name);
-        LOG("2afterfree");
     }
-    LOG("finish");
    
     RETURN(0);
 }
@@ -170,6 +166,7 @@ int MyFS::fuseUtime(const char *path, struct utimbuf *ubuf) {
 
 int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("\tNumber of open Files: %d",numberOfOpendFiles);
     
     if(numberOfOpendFiles<NUM_OPEN_FILES){
         numberOfOpendFiles++;
@@ -191,16 +188,23 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
     //copy path in name to make it not constant
     char* name = (char*)malloc(NAME_LENGTH); 
-    strcpy(name,path);
+    strcpy(name,path+1);
 
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
+
+    if(inode == NULL){
+        //TODO: errorcode
+        //errorhandling read
+    }
 
     //skip blocks
     uint32_t blockOffset = offset/BLOCK_SIZE;
     uint32_t byteOffset = offset - (blockOffset*BLOCK_SIZE);
     LOGF("offset = Blocks:%d Bytes%d", blockOffset ,byteOffset);
+
     uint32_t currentblock = inode->firstDataBlock;
+    LOGF("first index : %x", currentblock);
     for(uint32_t i = 0;i>blockOffset;i++){
         currentblock = fat->get(currentblock);
     }
@@ -212,18 +216,25 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
     uint32_t bocksToRead = size/BLOCK_SIZE;
     uint32_t lastBytesToRead  = size - (bocksToRead*BLOCK_SIZE);
+    LOGF("read = Blocks:%d Bytes%d", bocksToRead ,lastBytesToRead);
 
     //copy needed blocks to buf
-    for(uint32_t i = 0;i>bocksToRead;i++){
-        currentblock = fat->get(currentblock);
+    char* buffer = (char*)malloc(BLOCK_SIZE);
+    for(uint32_t i = 0;i<bocksToRead;i++){
+        LOGF("fat %x",currentblock);
         if(currentblock == END_OF_FILE_ENTRY){
-            LOG("Reached end of file");
+            LOGF("content :/n %p",buf+(i*BLOCK_SIZE));
             strcpy(buf+(i*BLOCK_SIZE),emptyblock);
-            break;
+            LOGF("content :/n %s",buf+(i*BLOCK_SIZE));
         }else{
-            bd->read(FIRST_DATA_BLOCK+currentblock,buf+(i*BLOCK_SIZE));
+            LOGF("error? %d",bd->read(FIRST_DATA_BLOCK+currentblock,buffer));
+            strcpy(buf+(i*BLOCK_SIZE),buffer);
+            LOGF("content :/n %p",buf+(i*BLOCK_SIZE));
+            LOGF("content :/n %s",buf+(i*BLOCK_SIZE));
+            currentblock = fat->get(currentblock);
         }
     }
+    free(buffer);
 
     //copy bytes which are to small for a block in buf
     char* bytebuffer = (char*)malloc(BLOCK_SIZE);
@@ -234,7 +245,8 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     }else{
         bd->read(FIRST_DATA_BLOCK+currentblock,bytebuffer);
     }
-    for(uint32_t i = 0;i>lastBytesToRead;i++){
+    for(uint32_t i = 0;i<lastBytesToRead;i++){
+        LOG("writebit");
         (buf+(bocksToRead*BLOCK_SIZE))[i] = bytebuffer[i];
     }
 
@@ -271,7 +283,7 @@ int MyFS::fuseFlush(const char *path, struct fuse_file_info *fileInfo) {
 
 int MyFS::fuseRelease(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
-    
+    LOGF("openfiles %d",numberOfOpendFiles);
     if(numberOfOpendFiles>0){
         numberOfOpendFiles--;
     }
