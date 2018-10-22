@@ -22,6 +22,9 @@
 #include "rootblock.h"
 #include "superblock.h"
 
+#include <unistd.h>
+#include <sys/types.h>
+
 class MyFS {
 private:
     static MyFS *_instance;

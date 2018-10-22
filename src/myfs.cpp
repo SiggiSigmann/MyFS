@@ -52,8 +52,39 @@ MyFS::~MyFS() {
 int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
     LOGM();
     
-    // TODO: Implement this!
-    
+    LOGF("\tPath:%s\n",path);
+    if ( strcmp( path, "/" ) == 0 ){
+        statbuf->st_uid = getuid();
+        statbuf->st_gid = getgid();
+         
+        statbuf->st_mode = S_IFDIR | 0555;
+		statbuf->st_nlink = 2; // Why "two" hardlinks instead of "one"? The answer is here: http://unix.stackexchange.com/a/101536
+	
+    }else{
+        InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
+
+        char* name = (char*)malloc(NAME_LENGTH);
+        strcpy(name,path);
+
+        inode = rootblock->getInodeByName(bd,name);
+
+        //statbuf->st_dev;
+        //statbuf->st_ino;
+        statbuf->st_mode = inode->mode;
+        //statbuf->st_nlink;
+        statbuf->st_uid = inode->userID;
+        statbuf->st_gid = inode->groupID;
+        //statbuf->st_rdev;
+        statbuf->st_size = inode->fileSize*BLOCK_SIZE;
+        statbuf->st_blksize = BLOCK_SIZE;
+        statbuf->st_blocks = inode->fileSize;
+        statbuf->st_atime = inode->atime;
+        statbuf->st_mtime = inode->mtime;
+        statbuf->st_ctime = inode->ctime;        
+
+        free(inode);
+    }
+   
     RETURN(0);
 }
 
@@ -197,7 +228,7 @@ int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    
+    LOGF("\tPath:%s\n",path);
     //ToDO: eheck if we need a check for dir exists
     filler( buf, ".", NULL, 0 );
     filler( buf, "..", NULL, 0 );
