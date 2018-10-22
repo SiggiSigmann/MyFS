@@ -107,7 +107,8 @@ int main(int argc, char *argv[]) {
             //todo: check if file exists
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
-                 return -(EIO);
+                print("unable to read metadata from file\n");
+                break;
             }
             char* basenameOfFile = basename(argv[i]);
 
@@ -120,19 +121,18 @@ int main(int argc, char *argv[]) {
             //check if a inode is free
             if(superblock->getNumberOfFreeInodes()<1){    //check if a inode is free
                 printf("not possibel to add more files then 62\n");
-                return -(EIO);
+                break;
             }
 
             //check if enough blocks are free
             if(superblock->getNumberOfFreeBlocks() <= neededBlocks){ //check if enough space (datablocks) ar free
                 printf("not enough space in FS\n");
-                return -(EIO);
+                break;
             }
 
             //check if the filename is free
             if(rootblock->checkFilenameOccupied(bd, basenameOfFile)!=(uint32_t)-1){
                 printf("name already in use\n");
-                //return -(EEXIST);
                 break;
             }
 
