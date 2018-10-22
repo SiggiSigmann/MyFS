@@ -71,25 +71,33 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
         char* name = (char*)malloc(NAME_LENGTH); 
         strcpy(name,path);
 
-        inode = rootblock->getInodeByName(bd,name);
+        inode = rootblock->getInodeByName(bd,name+1);
 
-        //statbuf->st_dev = 0;
-        //statbuf->st_ino = 0;
+        if(inode == NULL){
+            LOG("HILFE");
+            //todo:errorcode
+        }
+
+        statbuf->st_dev = 0;
+        statbuf->st_ino = 0;
         statbuf->st_mode = inode->mode;
-        //statbuf->st_nlink = 0;
+        statbuf->st_nlink = 0;
         statbuf->st_uid = inode->userID;
         statbuf->st_gid = inode->groupID;
-        //statbuf->st_rdev = 0;
+        statbuf->st_rdev = 0;
         statbuf->st_size = inode->fileSize*BLOCK_SIZE;
         statbuf->st_blksize = BLOCK_SIZE;
         statbuf->st_blocks = inode->fileSize;
         statbuf->st_atime = inode->atime;
         statbuf->st_mtime = inode->mtime;
         statbuf->st_ctime = inode->ctime;        
-
+        LOG("auftercopy");
         free(inode);
+        LOG("1afterfree");
         free(name);
+        LOG("2afterfree");
     }
+    LOG("finish");
    
     RETURN(0);
 }
@@ -206,7 +214,6 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     uint32_t lastBytesToRead  = size - (bocksToRead*BLOCK_SIZE);
 
     //copy needed blocks to buf
-    uint32_t returnedBytes = 0;
     for(uint32_t i = 0;i>bocksToRead;i++){
         currentblock = fat->get(currentblock);
         if(currentblock == END_OF_FILE_ENTRY){
