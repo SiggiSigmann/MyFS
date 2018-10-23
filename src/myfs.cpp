@@ -37,6 +37,9 @@ MyFS::MyFS() {
     fat = new FatHandler();
     imap = new IMapHandler();
     rootblock = new RootBlock();
+    blockBuffer = new FsBuffer();
+    blockBuffer->buffer = (char*)malloc(BLOCK_SIZE);
+    blockBuffer->blockindex = EMPTY_FAT_ENTRY;
 }
 
 MyFS::~MyFS() {
@@ -47,6 +50,8 @@ MyFS::~MyFS() {
     delete fat;
     delete imap;
     delete rootblock;
+    free(blockBuffer->buffer);
+    delete blockBuffer;
 }
 
 /**
@@ -181,8 +186,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     LOGM();
     LOGF("Name: %s",path);
     //TODO:think about EMPTY_FAT_ENTRY;
-    //TODO:put char buffer
-
+    //TODO:Errorcode
     if ( strcmp( path, "/" ) == 0 ){
         RETURN(-EISDIR); /* Is a directory */
     }
@@ -229,18 +233,29 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
             break;  //if no more data to read
         }
 
-        if(byteOffset){
+        if(blockBuffer->blockindex == currentblock){
+            memcpy(buffer,blockBuffer->buffer, BLOCK_SIZE);
+            LOGV("use Buffer: %d",currentblock);
+        }else{
             bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
+        }
+
+        if(byteOffset){
+            memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+            blockBuffer->blockindex = currentblock;
             for(uint32_t j = byteOffset; j < BLOCK_SIZE; j++){
                 (buf+(i*BLOCK_SIZE))[j] = buffer[j];
             }
             readedBytes += byteOffset;
             byteOffset = 0;
         }else{
-            bd->read(FIRST_DATA_BLOCK+currentblock,buf+(i*BLOCK_SIZE));
+            memcpy(buf+(i*BLOCK_SIZE),buffer, BLOCK_SIZE);
             readedBytes += BLOCK_SIZE;
+            memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+            blockBuffer->blockindex = currentblock;
         }
         currentblock = fat->get(currentblock);
+        LOGF("Bufferindex: %d", blockBuffer->blockindex);
     }
     
     //copy bytes which are to small for a block in buf

@@ -40,7 +40,12 @@ private:
     IMapHandler* imap;
     RootBlock* rootblock;
 
+    struct FsBuffer{
+        uint32_t blockindex;
+        char* buffer;
+    };
 
+    FsBuffer* blockBuffer;
 
 public:
     static MyFS *Instance();
