@@ -61,7 +61,6 @@ MyFS::~MyFS() {
 int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
     LOGM();
     
-    LOGF("\tPath:%s\n",path);
     if ( strcmp( path, "/" ) == 0 ){
         statbuf->st_uid = getuid();
         statbuf->st_gid = getgid();
@@ -170,7 +169,6 @@ int MyFS::fuseUtime(const char *path, struct utimbuf *ubuf) {
 
 int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("\tNumber of open Files: %d",numberOfOpendFiles);
     
     if(numberOfOpendFiles<NUM_OPEN_FILES){
         numberOfOpendFiles++;
@@ -184,7 +182,6 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
 
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("Name: %s",path);
     //TODO:think about EMPTY_FAT_ENTRY;
     //TODO:Errorcode
     if ( strcmp( path, "/" ) == 0 ){
@@ -202,12 +199,10 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
     //get first datablock
     uint32_t currentblock = inode->firstDataBlock;
-    LOGF("first index : %x", currentblock);
 
     //skip blocks
     uint32_t blockOffset = offset/BLOCK_SIZE;
     uint32_t byteOffset = offset - (blockOffset*BLOCK_SIZE);
-    LOGF("offset(%d) = Blocks:%d Bytes%d", offset, blockOffset ,byteOffset);
     for(uint32_t i = 0;i<blockOffset;i++){
         if(currentblock == END_OF_FILE_ENTRY){
             break;
@@ -223,19 +218,16 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     uint32_t readedBytes = 0;   //count read in bytes
     uint32_t blocksToRead = size/BLOCK_SIZE;
     uint32_t lastBytesToRead  = size - (blocksToRead*BLOCK_SIZE);
-    LOGF("read = Blocks:%d Bytes%d", blocksToRead ,lastBytesToRead);
 
     //copy needed blocks to buf
     char* buffer = (char*)malloc(BLOCK_SIZE);
     for(uint32_t i = 0;i<blocksToRead;i++){
-        LOGF("fat=%d",currentblock);
         if(currentblock == END_OF_FILE_ENTRY){
             break;  //if no more data to read
         }
 
         if(blockBuffer->blockindex == currentblock){
             memcpy(buffer,blockBuffer->buffer, BLOCK_SIZE);
-            LOGV("use Buffer: %d",currentblock);
         }else{
             bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
         }
@@ -255,14 +247,12 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
             blockBuffer->blockindex = currentblock;
         }
         currentblock = fat->get(currentblock);
-        LOGF("Bufferindex: %d", blockBuffer->blockindex);
     }
     
     //copy bytes which are to small for a block in buf
     if(lastBytesToRead){
         bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
         for(uint32_t i = 0;i<lastBytesToRead;i++){
-            LOG("writebit");
             readedBytes++;
             (buf+(blocksToRead*BLOCK_SIZE))[i] = buffer[i];
         }
@@ -272,7 +262,6 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     free(inode);
     free(name);
 
-    LOGF("bytes read:%d",readedBytes);
     RETURN(readedBytes);
 }
 
@@ -296,7 +285,6 @@ int MyFS::fuseFlush(const char *path, struct fuse_file_info *fileInfo) {
 
 int MyFS::fuseRelease(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("openfiles %d",numberOfOpendFiles);
     if(numberOfOpendFiles>0){
         numberOfOpendFiles--;
     }
@@ -337,7 +325,6 @@ int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
 int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
     if(strcmp( path, "/" ) == 0){
-        LOGF("\tPath:%s\n",path);
         filler( buf, ".", NULL, 0 );
         filler( buf, "..", NULL, 0 );
         for(uint32_t i = 0; i<NUM_DIR_ENTRIES;i++){
@@ -402,7 +389,6 @@ void* MyFS::fuseInit(struct fuse_conn_info *conn) {
         
         // you can get the containfer file name here:
         char* containerName = (((MyFsInfo *) fuse_get_context()->private_data))->contFile;
-        LOGF("Container file name: %s", containerName);
 
         bd->open(containerName);
         superblock->readSuperblock(bd);
