@@ -40,6 +40,8 @@ private:
     IMapHandler* imap;
     RootBlock* rootblock;
 
+
+
 public:
     static MyFS *Instance();
 
