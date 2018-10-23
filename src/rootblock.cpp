@@ -9,7 +9,7 @@ void RootBlock::init(BlockDevice*bd){
     for(int i=0;i < NUMBER_OF_INODE_BLOCKS; i++){
         char* fileName = new char[NAME_LENGTH];
         strcpy(fileName,EMPTY_INODE_STRING);
-        createInode(bd,FIRST_INODE_BLOCK+i, fileName,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE);
+        createInode(bd,FIRST_INODE_BLOCK+i, fileName,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE,EMPTY_INODE_VALUE);
         // printf("Created Inode %i \n",FIRST_INODE_BLOCK+i);
         delete[] fileName;
     }
@@ -17,14 +17,15 @@ void RootBlock::init(BlockDevice*bd){
 }
 
 //create a new Inode directly on the block device
-void RootBlock::createInode(BlockDevice *bd, uint32_t blockIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSize,
+void RootBlock::createInode(BlockDevice *bd, uint32_t blockIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes, uint32_t fileSizeBlocks,
         uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
     InodeStruct *inode = (InodeStruct *)malloc(BLOCK_SIZE);
     
     //copy everything into InodeStruct
-    inode->firstDataBlock = firstDataBlock;
     strcpy(inode->fileName, fileName);
-    inode->fileSize = fileSize;
+    inode->firstDataBlock = firstDataBlock;
+    inode->fileSizeBytes = fileSizeBytes;
+    inode->fileSizeBlocks = fileSizeBlocks;
     inode->atime = atime;
     inode->mtime = mtime;
     inode->ctime = ctime;
@@ -73,7 +74,7 @@ char* RootBlock::getFileName(BlockDevice *bd, uint32_t relativeIndex){
 /**
  * Updates inote, expexts relativeIndex and all inode params
  */
-void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSize,
+void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes, uint32_t fileSizeBlocks,
     uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
     char* chareinode = (char *)malloc(BLOCK_SIZE);
     for(int i =0; i<BLOCK_SIZE; i++){
@@ -83,7 +84,8 @@ void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileN
     printf("==> %s\n",fileName);
     strcpy(inode->fileName, fileName);
     inode->firstDataBlock = firstDataBlock;
-    inode->fileSize = fileSize;
+    inode->fileSizeBytes = fileSizeBytes;
+    inode->fileSizeBlocks = fileSizeBlocks;
     inode->atime = atime;
     inode->mtime = mtime;
     inode->ctime = ctime;

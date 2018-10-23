@@ -25,21 +25,6 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
     bd->create(BD_PATH);
     
     SECTION("Inode Lifecycle") {
-        /*
-        uint32_t index = 1000;
-        //write inode with data to block 10
-        //char fileName[NAME_LENGTH] = "empty";
-        
-        rootb->createInode(bd,index,fileName,1,100,100,100,100,100,100,100);
-        //create new inode struct to store data, size = blockSize
-        InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
-        //read inode struct from block 10
-        inode = rootb->getInode(bd,index);
-        REQUIRE(strcmp(fileName,inode->fileName) == 0);
-        REQUIRE(100==inode->fileSize);
-        REQUIRE(100==inode->mode);
-        free(inode);
-        */
 
         char* fileName = new char[NAME_LENGTH];
         strcpy(fileName,EMPTY_INODE_STRING);
@@ -79,7 +64,7 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
         // Update Inode 33
         char* testName = new char[NAME_LENGTH];
         strcpy(testName,"newName");
-        rootb->updateInode(bd,32,testName,1,1,1,1,1,1,1,1);
+        rootb->updateInode(bd,32,testName,1,1,1,1,1,1,1,1,1);
 
         // ─────────────────────────────────────────────────────────────────
         // test checkFilename exists
