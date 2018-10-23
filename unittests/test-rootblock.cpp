@@ -78,10 +78,10 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
 
         // ─────────────────────────────────────────────────────────────────
         // test getFileName get
-        char* inodeName = new char[NAME_LENGTH];
+        char* inodeName;
         inodeName = rootb->getFileName(bd,32);
         REQUIRE(strcmp(inodeName,testName) == 0);
-        char* inodeName2 = new char[NAME_LENGTH];
+        char* inodeName2;
         inodeName2 = rootb->getFileName(bd,1);
         REQUIRE(strcmp(inodeName2,fileName) == 0);
         
