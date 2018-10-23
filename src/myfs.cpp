@@ -205,6 +205,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     uint32_t byteOffset = offset - (blockOffset*BLOCK_SIZE);
     LOGF("offset = Blocks:%d Bytes%d", blockOffset ,byteOffset);
     for(uint32_t i = 0;i>blockOffset;i++){
+        if(currentblock == END_OF_FILE_ENTRY){
+            break;
+        }
         currentblock = fat->get(currentblock);
     }
 
