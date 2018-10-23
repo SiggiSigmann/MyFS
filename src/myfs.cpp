@@ -82,7 +82,7 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
         }
 
         statbuf->st_dev = 0;        //TODO:
-        statbuf->st_ino = 0;        //TODO:
+        statbuf->st_ino = rootblock->checkFilenameOccupied(bd,name);
         statbuf->st_mode = inode->mode;
         statbuf->st_nlink = 1;      //static value
         statbuf->st_uid = inode->userID;
@@ -109,8 +109,27 @@ int MyFS::fuseReadlink(const char *path, char *link, size_t size) {
 int MyFS::fuseMknod(const char *path, mode_t mode, dev_t dev) {
     LOGM();
     
-    // TODO: Implement this!
+    //check if a inode is free
+    if(superblock->getNumberOfFreeInodes()<1){
+        RETURN(-ENOSPC);
+    }
+
+    //check if filename allready exists
+    char* name = (char*)malloc(NAME_LENGTH); 
+    strcpy(name,path+1);
+    if(rootblock->checkFilenameOccupied(bd,name)!=(uint32_t)-1){
+       RETURN(EEXIST); 
+    }
+
+    //get inode index and calculate inode superblock values
+    uint32_t inodeIndex = superblock->getFirstFreeInodeIndex();
+    imap->occupyIMapEntry(inodeIndex);
+    superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(inodeIndex));
+    superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
     
+    rootblock->updateInode(bd, inodeIndex, name, END_OF_FILE_ENTRY, 0, 0,time(NULL),time(NULL),time(NULL),getuid(),getgid(),mode);
+
+    free(name);
     RETURN(0);
 }
 
@@ -387,9 +406,7 @@ int MyFS::fuseTruncate(const char *path, off_t offset, struct fuse_file_info *fi
 int MyFS::fuseCreate(const char *path, mode_t mode, struct fuse_file_info *fileInfo) {
     LOGM();
     
-    // TODO: Implement this!
-    
-    RETURN(0);
+    RETURN(-ENOSYS); /* Function not implemented --> instead mknod and open will be called */
 }
 
 void MyFS::fuseDestroy() {
