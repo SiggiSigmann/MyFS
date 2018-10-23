@@ -78,16 +78,16 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
         inode = rootblock->getInodeByName(bd,name);
 
         if(inode == NULL){
-            RETURN(ENOENT); /*No such file or directory*/
+            RETURN(-ENOENT); /*No such file or directory*/
         }
 
-        statbuf->st_dev = 0;
-        statbuf->st_ino = 0;
+        statbuf->st_dev = 0;        //TODO:
+        statbuf->st_ino = 0;        //TODO:
         statbuf->st_mode = inode->mode;
-        statbuf->st_nlink = 1;
+        statbuf->st_nlink = 1;      //static value
         statbuf->st_uid = inode->userID;
         statbuf->st_gid = inode->groupID;
-        statbuf->st_rdev = 0;
+        statbuf->st_rdev = 0;       //TODO:
         statbuf->st_size = inode->fileSizeBytes;
         statbuf->st_blksize = BLOCK_SIZE;
         statbuf->st_blocks = inode->fileSizeBlocks;
@@ -175,7 +175,7 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
         RETURN(0);
     }
 
-    RETURN(-EMFILE);
+    RETURN(-ENFILE);    /* File table overflow */
     
     
 }
@@ -194,7 +194,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
     if(inode == NULL){
-        RETURN(-(ENOENT)); /* No such file or directory */
+        RETURN(-ENOENT); /* No such file or directory */
     }
 
     //get first datablock
@@ -229,7 +229,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         if(blockBuffer->blockindex == currentblock){
             memcpy(buffer,blockBuffer->buffer, BLOCK_SIZE);
         }else{
-            bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
+            if(bd->read(FIRST_DATA_BLOCK+currentblock,buffer)){
+                RETURN(-EIO)
+            }
         }
 
         if(byteOffset){
@@ -251,7 +253,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     
     //copy bytes which are to small for a block in buf
     if(lastBytesToRead){
-        bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
+        if(bd->read(FIRST_DATA_BLOCK+currentblock,buffer)){
+            RETURN(-EIO)
+        }
         for(uint32_t i = 0;i<lastBytesToRead;i++){
             readedBytes++;
             (buf+(blocksToRead*BLOCK_SIZE))[i] = buffer[i];
@@ -329,7 +333,9 @@ int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t
         filler( buf, "..", NULL, 0 );
         for(uint32_t i = 0; i<NUM_DIR_ENTRIES;i++){
             if(imap->getIMapEntry(i)){
-                filler(buf, rootblock->getFileName(bd, i), NULL, 0 );
+                char* name = rootblock->getFileName(bd, i);
+                filler(buf, name, NULL, 0 );
+                delete[] name;
             }
         }
     
@@ -390,7 +396,9 @@ void* MyFS::fuseInit(struct fuse_conn_info *conn) {
         // you can get the containfer file name here:
         char* containerName = (((MyFsInfo *) fuse_get_context()->private_data))->contFile;
 
-        bd->open(containerName);
+        if(bd->open(containerName)){
+            RETURN(-EIO);
+        }
         superblock->readSuperblock(bd);
         dmap->readDMap(bd);
         fat->readFat(bd);
