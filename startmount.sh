@@ -47,6 +47,3 @@ mkdir fs
 
 ./mount.myfs container.bin log.txt fs
 
-cd fs
-cat file1.txt
-cat /MyFS/log.txt
