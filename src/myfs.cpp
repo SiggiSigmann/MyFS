@@ -71,7 +71,7 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
     }else{
         InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
 
-        //copy path in name to make it not constant
+        //copy path to name with the offste 1 to skip the / at the end of the name
         char* name = (char*)malloc(NAME_LENGTH); 
         strcpy(name,path+1);
 
@@ -167,6 +167,10 @@ int MyFS::fuseUtime(const char *path, struct utimbuf *ubuf) {
     return 0;
 }
 
+/**
+ * path	:  file to open
+ * fileInfo: ?
+ */
 int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
     
@@ -176,20 +180,27 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     }
 
     RETURN(-ENFILE);    /* File table overflow */
-    
-    
 }
 
+/**
+ * path: file to read out data
+ * buf:  will contain content out of file path
+ * size: number of bytes ehich sould be read
+ * offset: bytes with should be skipped
+ * fileInfo: ?
+ */
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
     //TODO:think about EMPTY_FAT_ENTRY;
-    //TODO:Errorcode
+
+    //check if path is dir
     if ( strcmp( path, "/" ) == 0 ){
         RETURN(-EISDIR); /* Is a directory */
     }
 
-    //get inode
-    char* name = (char*)malloc(NAME_LENGTH); 
+    //get inode by name
+    char* name = (char*)malloc(NAME_LENGTH);
+    //copy path to name with the offste 1 to skip the / at the end of the name
     strcpy(name,path+1);
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
@@ -207,7 +218,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         if(currentblock == END_OF_FILE_ENTRY){
             break;
         }
-        currentblock = fat->get(currentblock);
+
+        //get index of next data block
+        currentblock = fat->get(currentblock);      
     }
 
     if(currentblock == END_OF_FILE_ENTRY){
@@ -218,14 +231,13 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     uint32_t readedBytes = 0;   //count read in bytes
     uint32_t blocksToRead = size/BLOCK_SIZE;
     uint32_t lastBytesToRead  = size - (blocksToRead*BLOCK_SIZE);
-
-    //copy needed blocks to buf
-    char* buffer = (char*)malloc(BLOCK_SIZE);
+    char* buffer = (char*)malloc(BLOCK_SIZE);   //read buffer
     for(uint32_t i = 0;i<blocksToRead;i++){
         if(currentblock == END_OF_FILE_ENTRY){
             break;  //if no more data to read
         }
 
+        //read block in buffer
         if(blockBuffer->blockindex == currentblock){
             memcpy(buffer,blockBuffer->buffer, BLOCK_SIZE);
         }else{
@@ -234,6 +246,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
             }
         }
 
+        //write bytes
         if(byteOffset){
             memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
             blockBuffer->blockindex = currentblock;
@@ -248,6 +261,8 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
             memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
             blockBuffer->blockindex = currentblock;
         }
+
+        //get index of next datablock
         currentblock = fat->get(currentblock);
     }
     
@@ -287,8 +302,13 @@ int MyFS::fuseFlush(const char *path, struct fuse_file_info *fileInfo) {
     return 0;
 }
 
+/**
+ * path: path to file which should be Release
+ * fileInfo: ?
+ */
 int MyFS::fuseRelease(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
+
     if(numberOfOpendFiles>0){
         numberOfOpendFiles--;
     }
@@ -328,13 +348,14 @@ int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    if(strcmp( path, "/" ) == 0){
+
+    if(strcmp( path, "/" ) == 0){   //check if path is a directory
         filler( buf, ".", NULL, 0 );
         filler( buf, "..", NULL, 0 );
         for(uint32_t i = 0; i<NUM_DIR_ENTRIES;i++){
             if(imap->getIMapEntry(i)){
                 char* name = rootblock->getFileName(bd, i);
-                filler(buf, name, NULL, 0 );
+                filler(buf, name, NULL, 0 );    //fill buf with the name of the contained files
                 delete[] name;
             }
         }
@@ -343,8 +364,6 @@ int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t
     }
     
     RETURN(-ENOTDIR);
-    
-    // <<< My new code
 }
 
 int MyFS::fuseReleasedir(const char *path, struct fuse_file_info *fileInfo) {
