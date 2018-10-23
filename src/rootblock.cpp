@@ -82,6 +82,7 @@ void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileN
     InodeStruct* inode = (InodeStruct *)chareinode;
     printf("==> %s\n",fileName);
     strcpy(inode->fileName, fileName);
+    inode->firstDataBlock = firstDataBlock;
     inode->fileSize = fileSize;
     inode->atime = atime;
     inode->mtime = mtime;
