@@ -181,6 +181,7 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
     //TODO:think about EMPTY_FAT_ENTRY; 
+    //TODO:read only the amount of bytes which are needed.
     
     if ( strcmp( path, "/" ) == 0 ){
         RETURN(-EISDIR);
@@ -223,14 +224,18 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     for(uint32_t i = 0;i<bocksToRead;i++){
         LOGF("fat %x",currentblock);
         if(currentblock == END_OF_FILE_ENTRY){
-            LOGF("content :/n %p",buf+(i*BLOCK_SIZE));
-            strcpy(buf+(i*BLOCK_SIZE),emptyblock);
-            LOGF("content :/n %s",buf+(i*BLOCK_SIZE));
+            //strcpy(buf+(i*BLOCK_SIZE),emptyblock);
+            for(uint32_t j = 0; j < BLOCK_SIZE; j++){
+                (buf+(i*BLOCK_SIZE))[j] = emptyblock[i];
+            }
         }else{
-            LOGF("error? %d",bd->read(FIRST_DATA_BLOCK+currentblock,buffer));
-            strcpy(buf+(i*BLOCK_SIZE),buffer);
-            LOGF("content :/n %p",buf+(i*BLOCK_SIZE));
-            LOGF("content :/n %s",buf+(i*BLOCK_SIZE));
+            bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
+            //strcpy(buf+(i*BLOCK_SIZE),buffer);
+            for(uint32_t j = 0; j < BLOCK_SIZE; j++){
+                (buf+(i*BLOCK_SIZE))[j] = buffer[j];
+            }
+            LOGF("content : %p",buf+(i*BLOCK_SIZE));
+            LOGF("content : %s",buf+(i*BLOCK_SIZE));
             currentblock = fat->get(currentblock);
         }
     }
@@ -254,13 +259,15 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
 
 
-
+    LOGF("%s",buf);
 
     free(bytebuffer);
     free(emptyblock);
     free(inode);
     free(name);
-    RETURN(0);
+
+    LOGF("%s",buf);
+    RETURN(size);
 }
 
 int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
