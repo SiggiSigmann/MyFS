@@ -396,9 +396,7 @@ void* MyFS::fuseInit(struct fuse_conn_info *conn) {
         // you can get the containfer file name here:
         char* containerName = (((MyFsInfo *) fuse_get_context()->private_data))->contFile;
 
-        if(bd->open(containerName)){
-            RETURN(-EIO);
-        }
+        bd->open(containerName);
         superblock->readSuperblock(bd);
         dmap->readDMap(bd);
         fat->readFat(bd);
