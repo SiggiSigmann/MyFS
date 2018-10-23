@@ -106,9 +106,19 @@ int MyFS::fuseReadlink(const char *path, char *link, size_t size) {
     return 0;
 }
 
+/**
+ * path	: path with the filename which sould be created
+ * mode : excess mode of the file
+ * fileInfo : ?
+ */
 int MyFS::fuseMknod(const char *path, mode_t mode, dev_t dev) {
     LOGM();
     
+    //check if path is dir
+    if( strcmp( path, "/" ) == 0 ){
+        RETURN(-EISDIR); /* Is a directory */
+    }
+
     //check if a inode is free
     if(superblock->getNumberOfFreeInodes()<1){
         RETURN(-ENOSPC);
@@ -129,6 +139,10 @@ int MyFS::fuseMknod(const char *path, mode_t mode, dev_t dev) {
     
     rootblock->updateInode(bd, inodeIndex, name, END_OF_FILE_ENTRY, 0, 0,time(NULL),time(NULL),time(NULL),getuid(),getgid(),mode);
 
+    //write
+    superblock->writeSuperblock(bd);
+    imap->write(bd);
+
     free(name);
     RETURN(0);
 }
@@ -138,10 +152,53 @@ int MyFS::fuseMkdir(const char *path, mode_t mode) {
     return 0;
 }
 
+/**
+ * path: file to delete
+ */
 int MyFS::fuseUnlink(const char *path) {
     LOGM();
     
-    // TODO: Implement this!
+    //check if path is dir
+    if ( strcmp( path, "/" ) == 0 ){
+        RETURN(-EISDIR); /* Is a directory */
+    }
+
+    //get inodeindex
+    char* name = (char*)malloc(NAME_LENGTH); 
+    strcpy(name,path+1);
+    LOGF("name: %s",name);
+    uint32_t inodeindex = rootblock->checkFilenameOccupied(bd,name);
+    LOGF("index: %d",inodeindex);
+    if(inodeindex == (uint32_t)-1){
+        RETURN(-ENOENT); /* No such file or directory */
+    }
+
+    //get inode
+    InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
+    inode = rootblock->getInodeByName(bd,name);
+    uint32_t currentBlock = inode->firstDataBlock;
+
+    //define inode as free
+    if(!imap->getIMapEntry(inodeindex)){
+        RETURN(-ENOENT);
+    }
+    imap->freeIMapEntry(inodeindex);
+    superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()+1);
+
+    //free datablcoks
+    while(currentBlock!=END_OF_FILE_ENTRY){
+        LOGF("free index: %d",currentBlock);
+        dmap->freeDatablock(currentBlock);
+        currentBlock = fat->get(currentBlock);
+    }
+
+    //write to FS
+    superblock->writeSuperblock(bd);
+    dmap->writeDMap(bd);
+    imap->write(bd);
+
+    free(name);
+    free(inode);
     
     RETURN(0);
 }
@@ -403,6 +460,11 @@ int MyFS::fuseTruncate(const char *path, off_t offset, struct fuse_file_info *fi
     RETURN(0);
 }
 
+/**
+ * path	: path with the filename which sould be created
+ * mode : excess mode of the file
+ * fileInfo : ?
+ */
 int MyFS::fuseCreate(const char *path, mode_t mode, struct fuse_file_info *fileInfo) {
     LOGM();
     
