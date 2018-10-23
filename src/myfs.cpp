@@ -203,8 +203,8 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     //skip blocks
     uint32_t blockOffset = offset/BLOCK_SIZE;
     uint32_t byteOffset = offset - (blockOffset*BLOCK_SIZE);
-    LOGF("offset = Blocks:%d Bytes%d", blockOffset ,byteOffset);
-    for(uint32_t i = 0;i>blockOffset;i++){
+    LOGF("offset(%d) = Blocks:%d Bytes%d", offset, blockOffset ,byteOffset);
+    for(uint32_t i = 0;i<blockOffset;i++){
         if(currentblock == END_OF_FILE_ENTRY){
             break;
         }
@@ -224,7 +224,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     //copy needed blocks to buf
     char* buffer = (char*)malloc(BLOCK_SIZE);
     for(uint32_t i = 0;i<blocksToRead;i++){
-        LOGF("fat %x",currentblock);
+        LOGF("fat=%d",currentblock);
         if(currentblock == END_OF_FILE_ENTRY){
             break;  //if no more data to read
         }
