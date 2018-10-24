@@ -248,7 +248,7 @@ int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t
         RETURN(0);
     }
     
-    RETURN(ENOTDIR);
+    RETURN(-ENOTDIR);
     
     // <<< My new code
 }
