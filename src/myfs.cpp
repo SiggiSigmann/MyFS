@@ -448,22 +448,23 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     strcpy(name,path+1);    //copy path to name with the offste 1 to skip the / at the end of the name
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
-    LOGF("\tName: %s",name);
     if(inode == NULL){
         RETURN(-ENOENT); /* No such file or directory */
     }
     uint32_t currentblock = inode->firstDataBlock; //get first datablock
     //check if fuse points to end of file => empty file
     if(currentblock==END_OF_FILE_ENTRY){
-        LOG("\tget new block because file is empty");
+        LOG("\Get new block because file is empty");
         currentblock = superblock->getFirstFreeBlockIndex();
         //modify dmap
         dmap->occupyDatablock(currentblock);
         superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
         fat->set(currentblock,END_OF_FILE_ENTRY);
+        LOGF("\tAdd fat (%d|%d)",currentblock,END_OF_FILE_ENTRY);
+        
     }
     firstBlockIndex = currentblock;
-    LOGF("\tStartblock: %d",currentblock);
+    LOGF("\tStartblock: %d",firstBlockIndex);
 
     //skip blocks
     for(uint32_t i = 0;i<blockOffset;i++){
@@ -473,24 +474,22 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         }
 
         //get index of next data block
-        currentblock = fat->get(currentblock);      
+        currentblock = fat->get(currentblock);
+        LOGF("\tFat next: %d",currentblock); 
     }
 
     //write bytes in first data block which are not a complete block
     char* buffer = (char*)malloc(BLOCK_SIZE);   //read buffer
     if(firstBytesToWrite){
-        LOGF("\tbyteOffset -> Block Read: %d",currentblock);
+        LOGF("\tBlock: %d byteOffset: %d",currentblock, firstBytesToWrite);
         bd->read(FIRST_DATA_BLOCK+currentblock, buffer);
-        LOGF("|%s|",buffer);
         for(uint32_t i = 0;i<firstBytesToWrite;i++){
             buffer[i+byteOffset] = buf[i+writtenBytes];
-            LOGF("(%d) = %x|%c(%d)",i+byteOffset,buf[i+writtenBytes],buf[i+writtenBytes],i+writtenBytes);
         }
-        LOGF("|%s|",buffer);
-        LOGF("write code: %d",bd->write(FIRST_DATA_BLOCK+currentblock, buffer));
+        bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
 
         memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
-        blockBuffer->blockindex == currentblock;
+        blockBuffer->blockindex = currentblock;
 
         writtenBytes += firstBytesToWrite;
         currentblock = fat->get(currentblock);
@@ -499,6 +498,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
 
     //write compleat blocks
     for(uint32_t i = 0;i<blocksToWrite;i++){
+        LOGF("\twrite full Block: %d", i);
         if(currentblock==END_OF_FILE_ENTRY){
             LOG("\tget new block");
             currentblock = superblock->getFirstFreeBlockIndex();
@@ -514,7 +514,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
 
             memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
-            blockBuffer->blockindex == currentblock;
+            blockBuffer->blockindex = currentblock;
 
             //modify fat
             if(i==blocksToWrite-1){
@@ -534,7 +534,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
             
             memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
-            blockBuffer->blockindex == currentblock;
+            blockBuffer->blockindex = currentblock;
 
             currentblock = fat->get(currentblock);
         }
@@ -564,7 +564,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
 
         memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
-        blockBuffer->blockindex == currentblock;
+        blockBuffer->blockindex = currentblock;
 
     }
 
