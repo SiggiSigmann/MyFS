@@ -21,6 +21,7 @@ COPY src /MyFS/src
 COPY unittests /MyFS/unittests
 COPY startmount.sh /MyFS/startmount.sh
 COPY file4.txt /MyFS/file4.txt
+COPY fuseTests /MyFS/fuseTests
 
 WORKDIR /MyFS/
 
