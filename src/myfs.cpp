@@ -380,6 +380,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
 int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("offset: %d, buffer %d",offset,size);
 
     //TODO:What wil happen if it not reached end of file
     //TODO: • EBADF – Datei nicht zum Schreiben geöffnet
@@ -400,17 +401,17 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     LOGF("\toffset: total=%d (Blocks=%d Bytes=%d)",offset,blockOffset,byteOffset);
 
     //calculates blocks and bytes to write
-    uint32_t writtenBytes = 0;   //count write in bytes
-    uint32_t blocksToWrite = (size-byteOffset)/BLOCK_SIZE;
-    uint32_t lastBytesToWrite  = (size-byteOffset) - (blocksToWrite*BLOCK_SIZE);
-    if(byteOffset){
-        blocksToWrite = (size+byteOffset)/BLOCK_SIZE;
-        lastBytesToWrite  = size-((blocksToWrite*BLOCK_SIZE)-byteOffset);
-    }else{
-        blocksToWrite = size/BLOCK_SIZE;
-        lastBytesToWrite  = size - (blocksToWrite*BLOCK_SIZE);
+    uint32_t firstBytesToWrite = BLOCK_SIZE - byteOffset;
+    if(firstBytesToWrite>size){
+        firstBytesToWrite = size;
     }
-    LOGF("\tto write: total=%d (Blocks=%d Bytes=%d)",size,blocksToWrite,lastBytesToWrite);
+    uint32_t blocksToWrite = (size-firstBytesToWrite)/BLOCK_SIZE;
+    if(firstBytesToWrite+(blocksToWrite*BLOCK_SIZE)>size){
+        blocksToWrite--;
+    }
+    uint32_t lastBytesToWrite  = size-((blocksToWrite*BLOCK_SIZE)+firstBytesToWrite);
+    uint32_t writtenBytes = 0;   //count write in bytes
+    LOGF("\tto write: total=%d (BytesStart=%d Blocks=%d BytesEND=%d)",size,firstBytesToWrite,blocksToWrite,lastBytesToWrite);
     if(superblock->getNumberOfFreeBlocks()<blocksToWrite+1){
         RETURN(-ENOSPC);    /* No space left on device */
     }
@@ -421,6 +422,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     strcpy(name,path+1);    //copy path to name with the offste 1 to skip the / at the end of the name
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
+    LOGF("\tName: %s",name);
     if(inode == NULL){
         RETURN(-ENOENT); /* No such file or directory */
     }
@@ -450,14 +452,17 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
 
     //write bytes in first data block which are not a complete block
     char* buffer = (char*)malloc(BLOCK_SIZE);   //read buffer
-    if(byteOffset){
+    if(firstBytesToWrite){
         LOGF("\tbyteOffset -> Block Read: %d",currentblock);
         bd->read(FIRST_DATA_BLOCK+currentblock, buffer);
-        for(uint32_t i = 0;i<BLOCK_SIZE-byteOffset;i++){
-            buffer[i] = buf[i+writtenBytes];
+        LOGF("|%s|",buffer);
+        for(uint32_t i = 0;i<firstBytesToWrite;i++){
+            buffer[i+byteOffset] = buf[i+writtenBytes];
+            LOGF("(%d) = %x|%c(%d)",i+byteOffset,buf[i+writtenBytes],buf[i+writtenBytes],i+writtenBytes);
         }
-        writtenBytes += byteOffset;
-        bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
+        LOGF("|%s|",buffer);
+        LOGF("write: %d",bd->write(FIRST_DATA_BLOCK+currentblock, buffer));
+        writtenBytes += firstBytesToWrite;
         currentblock = fat->get(currentblock);
         LOGF("\tFat : %d", currentblock);
     }
@@ -502,6 +507,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
 
     //write last bytes which dont fit in a block
     if(lastBytesToWrite){
+        LOG("Last Blocks to write");
         if(currentblock==END_OF_FILE_ENTRY){
             LOG("\tget new block");
             currentblock = superblock->getFirstFreeBlockIndex();
