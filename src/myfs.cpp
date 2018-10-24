@@ -60,8 +60,10 @@ MyFS::~MyFS() {
  */
 int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
     LOGM();
+    LOGF("\tName: %s",path);
     
     if ( strcmp( path, "/" ) == 0 ){
+        LOG("\tIs dir");
         statbuf->st_uid = getuid();
         statbuf->st_gid = getgid();
          
@@ -69,6 +71,7 @@ int MyFS::fuseGetattr(const char *path, struct stat *statbuf) {
 		statbuf->st_nlink = 2; // Why "two" hardlinks instead of "one"? The answer is here: http://unix.stackexchange.com/a/101536
 	
     }else{
+        LOG("\tIs file");
         InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
 
         //copy path to name with the offste 1 to skip the / at the end of the name
@@ -113,16 +116,20 @@ int MyFS::fuseReadlink(const char *path, char *link, size_t size) {
  */
 int MyFS::fuseMknod(const char *path, mode_t mode, dev_t dev) {
     LOGM();
+    LOGF("\tName: %s",path);
     
     //check if path is dir
     if( strcmp( path, "/" ) == 0 ){
+        LOG("\tIs Path");
         RETURN(-EISDIR); /* Is a directory */
     }
+    LOG("\tIs File");
 
     //check if a inode is free
     if(superblock->getNumberOfFreeInodes()<1){
         RETURN(-ENOSPC);
     }
+    LOGF("\tNumber of free inodes: %d",superblock->getNumberOfFreeInodes());
 
     //check if filename allready exists
     char* name = (char*)malloc(NAME_LENGTH); 
@@ -133,9 +140,12 @@ int MyFS::fuseMknod(const char *path, mode_t mode, dev_t dev) {
 
     //get inode index and calculate inode superblock values
     uint32_t inodeIndex = superblock->getFirstFreeInodeIndex();
+    LOGF("\tInodeIndex: %d",inodeIndex);
     imap->occupyIMapEntry(inodeIndex);
     superblock->updateFirstFreeInodeIndex(imap->getNextFreeInode(inodeIndex));
+    LOGF("\tnew free InodeIndex: %d",superblock->getFirstFreeInodeIndex());
     superblock->updateNumberOfFreeInodes(superblock->getNumberOfFreeInodes()-1);
+    LOGF("\tnew Number of free inodes: %d",superblock->getNumberOfFreeInodes());
     
     rootblock->updateInode(bd, inodeIndex, name, END_OF_FILE_ENTRY, 0, 0,time(NULL),time(NULL),getuid(),getgid(),mode);
 
@@ -249,9 +259,13 @@ int MyFS::fuseUtime(const char *path, struct utimbuf *ubuf) {
  */
 int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("\Name: %s",path);
+    LOGF("\tNumber of opened files: %d",numberOfOpendFiles);
+
     //update accestime
     if(numberOfOpendFiles<NUM_OPEN_FILES){
         numberOfOpendFiles++;
+        LOGF("\tNew number of opened files: %d",numberOfOpendFiles);
         //get inode
         RETURN(0);
     }
@@ -268,14 +282,16 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("\tname: %s",path);
+    LOGF("\tName: %s",path);
     //TODO:think about EMPTY_FAT_ENTRY
     //TODO:filehandler put iniode inside
 
     //check if path is dir
     if ( strcmp( path, "/" ) == 0 ){
+        LOG("\tIs dir");
         RETURN(-EISDIR); /* Is a directory */
     }
+    LOG("\tIs file");
 
     //get inode by name
     char* name = (char*)malloc(NAME_LENGTH);
@@ -289,7 +305,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
     //get first datablock
     uint32_t currentblock = inode->firstDataBlock;
-    LOGF("\tstartbock: %d", currentblock);
+    LOGF("\tStartbock: %d", currentblock);
 
     //skip blocks
     uint32_t blockOffset = offset/BLOCK_SIZE;
@@ -303,7 +319,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         //get index of next data block
         currentblock = fat->get(currentblock);      
     }
-    LOGF("\tjump to block: %d", currentblock);
+    LOGF("\tJump to block: %d", currentblock);
 
     if(currentblock == END_OF_FILE_ENTRY){
         RETURN(0); //No data in file 
@@ -324,16 +340,18 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     
     char* buffer = (char*)malloc(BLOCK_SIZE);   //read buffer
     for(uint32_t i = 0;i<blocksToRead;i++){
-        LOGF("%d",END_OF_FILE_ENTRY);
         if(currentblock == END_OF_FILE_ENTRY){
             break;  //if no more data to read
         }
-        LOGF("\tread block: %d", currentblock);
+        LOGF("\tVirtuell adress: %d", currentblock);
+        LOGF("\tBlock adress %x",FIRST_DATA_BLOCK+currentblock);
 
         //read block in buffer
         if(blockBuffer->blockindex == currentblock){
+            LOG("\t\tRead form Buffer");
             memcpy(buffer,blockBuffer->buffer, BLOCK_SIZE);
         }else{
+            LOG("\t\tRead from Block");
             if(bd->read(FIRST_DATA_BLOCK+currentblock,buffer)){
                 RETURN(-EIO)
             }
@@ -341,14 +359,17 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
         //write bytes
         if(byteOffset){
+            LOG("\tRead with byte offset");
             memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
             blockBuffer->blockindex = currentblock;
+            LOGF("\t\tstart to read in Block at: %d",byteOffset);
             for(uint32_t j = byteOffset; j < BLOCK_SIZE; j++){
                 (buf+(i*BLOCK_SIZE))[j] = buffer[j];
             }
             readedBytes += byteOffset;
             byteOffset = 0;
         }else{
+            LOG("\tRead full block");
             memcpy(buf+(i*BLOCK_SIZE),buffer, BLOCK_SIZE);
             readedBytes += BLOCK_SIZE;
             memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
@@ -361,10 +382,14 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     
     //copy bytes which are to small for a block in buf
     if(lastBytesToRead){
-        LOGF("\tread bytes form block: %d", currentblock);
+        LOGF("\tread last bytes: %d", lastBytesToRead);
+        LOGF("\tVirtuell adress: %d", currentblock);
+        LOGF("\tBlock adress %x",FIRST_DATA_BLOCK+currentblock);
         if(bd->read(FIRST_DATA_BLOCK+currentblock,buffer)){
             RETURN(-EIO)
         }
+        memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+        blockBuffer->blockindex == currentblock;
         for(uint32_t i = 0;i<lastBytesToRead;i++){
             readedBytes++;
             (buf+(blocksToRead*BLOCK_SIZE))[i] = buffer[i];
@@ -380,8 +405,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
 int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("offset: %d, buffer %d",offset,size);
+    LOGF("\tName: %s",path);
 
+    //todo. lock
     //TODO:What wil happen if it not reached end of file
     //TODO: • EBADF – Datei nicht zum Schreiben geöffnet
     //TODO: chat if firstDataBLock is end of fitle
@@ -461,7 +487,11 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             LOGF("(%d) = %x|%c(%d)",i+byteOffset,buf[i+writtenBytes],buf[i+writtenBytes],i+writtenBytes);
         }
         LOGF("|%s|",buffer);
-        LOGF("write: %d",bd->write(FIRST_DATA_BLOCK+currentblock, buffer));
+        LOGF("write code: %d",bd->write(FIRST_DATA_BLOCK+currentblock, buffer));
+
+        memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+        blockBuffer->blockindex == currentblock;
+
         writtenBytes += firstBytesToWrite;
         currentblock = fat->get(currentblock);
         LOGF("\tFat : %d", currentblock);
@@ -483,6 +513,9 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             }
             bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
 
+            memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+            blockBuffer->blockindex == currentblock;
+
             //modify fat
             if(i==blocksToWrite-1){
                 LOGF("\tadd FAT: %d->%d",currentblock,END_OF_FILE_ENTRY);
@@ -499,6 +532,9 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
                 buffer[i] = buf[i+writtenBytes];
             }
             bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
+            
+            memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+            blockBuffer->blockindex == currentblock;
 
             currentblock = fat->get(currentblock);
         }
@@ -526,6 +562,9 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         }
         writtenBytes += lastBytesToWrite;
         bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
+
+        memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+        blockBuffer->blockindex == currentblock;
 
     }
 
@@ -561,9 +600,12 @@ int MyFS::fuseFlush(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseRelease(const char *path, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("\tName: %s",path);
 
+    LOGF("\tNumber of opend files: %d", numberOfOpendFiles);
     if(numberOfOpendFiles>0){
         numberOfOpendFiles--;
+        LOGF("\tnew number of opend files: %d", numberOfOpendFiles);
     }
     
     RETURN(0);
@@ -601,6 +643,7 @@ int MyFS::fuseOpendir(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("\tName: %s",path);
 
     //TODO:rethink if offset is not in block scale, how to calulet blocksToRead
 
@@ -611,6 +654,7 @@ int MyFS::fuseReaddir(const char *path, void *buf, fuse_fill_dir_t filler, off_t
             if(imap->getIMapEntry(i)){
                 char* name = rootblock->getFileName(bd, i);
                 filler(buf, name, NULL, 0 );    //fill buf with the name of the contained files
+                                LOGF("\tInode(%d): %s",i, name);
                 delete[] name;
             }
         }
@@ -672,6 +716,7 @@ void* MyFS::fuseInit(struct fuse_conn_info *conn) {
         
         // you can get the containfer file name here:
         char* containerName = (((MyFsInfo *) fuse_get_context()->private_data))->contFile;
+        LOGF("\tContainerfile: %s", containerName);
 
         bd->open(containerName);
         superblock->readSuperblock(bd);
@@ -701,8 +746,6 @@ int MyFS::fuseGetxattr(const char *path, const char *name, char *value, size_t s
     LOGM();
     RETURN(0);
 }
-        
-// TODO: Add your own additional methods here!
 
 /*
 Writes 'size' bytes to the block device, starting at index 'firstBlockIndex'
