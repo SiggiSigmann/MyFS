@@ -403,6 +403,13 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     uint32_t writtenBytes = 0;   //count write in bytes
     uint32_t blocksToWrite = (size-byteOffset)/BLOCK_SIZE;
     uint32_t lastBytesToWrite  = (size-byteOffset) - (blocksToWrite*BLOCK_SIZE);
+    if(byteOffset){
+        blocksToWrite = (size+byteOffset)/BLOCK_SIZE;
+        lastBytesToWrite  = size-((blocksToWrite*BLOCK_SIZE)-byteOffset);
+    }else{
+        blocksToWrite = size/BLOCK_SIZE;
+        lastBytesToWrite  = size - (blocksToWrite*BLOCK_SIZE);
+    }
     LOGF("\tto write: total=%d (Blocks=%d Bytes=%d)",size,blocksToWrite,lastBytesToWrite);
     if(superblock->getNumberOfFreeBlocks()<blocksToWrite+1){
         RETURN(-ENOSPC);    /* No space left on device */
@@ -418,8 +425,9 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         RETURN(-ENOENT); /* No such file or directory */
     }
     uint32_t currentblock = inode->firstDataBlock; //get first datablock
+    //check if fuse points to end of file => empty file
     if(currentblock==END_OF_FILE_ENTRY){
-        LOG("\tget new block");
+        LOG("\tget new block because file is empty");
         currentblock = superblock->getFirstFreeBlockIndex();
         //modify dmap
         dmap->occupyDatablock(currentblock);
@@ -451,6 +459,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         writtenBytes += byteOffset;
         bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
         currentblock = fat->get(currentblock);
+        LOGF("\tFat : %d", currentblock);
     }
 
     //write compleat blocks
