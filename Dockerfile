@@ -11,7 +11,10 @@ RUN apt-get update &&\
                     pkg-config=0.29.1-0ubuntu1 \
                     vim-common \
                     -y 
-
+#add Node
+RUN apt-get install --yes curl
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash
+RUN apt-get install nodejs -y 
 COPY CMakeLists.txt Makefile /MyFS/
 COPY includes /MyFS/includes/
 COPY src /MyFS/src
