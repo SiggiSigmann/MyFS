@@ -64,7 +64,7 @@ TEST_CASE( "update inode + read/write to block device", "[Rootblock]" ) {
         // Update Inode 33
         char* testName = new char[NAME_LENGTH];
         strcpy(testName,"newName");
-        rootb->updateInode(bd,32,testName,1,1,1,1,1,1,1,1,1);
+        rootb->updateInode(bd,32,testName,1,1,1,1,1,1,1,1);
 
         // ─────────────────────────────────────────────────────────────────
         // test checkFilename exists
