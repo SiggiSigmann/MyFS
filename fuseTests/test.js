@@ -13,7 +13,7 @@ describe("Myfs", async function () {
         if (fs.existsSync(basePath)) {
             expect(true).to.be.true;
         }else{
-            console.log(chalk.blue('\t\tmounting container.bin...'));
+            console.log(chalk.blue('\tmounting container.bin...'));
             shell.exec("cd .. && bash startmount.sh", {silent:true});
             expect(fs.existsSync(basePath)).to.be.true;
             done()
