@@ -74,7 +74,8 @@ void Superblock::writeSuperblock(BlockDevice* bd){
     *ptrBuffer++ = superblockStruct->uFirst_free_block_index;
 
     //Write the Superblock
-    writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
+    bd.write(superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer);    
+    //writeBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, buffer, BD_BLOCK_SIZE);
     delete [] buffer;
 }
 /*
