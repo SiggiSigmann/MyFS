@@ -75,7 +75,7 @@ char* RootBlock::getFileName(BlockDevice *bd, uint32_t relativeIndex){
  * Updates inote, expexts relativeIndex and all inode params
  */
 void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes, uint32_t fileSizeBlocks,
-    uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
+    uint32_t atime, uint32_t mtime, uint32_t userID, uint32_t groupID, uint32_t mode){
     char* chareinode = (char *)malloc(BLOCK_SIZE);
     for(int i =0; i<BLOCK_SIZE; i++){
         chareinode[i]=0;
@@ -88,7 +88,7 @@ void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileN
     inode->fileSizeBlocks = fileSizeBlocks;
     inode->atime = atime;
     inode->mtime = mtime;
-    inode->ctime = ctime;
+    inode->ctime = time(0);
     inode->userID = userID;
     inode->groupID = groupID;
     inode->mode = mode;
