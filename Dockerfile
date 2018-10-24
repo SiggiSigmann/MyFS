@@ -14,7 +14,10 @@ RUN apt-get update &&\
 #add Node
 RUN apt-get install --yes curl
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash
-RUN apt-get install nodejs -y 
+RUN apt-get install nodejs -y
+RUN echo 'alias runtest="cd /MyFS/fuseTests && npm test"' >> ~/.bashrc
+
+
 COPY CMakeLists.txt Makefile /MyFS/
 COPY includes /MyFS/includes/
 COPY src /MyFS/src
