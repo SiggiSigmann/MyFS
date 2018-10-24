@@ -424,7 +424,7 @@ echo =======>execute
 
 mkdir fs
 
-./mount.myfs -s container.bin log.txt fs
+./mount.myfs container.bin log.txt fs -s
 
 #cd fs
 #dd if=file1.txt ibs=1 skip=10 count=10
