@@ -268,6 +268,7 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
  */
 int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("\tname: %s",path);
     //TODO:think about EMPTY_FAT_ENTRY
     //TODO:filehandler put iniode inside
 
@@ -288,10 +289,12 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
     //get first datablock
     uint32_t currentblock = inode->firstDataBlock;
+    LOGF("\tstartbock: %d", currentblock);
 
     //skip blocks
     uint32_t blockOffset = offset/BLOCK_SIZE;
     uint32_t byteOffset = offset - (blockOffset*BLOCK_SIZE);
+    LOGF("\toffset: total=%d (Blocks=%d Bytes=%d)",offset,blockOffset,byteOffset);
     for(uint32_t i = 0;i<blockOffset;i++){
         if(currentblock == END_OF_FILE_ENTRY){
             break;
@@ -300,6 +303,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         //get index of next data block
         currentblock = fat->get(currentblock);      
     }
+    LOGF("\tjump to block: %d", currentblock);
 
     if(currentblock == END_OF_FILE_ENTRY){
         RETURN(0); //No data in file 
@@ -316,12 +320,15 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         blocksToRead = size/BLOCK_SIZE;
         lastBytesToRead  = size - (blocksToRead*BLOCK_SIZE);
     }
+    LOGF("\tread: total=%d (Blocks=%d Bytes=%d)",size,blocksToRead,lastBytesToRead);
     
     char* buffer = (char*)malloc(BLOCK_SIZE);   //read buffer
     for(uint32_t i = 0;i<blocksToRead;i++){
+        LOGF("%d",END_OF_FILE_ENTRY);
         if(currentblock == END_OF_FILE_ENTRY){
             break;  //if no more data to read
         }
+        LOGF("\tread block: %d", currentblock);
 
         //read block in buffer
         if(blockBuffer->blockindex == currentblock){
@@ -354,6 +361,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     
     //copy bytes which are to small for a block in buf
     if(lastBytesToRead){
+        LOGF("\tread bytes form block: %d", currentblock);
         if(bd->read(FIRST_DATA_BLOCK+currentblock,buffer)){
             RETURN(-EIO)
         }
@@ -378,6 +386,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     //TODO: chat if firstDataBLock is end of fitle
     //Todo: bytes schreiben in sperater schleife
     //TODO: update inode
+    //TODO: buffer inode
 
     
     //check if path is dir
@@ -415,6 +424,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         //modify dmap
         dmap->occupyDatablock(currentblock);
         superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
+        fat->set(currentblock,END_OF_FILE_ENTRY);
     }
     firstBlockIndex = currentblock;
     LOGF("\tStartblock: %d",currentblock);
