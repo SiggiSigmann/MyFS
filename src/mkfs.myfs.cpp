@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 
             //write inode
             printf("firstdatablock: %d",firstDataBlock);           
-            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, sb.st_size, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_ctime,sb.st_uid,sb.st_gid,S_IFREG | 0444);
+            rootblock->updateInode(bd, inodeIndex, basenameOfFile, firstDataBlock, sb.st_size, neededBlocks,sb.st_atime,sb.st_mtime,sb.st_uid,sb.st_gid,S_IFREG | 0444);
         }
 
         //write modifed FS blocks to FS
