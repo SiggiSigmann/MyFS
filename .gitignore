@@ -3,3 +3,4 @@ obj/*
 *.bin
 hex.txt
 node_modules
+*.txt
