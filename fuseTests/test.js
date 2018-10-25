@@ -61,9 +61,18 @@ describe("Myfs", async function () {
         });
         describe("Read:", async () => {
             let txtFile = path.join(basePath, "file1.txt");
-            let txtTest = path.join(testPath, "file1.txt")
-            it("without offset", async () => {
-                await compareTestToContainer(txtFile,txtText,0,1);
+            let txtTest = path.join(testPath, "file1.txt");
+            it("without offset: Exact", async () => {
+                await compareTestToContainer(txtFile,txtTest,0,512);
+            });
+            it("without offset: Half", async () => {
+                await compareTestToContainer(txtFile,txtTest,0,256);
+            });
+            it("without offset: Alot", async () => {
+                await compareTestToContainer(txtFile,txtTest,0,20*512);
+            });
+            it("without offset: nothing", async () => {
+                await compareTestToContainer(txtFile,txtTest,0,0);
             });
         });
     });
@@ -72,7 +81,6 @@ describe("Myfs", async function () {
 async function compareTestToContainer(file, testFile, pos, length) {
     let chunk1 = await exactly(file, pos, length);
     let chunk2 = await exactly(testFile, pos, length);
-    console.log("Chunk", chunk1, chunk2);
 }
 
 function exactly(file, pos, length) {
