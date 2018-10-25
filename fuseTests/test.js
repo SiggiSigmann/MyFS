@@ -1,31 +1,31 @@
 const expect = require("chai").expect;
 const chai = require("chai");
 const fs = require("fs");
+const readExactly = require("fs-read-exactly");
 const path = require("path");
-const shell = require('shelljs');
-const chalk = require('chalk');
+const shell = require("shelljs");
+const chalk = require("chalk");
 
-let basePath = "../fs/"
-let testPath = "./testFiles"
+let basePath = "../fs/";
+let testPath = "./testFiles";
 
 describe("Myfs", async function () {
     it("test if File System is mounted", function (done) {
-
         if (fs.existsSync(basePath)) {
             expect(true).to.be.true;
             done();
         } else {
-            console.log(chalk.blue('\tmounting container.bin...'));
+            console.log(chalk.blue("\tmounting container.bin..."));
             shell.exec("cd .. && bash startmount.sh", {
                 silent: true
             });
             expect(fs.existsSync(basePath)).to.be.true;
-            done()
+            done();
         }
-    }).timeout(25000)
+    }).timeout(25000);
     it("check if containe.bin has files", function () {
         let files = fs.readdirSync(basePath);
-        expect(files).to.be.not.empty
+        expect(files).to.be.not.empty;
         //fs.writeFile('file', new Buffer(1024*1024*54));
     });
     describe("test reading files", function () {
@@ -34,30 +34,52 @@ describe("Myfs", async function () {
                 let stats = fs.statSync(path.join(basePath, file));
                 expect(stats.blksize).to.be.equal(512);
                 //compared container.bin files
-                expect(fs.readFileSync(path.join(basePath, file), 'utf8')).to.be.equal(fs.readFileSync(path.join(testPath, file), "utf8"));
+                expect(fs.readFileSync(path.join(basePath, file), "utf8")).to.be.equal(
+                    fs.readFileSync(path.join(testPath, file), "utf8")
+                );
             });
         });
         it("read non-existing files", function () {
             expect(function () {
                 fs.readFileSync(path.join(basePath, "not Existing"));
-            }).to.throw("ENOENT: no such file or directory, open \'../fs/not Existing\'");
+            }).to.throw(
+                "ENOENT: no such file or directory, open '../fs/not Existing'"
+            );
         });
         it("bulk read files", async function () {
-            let testContents = []
+            let testContents = [];
             fs.readdirSync(testPath).forEach(file => {
-                testContents.push(fs.readFileSync(path.join(testPath, file), 'utf8'));
+                testContents.push(fs.readFileSync(path.join(testPath, file), "utf8"));
             });
             let containerFiles = fs.readdirSync(basePath);
             for (let j = 0; j < 100; j++) {
                 for (const i in containerFiles) {
-                    fs.readFile(path.join(basePath, containerFiles[i]), "utf8",(error,content)=>{
-                        expect(content).to.be.equal(testContents[i]);
-                    });
+                    let content = fs.readFileSync(path.join(basePath, containerFiles[i]), "utf8");
+                    expect(content).to.be.equal(testContents[i]);
                 }
             }
         });
-        
-
-
+        describe("Read:", async () => {
+            let txtFile = path.join(basePath, "file1.txt");
+            let txtTest = path.join(testPath, "file1.txt")
+            it("without offset", async () => {
+                await compareTestToContainer(txtFile,txtText,0,1);
+            });
+        });
     });
 });
+
+async function compareTestToContainer(file, testFile, pos, length) {
+    let chunk1 = await exactly(file, pos, length);
+    let chunk2 = await exactly(testFile, pos, length);
+    console.log("Chunk", chunk1, chunk2);
+}
+
+function exactly(file, pos, length) {
+    return new Promise((resolve, reject) => {
+        readExactly(file, pos, length, function (err, chunk) {
+            if (err) reject(err);
+            resolve(chunk);
+        });
+    });
+}
