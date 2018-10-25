@@ -2,5 +2,5 @@ obj/*
 .vscode
 *.bin
 hex.txt
-fs/*
 node_modules
+*.txt

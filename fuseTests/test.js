@@ -22,21 +22,14 @@ describe("Myfs", async function () {
             done();
         }
     }).timeout(25000);
-    it("check if containe.bin has files", function () {
+    it("check if container.bin has files", function () {
         let files = fs.readdirSync(basePath);
         expect(files).to.be.not.empty;
         //fs.writeFile('file', new Buffer(1024*1024*54));
     });
     describe("test reading files", function () {
         it("Compare container bin to testFiles", function () {
-            fs.readdirSync(basePath).forEach(file => {
-                let stats = fs.statSync(path.join(basePath, file));
-                expect(stats.blksize).to.be.equal(512);
-                //compared container.bin files
-                expect(fs.readFileSync(path.join(basePath, file), "utf8")).to.be.equal(
-                    fs.readFileSync(path.join(testPath, file), "utf8")
-                );
-            });
+            compareDirectorys()
         });
         it("read non-existing files", function () {
             expect(function () {
@@ -92,7 +85,7 @@ describe("Myfs", async function () {
                     compareTestToContainer(txtFile, txtTest, 512*2, 20 * 512);
                 });
                 it("short", async () => {
-                    compareTestToContainer(txtFile, txtTest, 10, 2*512);
+                    compareTestToContainer(txtFile, txtTest, 20,20);
                 });
             });
             describe('with oneBlock offset:', () => {
@@ -106,17 +99,36 @@ describe("Myfs", async function () {
                     compareTestToContainer(txtFile, txtTest, 512, 20 * 512);
                 });
                 it("short", async () => {
-                    compareTestToContainer(txtFile, txtTest, 512, 2*512);
+                    compareTestToContainer(txtFile, txtTest, 512, 20);
                 });
                 it("nothing", async () => {
                     compareTestToContainer(txtFile, txtTest, 512, 0);
                 });
             });
         });
-        describe('Write:', () => {
-            it('append:', () => {
-                fs.appendFileSync()
+       
+    });
+
+    describe('Write:', () => {
+        let smallString="test";
+        let oneBlockString= new Array(512 + 1).join("#");
+        let largeString= new Array(2000 + 1).join("#");
+
+        it('append: short', () => {
+            let files = fs.readdirSync(basePath);
+            files.forEach(file => {
+                append(path.join(basePath,file),smallString);
+                append(path.join(testPath,file),smallString);
             });
+            compareDirectorys();
+        });
+        it('append: long', () => {
+            let files = fs.readdirSync(basePath);
+            files.forEach(file => {
+                append(path.join(basePath,file),largeString);
+                append(path.join(testPath,file),largeString);
+            });
+            compareDirectorys();
         });
     });
 });
@@ -143,4 +155,28 @@ function readByByte(file, pos, length) {
     fs.fsyncSync(fd);
     fs.closeSync(fd);
     return buffer
+}
+
+function writeByByte(file, pos, string) {
+    let fd = fs.openSync(file,"w");
+    let buffer = Buffer.from(string, 'utf8');
+    fs.writeSync(fd,buffer,0,string.length,pos);
+    fs.fsyncSync(fd);
+    fs.closeSync(fd);
+}
+
+function append(file, string) {
+    let fd = fs.openSync(file,"a");
+    let buffer = Buffer.from(string, 'utf8');
+    fs.writeSync(fd,buffer,0,buffer.length,null);
+    fs.fsyncSync(fd);
+    fs.closeSync(fd);
+}
+
+function compareDirectorys(){
+    fs.readdirSync(basePath).forEach(file => {
+        expect(fs.readFileSync(path.join(basePath, file), "utf8")).to.be.equal(
+            fs.readFileSync(path.join(testPath, file), "utf8")
+        );
+    });
 }
