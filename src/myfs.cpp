@@ -353,10 +353,10 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
             RETURN(-EIO);
         }
         if(currentblock == END_OF_FILE_ENTRY){
+            LOG("reach end of file");
             break;  //if no more data to read
         }
         LOGF("Virtuell adress: %d", currentblock);
-        LOGF("Block adress %x",FIRST_DATA_BLOCK+currentblock);
 
         //read block in buffer
         if(blockBuffer->blockindex == currentblock){
@@ -512,6 +512,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
                 LOGF("Break Jump at rounf %d from %d because end of file",i, blockOffset);
                 LOGF("add FAT: %d->%d",currentblock,superblock->getFirstFreeBlockIndex());
                 fat->set(currentblock, superblock->getFirstFreeBlockIndex());
+                currentblock=superblock->getFirstFreeBlockIndex();
                 break;
             }else{
                currentblock =  jumpTo;
