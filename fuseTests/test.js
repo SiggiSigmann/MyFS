@@ -1,7 +1,6 @@
 const expect = require("chai").expect;
 const chai = require("chai");
 const fs = require("fs");
-const readExactly = require("fs-read-exactly");
 const path = require("path");
 const shell = require("shelljs");
 const chalk = require("chalk");
@@ -64,70 +63,84 @@ describe("Myfs", async function () {
             let txtTest = path.join(testPath, "file1.txt");
             describe('without offset:', () => {
                 it("Exact", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 0, 512);
+                    compareTestToContainer(txtFile, txtTest, 0, 512);
                 });
                 it("Half", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 0, 256);
+                    compareTestToContainer(txtFile, txtTest, 0, 256);
                 });
                 it("Long", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 0, 20 * 512);
+                    compareTestToContainer(txtFile, txtTest, 0, 20 * 512);
                 });
                 it("short", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 0, 20 * 600);
+                    compareTestToContainer(txtFile, txtTest, 0, 20 * 600);
                 });
                 it("nothing", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 0, 0);
+                    compareTestToContainer(txtFile, txtTest, 0, 0);
                 });
             });
             describe('with offset:', () => {
                 it("Exact", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512, 512);
+                    compareTestToContainer(txtFile, txtTest, 512, 512);
                 });
                 it("Half", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 256, 256);
+                    compareTestToContainer(txtFile, txtTest, 256, 256);
                 });
                 it("One", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 500, 12);
+                    compareTestToContainer(txtFile, txtTest, 500, 12);
                 });
                 it("Long", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512*2, 20 * 512);
+                    compareTestToContainer(txtFile, txtTest, 512*2, 20 * 512);
                 });
                 it("short", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 10, 2*512);
+                    compareTestToContainer(txtFile, txtTest, 10, 2*512);
                 });
             });
             describe('with oneBlock offset:', () => {
                 it("Exact", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512, 512);
+                    compareTestToContainer(txtFile, txtTest, 512, 512);
                 });
                 it("Half", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512, 256);
+                    compareTestToContainer(txtFile, txtTest, 512, 256);
                 });
                 it("Long", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512, 20 * 512);
+                    compareTestToContainer(txtFile, txtTest, 512, 20 * 512);
                 });
                 it("short", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512, 2*512);
+                    compareTestToContainer(txtFile, txtTest, 512, 2*512);
                 });
                 it("nothing", async () => {
-                    await compareTestToContainer(txtFile, txtTest, 512, 0);
+                    compareTestToContainer(txtFile, txtTest, 512, 0);
                 });
+            });
+        });
+        describe('Write:', () => {
+            it('append:', () => {
+                fs.appendFileSync()
             });
         });
     });
 });
 
-async function compareTestToContainer(file, testFile, pos, length) {
-    let chunk1 = await exactly(file, pos, length);
-    let chunk2 = await exactly(testFile, pos, length);
+function compareTestToContainer(file, testFile, pos, length) {
+    let chunk1 = readByByte(file, pos, length);
+    let chunk2 = readByByte(testFile, pos, length);
     expect(chunk1.toString('hex')).to.be.equal(chunk2.toString('hex'));
+    
+    /** 
+    let desF = fs.openSync(file,"a");
+    fs.appendFileSync(desF,"x");
+    fs.fsyncSync(desF);
+    let desT = fs.openSync(testFile,"a");
+    fs.appendFileSync(desT,"x");
+    fs.fsyncSync(desT);
+    */
 }
 
-function exactly(file, pos, length) {
-    return new Promise((resolve, reject) => {
-        readExactly(file, pos, length, function (err, chunk) {
-            if (err) reject(err);
-            resolve(chunk);
-        });
-    });
+function readByByte(file, pos, length) {
+    let fd = fs.openSync(file,"rs");
+    let buffer = Buffer.alloc(length);
+    fs.readSync(fd,buffer,0,length,pos);
+    fs.fsyncSync(fd);
+    fs.closeSync(fd);
+    return buffer
 }
