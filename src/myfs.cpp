@@ -324,7 +324,7 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         if(currentblock == END_OF_FILE_ENTRY){
             break;
         }
-
+        LOGF("used fat entry: %d->%d", currentblock, fat->get(currentblock));
         //get index of next data block
         currentblock = fat->get(currentblock);      
     }
@@ -443,6 +443,8 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     //TODO: • EBADF – Datei nicht zum Schreiben geöffnet
     //TODO bd cunter in superblcok
     //TODO: refectorwith dmap
+
+    //TODO: dmap
     
     //check if path is dir
     if ( strcmp( path, "/" ) == 0 ){
@@ -496,15 +498,27 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     //-----sicher^
 
     //skip blocks
-    for(uint32_t i = 0;i<blockOffset;i++){
-        if(currentblock == END_OF_FILE_ENTRY){
-            LOG("error");
-            RETURN(-EINVAL); /* Invalid argument */
+    if(blockOffset){
+        uint32_t jumpTo = currentblock;
+        for(uint32_t i = 0;i<blockOffset;i++){
+            /*if(currentblock == END_OF_FILE_ENTRY){
+                LOG("error");
+                RETURN(-EINVAL); /* Invalid argument 
+            }*/
+
+            //get index of next data block
+            jumpTo = fat->get(jumpTo);
+            if(jumpTo == END_OF_FILE_ENTRY){
+                LOGF("Break Jump at rounf %d from %d because end of file",i, blockOffset);
+                LOGF("add FAT: %d->%d",currentblock,superblock->getFirstFreeBlockIndex());
+                fat->set(currentblock, superblock->getFirstFreeBlockIndex());
+                break;
+            }else{
+               currentblock =  jumpTo;
+            }
+            LOGF("Fat next: %d",jumpTo);
         }
 
-        //get index of next data block
-        currentblock = fat->get(currentblock);
-        LOGF("Fat next: %d",currentblock); 
     }
 
     LOGF("Startblock: %d",firstBlockIndex);
@@ -525,14 +539,13 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
 
         writtenBytes += firstBytesToWrite;
         LOGF("written bytes: %d", writtenBytes);
-        currentblock = fat->get(currentblock);
-        LOGF("Fat : %d", currentblock);
     }
 
     //write compleat blocks
     for(uint32_t i = 0;i<blocksToWrite;i++){
         LOGF("write full Block: %d", i);
-        if(currentblock==END_OF_FILE_ENTRY||currentblock==EMPTY_FAT_ENTRY||dmap->get(currentblock)){
+        LOGF("dmap[%d]: %d",currentblock,dmap->get(currentblock));
+        if(currentblock==END_OF_FILE_ENTRY||currentblock==EMPTY_FAT_ENTRY||!dmap->get(currentblock)){
             LOG("get new block");
             currentblock = superblock->getFirstFreeBlockIndex();
               //modify dmap
@@ -542,7 +555,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             LOGF("write to : %d", currentblock);
             //copy content of file to FS
             for(uint32_t j = 0; j<BLOCK_SIZE;j++){
-                buffer[i] = buf[i+writtenBytes];
+                buffer[j] = buf[j+writtenBytes];
             }
             bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
 
@@ -554,9 +567,11 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             if(i==blocksToWrite-1 && lastBytesToWrite == 0){
                 LOGF("add FAT: %d->%d",currentblock,END_OF_FILE_ENTRY);
                 fat->set(currentblock, END_OF_FILE_ENTRY);
+                 currentblock = fat->get(currentblock);
             }else{
                 LOGF("add FAT: %d->%d",currentblock,superblock->getFirstFreeBlockIndex());
                 fat->set(currentblock, superblock->getFirstFreeBlockIndex());
+                currentblock = fat->get(currentblock);
             }
         }else{
             currentblock = fat->get(currentblock);
@@ -565,7 +580,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             LOGF("write to : %d", currentblock);
             //copy content of file to FS
             for(uint32_t j = 0; j<BLOCK_SIZE;j++){
-                buffer[i] = buf[i+writtenBytes];
+                buffer[j] = buf[j+writtenBytes];
             }
             bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
             
@@ -579,8 +594,10 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
 
     //write last bytes which dont fit in a block
     if(lastBytesToWrite){
-        LOG("Last Blocks to write");
-        if(currentblock==END_OF_FILE_ENTRY){
+        LOGF("Last Blocks to write: %d",lastBytesToWrite);
+        currentblock = fat->get(currentblock);
+        LOGF("write to: %d", currentblock);
+        if(currentblock==END_OF_FILE_ENTRY || currentblock==EMPTY_FAT_ENTRY || !dmap->get(currentblock)){
             LOG("get new block");
             currentblock = superblock->getFirstFreeBlockIndex();
               //modify dmap
@@ -610,7 +627,13 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     LOGF("old file size: %d",inode->fileSizeBytes);
     LOGF("written bytes: %d", writtenBytes);
 
-    rootblock->updateInode(bd, rootblock->checkFilenameOccupied(bd, name), inode->fileName, firstBlockIndex, inode->fileSizeBytes+writtenBytes,inode->fileSizeBlocks+blocksToWrite,time(0),time(0),inode->userID,inode->groupID,inode->mode);
+    //calc block size
+    uint32_t newBlockSize = (inode->fileSizeBytes+writtenBytes)/BLOCK_SIZE;
+    if((inode->fileSizeBytes+writtenBytes)%BLOCK_SIZE){
+        newBlockSize++;
+    }
+
+    rootblock->updateInode(bd, rootblock->checkFilenameOccupied(bd, name), inode->fileName, firstBlockIndex, inode->fileSizeBytes+writtenBytes,newBlockSize,time(0),time(0),inode->userID,inode->groupID,inode->mode);
     
     LOGF("new file size: %d",inode->fileSizeBytes+writtenBytes);
     //write to fs
@@ -622,7 +645,6 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     free(inode);
     free(name);
 
-    LOGF("written bytes: %d",writtenBytes);
     RETURN(writtenBytes);
 }
 
