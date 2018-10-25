@@ -266,14 +266,20 @@ int MyFS::fuseOpen(const char *path, struct fuse_file_info *fileInfo) {
     LOGF("Name: %s",path);
     LOGF("Number of opened files: %d",numberOfOpendFiles);
 
+    fileInfo->fh = -1;
+
     //update accestime
     if(numberOfOpendFiles<NUM_OPEN_FILES){
         numberOfOpendFiles++;
         LOGF("New number of opened files: %d",numberOfOpendFiles);
-        fileInfo->fh = 10+numberOfOpendFiles;
-        fileInfo->flags = 1;
-        LOGF("\tset fh: %d",fileInfo->fh);
-        LOGF("\tset flag: %d",fileInfo->flags);
+        
+        char* name = (char*)malloc(NAME_LENGTH);
+        //copy path to name with the offste 1 to skip the / at the end of the name
+        strcpy(name,path+1);
+        fileInfo->fh = rootblock->checkFilenameOccupied(bd,name);
+        LOGF("\tfh (%s): %d",name,fileInfo->fh);
+        free(name);
+
         //get inode
         RETURN(0);
     }
@@ -292,7 +298,6 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     LOGM();
     LOGF("Name: %s",path);
     LOGF("\tset fh: %d",fileInfo->fh);
-    LOGF("\tset flag: %d",fileInfo->flags);
     //TODO:filehandler put iniode insidee
 
     //check if path is dir
@@ -302,15 +307,22 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     }
     LOG("Is file");
 
-    //get inode by name
+    /*//get inode by name
     char* name = (char*)malloc(NAME_LENGTH);
     //copy path to name with the offste 1 to skip the / at the end of the name
     strcpy(name,path+1);
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
     if(inode == NULL){
-        RETURN(-ENOENT); /* No such file or directory */
+        RETURN(-ENOENT); /* No such file or directory 
+    }*/
+
+    //get inode from fileInfo->fh
+    if(fileInfo->fh==(uint64_t)-1){
+       RETURN(-ENOENT); /* No such file or directory */
     }
+    InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
+    inode = rootblock->getInode(bd,fileInfo->fh);
 
     //get first datablock
     uint32_t currentblock = inode->firstDataBlock;
@@ -430,7 +442,6 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 
     free(buffer);
     free(inode);
-    free(name);
 
     RETURN(readedBytes);
 }
@@ -475,13 +486,20 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     }
 
     //get inode by name
-    char* name = (char*)malloc(NAME_LENGTH);
+    /*char* name = (char*)malloc(NAME_LENGTH);
     strcpy(name,path+1);    //copy path to name with the offste 1 to skip the / at the end of the name
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd,name);
     if(inode == NULL){
-        RETURN(-ENOENT); /* No such file or directory */
+        RETURN(-ENOENT); /* No such file or directory 
+    }*/
+
+    //get inode from fileInfo->fh
+    if(fileInfo->fh==(uint64_t)-1){
+       RETURN(-ENOENT); /* No such file or directory */
     }
+    InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
+    inode = rootblock->getInode(bd,fileInfo->fh);
 
     //get startblock
     uint32_t currentblock = inode->firstDataBlock; //get first datablock
@@ -489,9 +507,11 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     if(firstBlockIndex==END_OF_FILE_ENTRY){
         LOG("\Get new block because file is empty");
         firstBlockIndex = superblock->getFirstFreeBlockIndex();
+        dmap->occupyDatablock(currentblock);
+        superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
+        superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
+        currentblock =firstBlockIndex;
     }
-
-    //-----sicher^
 
     //skip blocks
     if(blockOffset){
@@ -632,7 +652,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         newBlockSize++;
     }
 
-    rootblock->updateInode(bd, rootblock->checkFilenameOccupied(bd, name), inode->fileName, firstBlockIndex, inode->fileSizeBytes+writtenBytes,newBlockSize,time(0),time(0),inode->userID,inode->groupID,inode->mode);
+    rootblock->updateInode(bd, fileInfo->fh, inode->fileName, firstBlockIndex, inode->fileSizeBytes+writtenBytes,newBlockSize,time(0),time(0),inode->userID,inode->groupID,inode->mode);
     
     LOGF("new file size: %d",inode->fileSizeBytes+writtenBytes);
     //write to fs
@@ -644,7 +664,6 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     
     free(buffer);
     free(inode);
-    free(name);
 
     RETURN(writtenBytes);
 }
@@ -743,6 +762,8 @@ int MyFS::fuseFsyncdir(const char *path, int datasync, struct fuse_file_info *fi
 
 int MyFS::fuseTruncate(const char *path, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
+    LOGF("Name: %s",path);
+    LOGF("Offset: %d",offset);
     RETURN(0);
 }
 
