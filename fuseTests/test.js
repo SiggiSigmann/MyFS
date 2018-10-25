@@ -37,7 +37,17 @@ describe("Myfs", async function () {
                 //compared container.bin files
                 expect(fs.readFileSync(path.join(basePath, file), 'utf8')).to.be.equal(fs.readFileSync(path.join(testPath, file), "utf8"));
             });
-
         });
+        it("read non-existing files", function () {
+            expect(function () {
+                fs.readFileSync(path.join(basePath, "not Existing"));
+            }).to.throw("ENOENT: no such file or directory, open \'../fs/not Existing\'");
+        });
+        it("read non-existing directory", function () {
+            expect(function () {
+                fs.readdirSync(path.join(basePath, "not Existing"));
+            }).to.throw("ENOENT: no such file or directory, scandir '../fs/not Existing");
+        });
+
     });
 });
