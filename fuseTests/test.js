@@ -32,7 +32,6 @@ describe("Myfs", async function () {
         it("Compare container bin to testFiles", function () {
             fs.readdirSync(basePath).forEach(file => {
                 let stats = fs.statSync(path.join(basePath, file));
-                fs.readFileSync(path.join(basePath, file));
                 expect(stats.blksize).to.be.equal(512);
                 //compared container.bin files
                 expect(fs.readFileSync(path.join(basePath, file), 'utf8')).to.be.equal(fs.readFileSync(path.join(testPath, file), "utf8"));
@@ -43,11 +42,22 @@ describe("Myfs", async function () {
                 fs.readFileSync(path.join(basePath, "not Existing"));
             }).to.throw("ENOENT: no such file or directory, open \'../fs/not Existing\'");
         });
-        it("read non-existing directory", function () {
-            expect(function () {
-                fs.readdirSync(path.join(basePath, "not Existing"));
-            }).to.throw("ENOENT: no such file or directory, scandir '../fs/not Existing");
+        it("bulk read files", async function () {
+            let testContents = []
+            fs.readdirSync(testPath).forEach(file => {
+                testContents.push(fs.readFileSync(path.join(testPath, file), 'utf8'));
+            });
+            let containerFiles = fs.readdirSync(basePath);
+            for (let j = 0; j < 100; j++) {
+                for (const i in containerFiles) {
+                    fs.readFile(path.join(basePath, containerFiles[i]), "utf8",(error,content)=>{
+                        expect(content).to.be.equal(testContents[i]);
+                    });
+                }
+            }
         });
+        
+
 
     });
 });
