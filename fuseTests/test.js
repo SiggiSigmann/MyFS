@@ -62,9 +62,7 @@ describe("Myfs", async function () {
         describe("Read:", async () => {
             let txtFile = path.join(basePath, "file1.txt");
             let txtTest = path.join(testPath, "file1.txt");
-            describe('without offset', () => {
-
-
+            describe('without offset:', () => {
                 it("Exact", async () => {
                     await compareTestToContainer(txtFile, txtTest, 0, 512);
                 });
@@ -81,6 +79,40 @@ describe("Myfs", async function () {
                     await compareTestToContainer(txtFile, txtTest, 0, 0);
                 });
             });
+            describe('with offset:', () => {
+                it("Exact", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512, 512);
+                });
+                it("Half", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 256, 256);
+                });
+                it("One", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 500, 12);
+                });
+                it("Long", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512*2, 20 * 512);
+                });
+                it("short", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 10, 2*512);
+                });
+            });
+            describe('with oneBlock offset:', () => {
+                it("Exact", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512, 512);
+                });
+                it("Half", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512, 256);
+                });
+                it("Long", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512, 20 * 512);
+                });
+                it("short", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512, 2*512);
+                });
+                it("nothing", async () => {
+                    await compareTestToContainer(txtFile, txtTest, 512, 0);
+                });
+            });
         });
     });
 });
@@ -88,6 +120,7 @@ describe("Myfs", async function () {
 async function compareTestToContainer(file, testFile, pos, length) {
     let chunk1 = await exactly(file, pos, length);
     let chunk2 = await exactly(testFile, pos, length);
+    expect(chunk1.toString('hex')).to.be.equal(chunk2.toString('hex'));
 }
 
 function exactly(file, pos, length) {
