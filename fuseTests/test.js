@@ -4,11 +4,21 @@ const fs = require("fs");
 const path = require("path");
 const shell = require("shelljs");
 const chalk = require("chalk");
+const crypto = require("crypto");
 
 let basePath = "../fs/";
 let testPath = "./testFiles";
 
 describe("Myfs", async function () {
+    it('generate 4 testfiles', () => {
+        for (let i = 1; i < 5; i++) {
+            token = crypto.randomBytes(5000).toString('hex');
+            fs.writeFileSync(path.join(testPath,"file"+i+".txt"), token, { flag: 'w' });
+            
+            fs.writeFileSync(path.join(basePath,"file"+i+".txt"), token, { flag: 'w' });
+
+        }
+    });
     it("test if File System is mounted", function (done) {
         if (fs.existsSync(basePath)) {
             expect(true).to.be.true;
@@ -82,10 +92,10 @@ describe("Myfs", async function () {
                     compareTestToContainer(txtFile, txtTest, 500, 12);
                 });
                 it("Long", async () => {
-                    compareTestToContainer(txtFile, txtTest, 512*2, 20 * 512);
+                    compareTestToContainer(txtFile, txtTest, 512 * 2, 20 * 512);
                 });
                 it("short", async () => {
-                    compareTestToContainer(txtFile, txtTest, 20,20);
+                    compareTestToContainer(txtFile, txtTest, 20, 20);
                 });
             });
             describe('with oneBlock offset:', () => {
@@ -106,27 +116,33 @@ describe("Myfs", async function () {
                 });
             });
         });
-       
+
     });
 
     describe('Write:', () => {
-        let smallString="test";
-        let oneBlockString= new Array(512 + 1).join("#");
-        let largeString= new Array(2000 + 1).join("#");
+        let smallString = "test";
+        let oneBlockString = new Array(512 + 1).join("#");
+        let largeString = new Array(2000 + 1).join("#");
 
+        let files = fs.readdirSync(basePath);
         it('append: short', () => {
-            let files = fs.readdirSync(basePath);
             files.forEach(file => {
-                append(path.join(basePath,file),smallString);
-                append(path.join(testPath,file),smallString);
+                append(path.join(basePath, file), smallString);
+                append(path.join(testPath, file), smallString);
             });
             compareDirectorys();
         });
         it('append: long', () => {
-            let files = fs.readdirSync(basePath);
             files.forEach(file => {
-                append(path.join(basePath,file),largeString);
-                append(path.join(testPath,file),largeString);
+                append(path.join(basePath, file), largeString);
+                append(path.join(testPath, file), largeString);
+            });
+            compareDirectorys();
+        });
+        it('write: short', () => {
+            files.forEach(file => {
+                writeByByte(path.join(basePath, file), 0, largeString);
+                writeByByte(path.join(testPath, file), 0, largeString);
             });
             compareDirectorys();
         });
@@ -137,7 +153,7 @@ function compareTestToContainer(file, testFile, pos, length) {
     let chunk1 = readByByte(file, pos, length);
     let chunk2 = readByByte(testFile, pos, length);
     expect(chunk1.toString('hex')).to.be.equal(chunk2.toString('hex'));
-    
+
     /** 
     let desF = fs.openSync(file,"a");
     fs.appendFileSync(desF,"x");
@@ -149,31 +165,31 @@ function compareTestToContainer(file, testFile, pos, length) {
 }
 
 function readByByte(file, pos, length) {
-    let fd = fs.openSync(file,"rs");
+    let fd = fs.openSync(file, "rs");
     let buffer = Buffer.alloc(length);
-    fs.readSync(fd,buffer,0,length,pos);
+    fs.readSync(fd, buffer, 0, length, pos);
     fs.fsyncSync(fd);
     fs.closeSync(fd);
     return buffer
 }
 
 function writeByByte(file, pos, string) {
-    let fd = fs.openSync(file,"w");
+    let fd = fs.openSync(file, "w");
     let buffer = Buffer.from(string, 'utf8');
-    fs.writeSync(fd,buffer,0,string.length,pos);
+    fs.writeSync(fd, buffer, 0, string.length, pos);
     fs.fsyncSync(fd);
     fs.closeSync(fd);
 }
 
 function append(file, string) {
-    let fd = fs.openSync(file,"a");
+    let fd = fs.openSync(file, "a");
     let buffer = Buffer.from(string, 'utf8');
-    fs.writeSync(fd,buffer,0,buffer.length,null);
+    fs.writeSync(fd, buffer, 0, buffer.length, null);
     fs.fsyncSync(fd);
     fs.closeSync(fd);
 }
 
-function compareDirectorys(){
+function compareDirectorys() {
     fs.readdirSync(basePath).forEach(file => {
         expect(fs.readFileSync(path.join(basePath, file), "utf8")).to.be.equal(
             fs.readFileSync(path.join(testPath, file), "utf8")
