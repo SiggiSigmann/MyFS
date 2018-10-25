@@ -12,6 +12,7 @@
     "chai": "^4.1.2",
     "chai-fs": "^2.0.0",
     "chalk": "^2.4.1",
+    "fs-read-exactly": "^1.0.0",
     "mocha": "^5.2.0",
     "shelljs": "^0.8.2"
   }
