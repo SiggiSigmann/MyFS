@@ -438,13 +438,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
 int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
     LOGF("Name: %s",path);
+    LOGF("Free blocks: %d",superblock->getNumberOfFreeBlocks());
 
-    //TODO:What will happen if it not reached end of file
     //TODO: • EBADF – Datei nicht zum Schreiben geöffnet
-    //TODO bd cunter in superblcok
-    //TODO: refectorwith dmap
-
-    //TODO: dmap
     
     //check if path is dir
     if ( strcmp( path, "/" ) == 0 ){
@@ -552,6 +548,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
               //modify dmap
             dmap->occupyDatablock(currentblock);
             superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
+            superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
         
             LOGF("write to : %d", currentblock);
             //copy content of file to FS
@@ -604,6 +601,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
               //modify dmap
             dmap->occupyDatablock(currentblock);
             superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
+            superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
         
             LOGF("write to : %d", currentblock);
         }
@@ -641,6 +639,8 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     superblock->writeSuperblock(bd);
     dmap->writeDMap(bd);
     fat->writeFat(bd);
+
+    LOGF("Free blocks: %d",superblock->getNumberOfFreeBlocks());
     
     free(buffer);
     free(inode);
