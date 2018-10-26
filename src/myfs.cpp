@@ -252,8 +252,6 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     LOGF("Name: %s",path);
     LOGF("newSize: %d",newSize);
 
-    //TODO: catch size 0
-
     //get new sizes
     uint32_t newSizeInBlocks = newSize/BLOCK_SIZE;
     uint32_t bytesOfLastBlocks = newSize%BLOCK_SIZE;
@@ -284,9 +282,9 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
         for(uint32_t i = 0;i<newSizeInBlocks-1;i++){
             currentblock = fat->get(currentblock);
             LOGF("Fat entry: %d",currentblock);
-            /*if(currentblock == END_OF_FILE_ENTRY){
-                RERURN(-EIO);
-            }*/
+            if(currentblock == END_OF_FILE_ENTRY){
+                RETURN(-EINVAL); /* Invalid argument */
+            }
         }
 
             //rewrite eof
@@ -306,14 +304,17 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     if(bytesOfLastBlocks){
         LOG("delete bytes");
         bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
+        
+        LOGF("Update Buffer: %d",currentblock);
+        memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+        blockBuffer->blockindex = currentblock;
+
         LOGF("from %d to %d",bytesOfLastBlocks,BLOCK_SIZE);
         for(uint32_t i = bytesOfLastBlocks;i<BLOCK_SIZE;i++){
             buffer[i]=0;
         }
         bd->write(FIRST_DATA_BLOCK+currentblock,buffer);
     }
-
-    //TODO UPDATE BUFFER
 
     //delete blocks
     for(uint32_t i = newSizeInBlocks; i < originalSizeInBlocks; i++){
@@ -387,7 +388,6 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
     LOGM();
     LOGF("Name: %s",path);
     LOGF("\tset fh: %d",fileInfo->fh);
-    //TODO:filehandler put iniode insidee
 
     //check if path is dir
     if ( strcmp( path, "/" ) == 0 ){
@@ -539,8 +539,6 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     LOGM();
     LOGF("Name: %s",path);
     LOGF("Free blocks: %d",superblock->getNumberOfFreeBlocks());
-
-    //TODO: • EBADF – Datei nicht zum Schreiben geöffnet
     
     //check if path is dir
     if ( strcmp( path, "/" ) == 0 ){
@@ -585,7 +583,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
 
     //get inode from fileInfo->fh
     if(fileInfo->fh==(uint64_t)-1){
-       RETURN(-ENOENT); /* No such file or directory */
+       RETURN(-EBADF); /* No such file or directory */
     }
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInode(bd,fileInfo->fh);
