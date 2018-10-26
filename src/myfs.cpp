@@ -529,6 +529,9 @@ int MyFS::fuseRead(const char *path, char *buf, size_t size, off_t offset, struc
         }
     }
 
+    rootblock->updateInode(bd, fileInfo->fh, inode->fileName, inode->firstDataBlock, inode->fileSizeBytes,inode->fileSizeBlocks,time(0),inode->mtime,inode->userID,inode->groupID,inode->mode);
+    
+
     free(buffer);
     free(inode);
 
