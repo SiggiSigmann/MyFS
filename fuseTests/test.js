@@ -235,8 +235,72 @@ describe("Myfs", async function () {
         })
     });
     describe("create new files:",() =>{
-
-    })
+        it('generate 64 small test files', () => {
+            for (let i = 1; i < 65; i++) {
+                token = crypto.randomBytes(513).toString('hex');
+                fs.writeFileSync(path.join(testPath, "file" + i + ".txt"), token, {
+                    flag: 'w'
+                });
+    
+                fs.writeFileSync(path.join(basePath, "file" + i + ".txt"), token, {
+                    flag: 'w'
+                });
+            }
+            compareDirectorys();
+        });
+    });
+    describe('test time', () => {
+        describe('atime:', () => {
+            it('read:', () => {
+                let file =path.join(basePath,"file1.txt");
+                let atime = fs.statSync(file).atimeMs;
+                readByByte(file,0,512);
+                expect(atime).to.be.not.equal(fs.statSync(file).atimeMs);
+            });
+        });
+        describe('mtime:', () => {
+            it('append:', () => {
+                let file =path.join(basePath,"file1.txt");
+                let mtime = fs.statSync(file).mtimeMs;
+                append(file,"#kmd")
+                expect(mtime).to.be.not.equal(fs.statSync(file).mtimeMs);
+            });
+            it('write:', () => {
+                let file =path.join(basePath,"file1.txt");
+                let mtime = fs.statSync(file).mtimeMs;
+                writeByByte(file,0,"test")
+                expect(mtime).to.be.not.equal(fs.statSync(file).mtimeMs);
+            });
+        });
+        describe('ctime', () => {
+            it('append:', () => {
+                let file = path.join(basePath,"file1.txt");
+                let ctimeMs = fs.statSync(file).ctimeMs;
+                append(file,"#kmd")
+                expect(ctimeMs).to.be.not.equal(fs.statSync(file).ctimeMs);
+            });
+            it('write:', () => {
+                let file =path.join(basePath,"file1.txt");
+                let ctime = fs.statSync(file).ctimeMs;
+                writeByByte(file,0,"test")
+                expect(ctime).to.be.not.equal(fs.statSync(file).ctimeMs);
+            });
+        });
+    });
+    describe('cleanup', () => {
+        it('delete all files in base directory', () => {
+            let files = fs.readdirSync(basePath);
+            files.forEach(file => {
+                fs.unlinkSync(path.join(basePath, file));
+            });
+        });
+        it('delete all files in test directory', () => {
+            let files = fs.readdirSync(testPath);
+            files.forEach(file => {
+                fs.unlinkSync(path.join(testPath, file));
+            });
+        });
+    });
 });
 
 function compareTestToContainer(file, testFile, pos, length) {
