@@ -249,6 +249,82 @@ int MyFS::fuseChown(const char *path, uid_t uid, gid_t gid) {
 
 int MyFS::fuseTruncate(const char *path, off_t newSize) {
     LOGM();
+    LOGF("Name: %s",path);
+    LOGF("newSize: %d",newSize);
+
+    //get new sizes
+    uint32_t newSizeInBlocks = newSize/BLOCK_SIZE;
+    uint32_t bytesOfLastBlocks = newSize%BLOCK_SIZE;
+    if(bytesOfLastBlocks){
+        newSizeInBlocks++;
+    }
+    LOGF("New size Bytes: %d (Blocks: %d | Bytes: %d )",newSize, newSizeInBlocks, bytesOfLastBlocks);
+
+    //get inode
+    char* name = (char*)malloc(NAME_LENGTH);
+    strcpy(name,path+1);
+    uint32_t inodenumber = rootblock->checkFilenameOccupied(bd,name);
+    InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
+    inode = rootblock->getInodeByName(bd, name);
+    uint32_t currentblock = inode->firstDataBlock;
+    uint32_t originalSizeInBlocks = inode->fileSizeBlocks;
+    LOGF("Startblock: %d", currentblock);
+
+    //check new size
+    if(newSizeInBlocks > originalSizeInBlocks){
+        RETURN(-EINVAL); /* Invalid argument */
+    }
+
+    //skip blocks
+    LOGF("from %d to %d",0,newSizeInBlocks);
+    for(uint32_t i = 0;i<newSizeInBlocks-1;i++){
+        currentblock = fat->get(currentblock);
+        LOGF("Fat entry: %d",currentblock);
+        //TODO:end of file?
+    }
+
+    //rewrite eof
+    uint32_t firstBlockToDele = fat->get(currentblock);
+    fat->set(currentblock, END_OF_FILE_ENTRY);
+
+    //overrite last Block
+    char* buffer = (char*)malloc(BLOCK_SIZE);
+    if(bytesOfLastBlocks){
+        LOG("delete bytes");
+        bd->read(FIRST_DATA_BLOCK+currentblock,buffer);
+        LOGF("from %d to %d",bytesOfLastBlocks,BLOCK_SIZE);
+        for(uint32_t i = bytesOfLastBlocks;i<BLOCK_SIZE;i++){
+            buffer[i]=0;
+        }
+        bd->write(FIRST_DATA_BLOCK+currentblock,buffer);
+    }
+
+    //TODO UPDATE BUFFER
+
+    //delete blocks
+    LOGF("from %d to %d",newSizeInBlocks,originalSizeInBlocks);
+    for(uint32_t i = newSizeInBlocks; i < originalSizeInBlocks; i++){
+        LOGF("free block: %d",currentblock);
+        dmap->freeDatablock(currentblock);
+        currentblock = fat->get(currentblock);
+        superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()+1);
+        if(currentblock==END_OF_FILE_ENTRY){
+            LOGF("reached end of file (%d)",i);
+            break;
+        }
+    }
+
+  
+
+    rootblock->updateInode(bd, rootblock->checkFilenameOccupied(bd,name), inode->fileName, inode->firstDataBlock, newSize, newSizeInBlocks,time(0),time(0),getuid(),getgid(),inode->mode);
+    
+    fat->writeFat(bd);
+    dmap->writeDMap(bd);
+
+    free(buffer);
+    free(inode);
+    free(name);
+
     return 0;
 }
 
@@ -762,8 +838,6 @@ int MyFS::fuseFsyncdir(const char *path, int datasync, struct fuse_file_info *fi
 
 int MyFS::fuseTruncate(const char *path, off_t offset, struct fuse_file_info *fileInfo) {
     LOGM();
-    LOGF("Name: %s",path);
-    LOGF("Offset: %d",offset);
     RETURN(0);
 }
 
