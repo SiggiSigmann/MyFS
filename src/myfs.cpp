@@ -252,6 +252,8 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     LOGF("Name: %s",path);
     LOGF("newSize: %d",newSize);
 
+    //TODO: catch size 0
+
     //get new sizes
     uint32_t newSizeInBlocks = newSize/BLOCK_SIZE;
     uint32_t bytesOfLastBlocks = newSize%BLOCK_SIZE;
@@ -266,8 +268,10 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     uint32_t inodenumber = rootblock->checkFilenameOccupied(bd,name);
     InodeStruct* inode = (InodeStruct *)malloc(BLOCK_SIZE);
     inode = rootblock->getInodeByName(bd, name);
-    uint32_t currentblock = inode->firstDataBlock;
+    uint32_t firstBlockEntry = inode->firstDataBlock;
+    uint32_t currentblock = firstBlockEntry;
     uint32_t originalSizeInBlocks = inode->fileSizeBlocks;
+    LOGF("Orginal block size: %d",originalSizeInBlocks);
     LOGF("Startblock: %d", currentblock);
 
     //check new size
@@ -276,16 +280,26 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     }
 
     //skip blocks
-    LOGF("from %d to %d",0,newSizeInBlocks);
-    for(uint32_t i = 0;i<newSizeInBlocks-1;i++){
-        currentblock = fat->get(currentblock);
-        LOGF("Fat entry: %d",currentblock);
-        //TODO:end of file?
+    if(newSizeInBlocks){
+        for(uint32_t i = 0;i<newSizeInBlocks-1;i++){
+            currentblock = fat->get(currentblock);
+            LOGF("Fat entry: %d",currentblock);
+            /*if(currentblock == END_OF_FILE_ENTRY){
+                RERURN(-EIO);
+            }*/
+        }
+
+            //rewrite eof
+        uint32_t firstBlockToDele = fat->get(currentblock);
+        fat->set(currentblock, END_OF_FILE_ENTRY);
+        LOGF("update fat: %d->%d", currentblock,END_OF_FILE_ENTRY);
+
+    }else{
+        firstBlockEntry = END_OF_FILE_ENTRY;
+        LOGF("new start block: %d", firstBlockEntry);
     }
 
-    //rewrite eof
-    uint32_t firstBlockToDele = fat->get(currentblock);
-    fat->set(currentblock, END_OF_FILE_ENTRY);
+
 
     //overrite last Block
     char* buffer = (char*)malloc(BLOCK_SIZE);
@@ -302,7 +316,6 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     //TODO UPDATE BUFFER
 
     //delete blocks
-    LOGF("from %d to %d",newSizeInBlocks,originalSizeInBlocks);
     for(uint32_t i = newSizeInBlocks; i < originalSizeInBlocks; i++){
         LOGF("free block: %d",currentblock);
         dmap->freeDatablock(currentblock);
@@ -315,8 +328,8 @@ int MyFS::fuseTruncate(const char *path, off_t newSize) {
     }
 
   
-
-    rootblock->updateInode(bd, rootblock->checkFilenameOccupied(bd,name), inode->fileName, inode->firstDataBlock, newSize, newSizeInBlocks,time(0),time(0),getuid(),getgid(),inode->mode);
+    LOGF("Startblock: %d", firstBlockEntry);
+    rootblock->updateInode(bd, rootblock->checkFilenameOccupied(bd,name), inode->fileName, firstBlockEntry, newSize, newSizeInBlocks,time(0),time(0),getuid(),getgid(),inode->mode);
     
     fat->writeFat(bd);
     dmap->writeDMap(bd);
@@ -583,8 +596,8 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     if(firstBlockIndex==END_OF_FILE_ENTRY){
         LOG("\Get new block because file is empty");
         firstBlockIndex = superblock->getFirstFreeBlockIndex();
-        dmap->occupyDatablock(currentblock);
-        superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
+        dmap->occupyDatablock(firstBlockIndex);
+        superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(firstBlockIndex));
         superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
         currentblock =firstBlockIndex;
     }
@@ -635,61 +648,67 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     }
 
     //write compleat blocks
-    for(uint32_t i = 0;i<blocksToWrite;i++){
-        LOGF("write full Block: %d", i);
-        LOGF("dmap[%d]: %d",currentblock,dmap->get(currentblock));
-        if(currentblock==END_OF_FILE_ENTRY||currentblock==EMPTY_FAT_ENTRY||!dmap->get(currentblock)){
-            LOG("get new block");
-            currentblock = superblock->getFirstFreeBlockIndex();
-              //modify dmap
-            dmap->occupyDatablock(currentblock);
-            superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
-            superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
-        
-            LOGF("write to : %d", currentblock);
-            //copy content of file to FS
-            for(uint32_t j = 0; j<BLOCK_SIZE;j++){
-                buffer[j] = buf[j+writtenBytes];
-            }
-            bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
-
-            LOGF("Update Buffer: %d",currentblock);
-            memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
-            blockBuffer->blockindex = currentblock;
-
-            //modify fat
-            if(i==blocksToWrite-1 && lastBytesToWrite == 0){
-                LOGF("add FAT: %d->%d",currentblock,END_OF_FILE_ENTRY);
-                fat->set(currentblock, END_OF_FILE_ENTRY);
-                 currentblock = fat->get(currentblock);
-            }else{
-                LOGF("add FAT: %d->%d",currentblock,superblock->getFirstFreeBlockIndex());
-                fat->set(currentblock, superblock->getFirstFreeBlockIndex());
-                currentblock = fat->get(currentblock);
-            }
-        }else{
-            currentblock = fat->get(currentblock);
-            //fehler wenn block überschreiebn wirt neue datei uns os
-            LOG("overwrite old block");
-            LOGF("write to : %d", currentblock);
-            //copy content of file to FS
-            for(uint32_t j = 0; j<BLOCK_SIZE;j++){
-                buffer[j] = buf[j+writtenBytes];
-            }
-            bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
+    if(blocksToWrite){
+        for(uint32_t i = 0;i<blocksToWrite;i++){
+            LOGF("write full Block: %d", i);
+            LOGF("dmap[%d]: %d",currentblock,dmap->get(currentblock));
+            if(currentblock==END_OF_FILE_ENTRY||currentblock==EMPTY_FAT_ENTRY||!dmap->get(currentblock)){
+                LOG("get new block");
+                currentblock = superblock->getFirstFreeBlockIndex();
+                //modify dmap
+                dmap->occupyDatablock(currentblock);
+                superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
+                superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
             
-            LOGF("Update Buffer: %d",currentblock);
-            memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
-            blockBuffer->blockindex = currentblock;
+                LOGF("write to : %d", currentblock);
+                //copy content of file to FS
+                for(uint32_t j = 0; j<BLOCK_SIZE;j++){
+                    buffer[j] = buf[j+writtenBytes];
+                }
+                bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
+
+                LOGF("Update Buffer: %d",currentblock);
+                memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+                blockBuffer->blockindex = currentblock;
+
+                //modify fat
+                if(i==blocksToWrite-1 && lastBytesToWrite == 0){
+                    LOGF("add FAT: %d->%d",currentblock,END_OF_FILE_ENTRY);
+                    fat->set(currentblock, END_OF_FILE_ENTRY);
+                    currentblock = fat->get(currentblock);
+                }else{
+                    LOGF("add FAT: %d->%d",currentblock,superblock->getFirstFreeBlockIndex());
+                    fat->set(currentblock, superblock->getFirstFreeBlockIndex());
+                    currentblock = fat->get(currentblock);
+                }
+            }else{
+                currentblock = fat->get(currentblock);
+                //fehler wenn block überschreiebn wirt neue datei uns os
+                LOG("overwrite old block");
+                LOGF("write to : %d", currentblock);
+                //copy content of file to FS
+                for(uint32_t j = 0; j<BLOCK_SIZE;j++){
+                    buffer[j] = buf[j+writtenBytes];
+                }
+                bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
+                
+                LOGF("Update Buffer: %d",currentblock);
+                memcpy(blockBuffer->buffer,buffer, BLOCK_SIZE);
+                blockBuffer->blockindex = currentblock;
+            }
+            writtenBytes += BLOCK_SIZE;
+            LOGF("written bytes: %d", writtenBytes);
         }
-        writtenBytes += BLOCK_SIZE;
-        LOGF("written bytes: %d", writtenBytes);
+        if(currentblock==END_OF_FILE_ENTRY||currentblock==EMPTY_FAT_ENTRY||!dmap->get(currentblock)){
+            currentblock = fat->get(currentblock);
+        }
+        
+        
     }
 
     //write last bytes which dont fit in a block
     if(lastBytesToWrite){
         LOGF("Last Blocks to write: %d",lastBytesToWrite);
-        currentblock = fat->get(currentblock);
         LOGF("write to: %d", currentblock);
         if(currentblock==END_OF_FILE_ENTRY || currentblock==EMPTY_FAT_ENTRY || !dmap->get(currentblock)){
             LOG("get new block");
