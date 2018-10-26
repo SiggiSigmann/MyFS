@@ -11,25 +11,29 @@ let testPath = "./testFiles";
 
 describe("Myfs", async function () {
     it('generate 4 testfiles', () => {
+        if (!fs.existsSync(basePath)) {
+            fs.mkdirSync(basePath);
+        }
         for (let i = 1; i < 5; i++) {
             token = crypto.randomBytes(5000).toString('hex');
             fs.writeFileSync(path.join(testPath, "file" + i + ".txt"), token, {
                 flag: 'w'
             });
-
+            /*
             fs.writeFileSync(path.join(basePath, "file" + i + ".txt"), token, {
                 flag: 'w'
             });
+            */
 
         }
     });
     it("test if File System is mounted", function (done) {
-        if (fs.existsSync(basePath)) {
+        if (fs.readdirSync(basePath).length != 0) {
             expect(true).to.be.true;
             done();
         } else {
             console.log(chalk.blue("\tmounting container.bin..."));
-            shell.exec("cd .. && bash startmount.sh", {
+            shell.exec("bash mount.sh", {
                 silent: true
             });
             expect(fs.existsSync(basePath)).to.be.true;
@@ -127,12 +131,9 @@ describe("Myfs", async function () {
         let smallString = "test";
         let oneBlockString = new Array(512 + 1).join("#");
         let largeString = crypto.randomBytes(20000).toString('hex');
-        let files = fs.readdirSync(basePath);
         describe('append:', () => {
-
-
-            let files = fs.readdirSync(basePath);
             it('append: short', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     append(path.join(basePath, file), smallString);
                     append(path.join(testPath, file), smallString);
@@ -140,6 +141,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('append: long', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     append(path.join(basePath, file), largeString);
                     append(path.join(testPath, file), largeString);
@@ -149,6 +151,7 @@ describe("Myfs", async function () {
         });
         describe('write:', () => {
             it('short', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 0, smallString);
                     writeByByte(path.join(testPath, file), 0, smallString);
@@ -156,6 +159,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('block', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 0, oneBlockString);
                     writeByByte(path.join(testPath, file), 0, oneBlockString);
@@ -163,6 +167,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('long', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 0, largeString);
                     writeByByte(path.join(testPath, file), 0, largeString);
@@ -172,6 +177,7 @@ describe("Myfs", async function () {
         });
         describe('Write one block offset', () => {
             it('short', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 512, smallString);
                     writeByByte(path.join(testPath, file), 512, smallString);
@@ -179,6 +185,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('block', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 512, oneBlockString);
                     writeByByte(path.join(testPath, file), 512, oneBlockString);
@@ -186,6 +193,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('long', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 0, largeString);
                     writeByByte(path.join(testPath, file), 0, largeString);
@@ -195,6 +203,7 @@ describe("Myfs", async function () {
         });
         describe('Write offset', () => {
             it('short', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 2000, smallString);
                     writeByByte(path.join(testPath, file), 2000, smallString);
@@ -202,6 +211,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('block', () => {
+                let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 1, oneBlockString);
                     writeByByte(path.join(testPath, file), 1, oneBlockString);
@@ -209,6 +219,8 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
             it('long', () => {
+                let files = fs.readdirSync(basePath);
+
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 511, largeString);
                     writeByByte(path.join(testPath, file), 511, largeString);
@@ -218,14 +230,14 @@ describe("Myfs", async function () {
         });
     });
     describe('delete files:', () => {
-        let files = fs.readdirSync(basePath);
         it('delete all files in directory', () => {
+            let files = fs.readdirSync(basePath);
             files.forEach(file => {
                 fs.unlinkSync(path.join(basePath, file));
                 fs.unlinkSync(path.join(testPath, file));
             });
         });
-        it("delete not xisting file",()=>{
+        it("delete not existing file", () => {
             expect(function () {
                 fs.unlinkSync(path.join(testPath, "none"));
             }).to.throw(
@@ -234,14 +246,14 @@ describe("Myfs", async function () {
 
         })
     });
-    describe("create new files:",() =>{
+    describe("create new files:", () => {
         it('generate 64 small test files', () => {
             for (let i = 1; i < 65; i++) {
                 token = crypto.randomBytes(513).toString('hex');
                 fs.writeFileSync(path.join(testPath, "file" + i + ".txt"), token, {
                     flag: 'w'
                 });
-    
+
                 fs.writeFileSync(path.join(basePath, "file" + i + ".txt"), token, {
                     flag: 'w'
                 });
@@ -252,37 +264,37 @@ describe("Myfs", async function () {
     describe('test time', () => {
         describe('atime:', () => {
             it('read:', () => {
-                let file =path.join(basePath,"file1.txt");
+                let file = path.join(basePath, "file1.txt");
                 let atime = fs.statSync(file).atimeMs;
-                readByByte(file,0,512);
+                readByByte(file, 0, 512);
                 expect(atime).to.be.not.equal(fs.statSync(file).atimeMs);
             });
         });
         describe('mtime:', () => {
             it('append:', () => {
-                let file =path.join(basePath,"file1.txt");
+                let file = path.join(basePath, "file1.txt");
                 let mtime = fs.statSync(file).mtimeMs;
-                append(file,"#kmd")
+                append(file, "#kmd")
                 expect(mtime).to.be.not.equal(fs.statSync(file).mtimeMs);
             });
             it('write:', () => {
-                let file =path.join(basePath,"file1.txt");
+                let file = path.join(basePath, "file1.txt");
                 let mtime = fs.statSync(file).mtimeMs;
-                writeByByte(file,0,"test")
+                writeByByte(file, 0, "test")
                 expect(mtime).to.be.not.equal(fs.statSync(file).mtimeMs);
             });
         });
         describe('ctime', () => {
             it('append:', () => {
-                let file = path.join(basePath,"file1.txt");
+                let file = path.join(basePath, "file1.txt");
                 let ctimeMs = fs.statSync(file).ctimeMs;
-                append(file,"#kmd")
+                append(file, "#kmd")
                 expect(ctimeMs).to.be.not.equal(fs.statSync(file).ctimeMs);
             });
             it('write:', () => {
-                let file =path.join(basePath,"file1.txt");
+                let file = path.join(basePath, "file1.txt");
                 let ctime = fs.statSync(file).ctimeMs;
-                writeByByte(file,0,"test")
+                writeByByte(file, 0, "test")
                 expect(ctime).to.be.not.equal(fs.statSync(file).ctimeMs);
             });
         });
