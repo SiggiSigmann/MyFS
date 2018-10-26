@@ -416,10 +416,8 @@ echo wir brauchen mehr tests >> file3.txt
 echo bild programm
 make -f Makefile
 
-echo =======>execute
-./mkfs.myfs container.bin /MyFS/folder1/file1.txt /MyFS/file2.txt /MyFS/file3.txt /MyFS/file4.txt
+./mkfs.myfs container.bin /MyFS/folder1/file1.txt /MyFS/file2.txt /MyFS/file3.txt
 echo $?
-echo =======>execute
 #xxd -c 32 container.bin > hex.txt
 
 mkdir fs
