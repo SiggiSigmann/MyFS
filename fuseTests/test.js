@@ -14,6 +14,9 @@ describe("Myfs", async function () {
         if (!fs.existsSync(basePath)) {
             fs.mkdirSync(basePath);
         }
+        if (!fs.existsSync(testPath)) {
+            fs.mkdirSync(testPath);
+        }
         for (let i = 1; i < 5; i++) {
             token = crypto.randomBytes(5000).toString('hex');
             fs.writeFileSync(path.join(testPath, "file" + i + ".txt"), token, {
@@ -127,7 +130,7 @@ describe("Myfs", async function () {
 
     });
 
-    describe.skip('Write:', () => {
+    describe('Write:', () => {
         let smallString = "test";
         let oneBlockString = new Array(512 + 1).join("#");
         let largeString = crypto.randomBytes(20).toString('hex');
@@ -301,7 +304,7 @@ describe("Myfs", async function () {
             });
         });
     });
-    describe.skip('cleanup', () => {
+    describe('cleanup', () => {
         it('delete all files in base directory', () => {
             let files = fs.readdirSync(basePath);
             files.forEach(file => {
