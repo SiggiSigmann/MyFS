@@ -3,6 +3,10 @@
 #include <string.h>
 #include <iostream>
 
+RootBlock::RootBlock(IMapHandler* imap){
+     this->imap = imap;
+ }
+
 //creates the rootblock including all Inodes and writes them on the block device
 void RootBlock::init(BlockDevice*bd){
     //create inodes for rootblock
@@ -78,7 +82,9 @@ void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileN
     uint32_t atime, uint32_t mtime, uint32_t userID, uint32_t groupID, uint32_t mode){
     char* chareinode = (char *)malloc(BLOCK_SIZE);
     for(int i =0; i<BLOCK_SIZE; i++){
-        chareinode[i]=0;
+        if(imap->getIMapEntry(i)){
+            chareinode[i]=0;
+        }     
     }
     InodeStruct* inode = (InodeStruct *)chareinode;
     printf("==> %s\n",fileName);
@@ -104,7 +110,7 @@ uint32_t RootBlock::checkFilenameOccupied(BlockDevice *bd, char *fileName){
     InodeStruct *inode = (InodeStruct *)malloc(BLOCK_SIZE);
     for (uint32_t i = 0; i < NUMBER_OF_INODES; i++) {
             inode = getInode(bd, i); 
-            if (strcmp(inode->fileName ,fileName) == 0){
+            if (strcmp(inode->fileName ,fileName) == 0 && imap->getIMapEntry(i)){
                 free(inode);
                 return i;
             }

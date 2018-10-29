@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
         imap->init();
         imap->write(bd);
 
-        RootBlock* rootblock = new RootBlock();
+        RootBlock* rootblock = new RootBlock(imap);
         rootblock->init(bd);
 
         char* emptyblock = (char*)malloc(BLOCK_SIZE);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
         imap->init();
         imap->write(bd);
 
-        RootBlock* rootblock = new RootBlock();
+        RootBlock* rootblock = new RootBlock(imap);
         rootblock->init(bd);
 
         char* emptyblock = (char*)malloc(BLOCK_SIZE);

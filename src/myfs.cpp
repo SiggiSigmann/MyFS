@@ -36,7 +36,7 @@ MyFS::MyFS() {
     dmap = new DMap();
     fat = new FatHandler();
     imap = new IMapHandler();
-    rootblock = new RootBlock();
+    rootblock = new RootBlock(imap);
     blockBuffer = new FsBuffer();
 
     LOGF("Update Buffer: %d",EMPTY_FAT_ENTRY);
@@ -163,6 +163,8 @@ int MyFS::fuseMkdir(const char *path, mode_t mode) {
     LOGM();
     return 0;
 }
+
+//todo check impa
 
 /**
  * path: file to delete
