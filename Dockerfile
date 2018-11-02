@@ -20,7 +20,7 @@ RUN echo 'alias e="exit"' >> ~/.bashrc
 RUN echo 'alias log="more /MyFS/log.txt"' >> ~/.bashrc
 RUN echo 'alias tofs="cd /MyFS/fs"' >> ~/.bashrc
 RUN echo 'alias totest="cd /MyFS/fuseTests/testFiles"' >> ~/.bashrc
-RUN echo 'alias s="/MyFS/startmount.sh"' >> ~/.bash
+RUN echo 'alias s="/MyFS/startmount.sh"' >> ~/.bashrc
 
 
 COPY CMakeLists.txt Makefile /MyFS/

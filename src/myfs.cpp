@@ -164,7 +164,7 @@ int MyFS::fuseMkdir(const char *path, mode_t mode) {
     return 0;
 }
 
-//todo check impa
+/\todo check impa
 
 /**
  * path: file to delete
@@ -621,39 +621,36 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
     //skip blocks
     if(blockOffset){
         LOG("blockOffset--------------------------------------------");
-        uint32_t jumpTo = currentblock; //TODO: remove jumTo
         for(uint32_t i = 0;i<blockOffset;i++){
             if(currentblock==END_OF_FILE_ENTRY || currentblock==EMPTY_FAT_ENTRY || !dmap->get(currentblock)){
                 LOG("get new block");
                 currentblock = superblock->getFirstFreeBlockIndex();
                 
-                LOGF("add DMAP: %d",currentblock);
+                LOGF("\tadd DMAP: %d",currentblock);
                 dmap->occupyDatablock(currentblock);
                 superblock->updateFirstFreeBlockIndex(dmap->getNextFreeDatablock(currentblock));
                 superblock->updateNumberOfFreeBlocks(superblock->getNumberOfFreeBlocks()-1);
 
-                LOGF("write 0 to: %d", currentblock);
+                LOGF("\twrite 0 to: %d", currentblock);
                 //copy content of file to FS
                 bd->write(FIRST_DATA_BLOCK+currentblock, buffer);
                 zerroBytes += BLOCK_SIZE;
 
-                LOGF("add FAT: %d->%d",currentblock, superblock->getFirstFreeBlockIndex());
+                LOGF("\tadd FAT: %d->%d",currentblock, superblock->getFirstFreeBlockIndex());
                 fat->set(currentblock,  superblock->getFirstFreeBlockIndex());
                 currentblock = fat->get(currentblock);
-                //modify dmap
-                
+                LOGF("\tcurrentblock: %d",currentblock);
+
             }else{
-                 //get index of next data block
-                jumpTo = fat->get(jumpTo);
-                LOGF("jump: %d -> %d",currentblock,jumpTo);
-                if(jumpTo == END_OF_FILE_ENTRY){
-                    LOGF("Break Jump at rounf %d from %d because end of file",i, blockOffset);
-                    LOGF("add FAT: %d->%d",currentblock,superblock->getFirstFreeBlockIndex());
-                    fat->set(currentblock, superblock->getFirstFreeBlockIndex());
+                LOG("use Fat entry");
+                uint32_t nextBlockAdress = fat->get(currentblock);
+                if(nextBlockAdress==END_OF_FILE_ENTRY || nextBlockAdress==EMPTY_FAT_ENTRY || !dmap->get(nextBlockAdress)){
+                    fat->set(currentblock,  superblock->getFirstFreeBlockIndex());
+                    LOGF("\tget new Block: %d",superblock->getFirstFreeBlockIndex());
                     currentblock=superblock->getFirstFreeBlockIndex();
-                    //break;
                 }else{
-                currentblock =  jumpTo;
+                    LOGF("continue: %d",nextBlockAdress);
+                    currentblock=nextBlockAdress;
                 }
             } 
         }
@@ -766,7 +763,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
             LOGF("written bytes: %d", writtenBytes);
         }
 
-        //TODO: was passiert wenn überschreiebn wir aber das ende füher kommt
+        /\tODO: was passiert wenn überschreiebn wir aber das ende füher kommt
         /*if(currentblock==END_OF_FILE_ENTRY||currentblock==EMPTY_FAT_ENTRY||!dmap->get(currentblock)){
             currentblock = fat->get(currentblock);
         }*/
@@ -806,7 +803,7 @@ int MyFS::fuseWrite(const char *path, const char *buf, size_t size, off_t offset
         blockBuffer->blockindex = currentblock;
 
         LOGF("add FAT: %d->%d",currentblock,END_OF_FILE_ENTRY);
-        fat->set(currentblock, END_OF_FILE_ENTRY); //TODO: immer?
+        fat->set(currentblock, END_OF_FILE_ENTRY); /\tODO: immer?
     }
 
     LOGF("old file size: %d",inode->fileSizeBytes);
