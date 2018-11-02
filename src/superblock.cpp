@@ -22,7 +22,7 @@ Superblock::~Superblock(){
 /*
 Writes the Superblock to the BlockDevice.
 */
-void Superblock::writeSuperblock(BlockDevice bd){
+void Superblock::writeSuperblock(BlockDevice* bd){
     char* buffer = new char[BD_BLOCK_SIZE];
     for(int i = 0; i<BLOCK_SIZE;i++){
         buffer[i] = 0;
@@ -81,7 +81,7 @@ void Superblock::writeSuperblock(BlockDevice bd){
 /*
 Reads the Superblock from the block device into the Superblock data structure.
 */
-void Superblock::readSuperblock(BlockDevice bd){
+void Superblock::readSuperblock(BlockDevice* bd){
     char* buffer = readBytes(bd, superblockStruct->uSUPERBLOCK_BLOCK_INDEX, BD_BLOCK_SIZE);
     uint32_t* ptrBuffer = (uint32_t*) buffer;
     
@@ -128,14 +128,30 @@ void Superblock::updateNumberOfFreeInodes(uint32_t newNumber){
     superblockStruct->uNumber_of_free_inodes = newNumber;
 }
 
+uint32_t Superblock::getNumberOfFreeInodes(){
+    return superblockStruct->uNumber_of_free_inodes;
+}
+
 void Superblock::updateFirstFreeInodeIndex(uint32_t newIndex){
     superblockStruct->uFirst_free_inode_index = newIndex;
+}
+
+uint32_t Superblock::getNumberOfFreeBlocks(){
+    return  superblockStruct->uNumber_of_free_blocks;
 }
 
 void Superblock::updateNumberOfFreeBlocks(uint32_t newNumber){
     superblockStruct->uNumber_of_free_blocks = newNumber;
 }
 
+uint32_t Superblock::getFirstFreeBlockIndex(){
+    return   superblockStruct->uFirst_free_block_index;
+}
+
 void Superblock::updateFirstFreeBlockIndex(uint32_t newIndex){
     superblockStruct->uFirst_free_block_index = newIndex;
+}
+
+uint32_t Superblock::getFirstFreeInodeIndex(){
+    return superblockStruct->uFirst_free_inode_index;
 }

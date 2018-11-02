@@ -15,22 +15,42 @@
 
 #include "blockdevice.h"
 #include "constants.h"
-#include "superblock.h"
 
 #include "dmap.h"
 #include "fat.h"
+#include "imap.h"
+#include "rootblock.h"
+#include "superblock.h"
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
 
 class MyFS {
 private:
     static MyFS *_instance;
     FILE *logFile;
 
+    uint32_t numberOfOpendFiles = 0;
+
+    BlockDevice* bd;
+    Superblock* superblock;
+    DMap* dmap;
+    FatHandler* fat;
+    IMapHandler* imap;
+    RootBlock* rootblock;
+
+    struct FsBuffer{
+        uint32_t blockindex;
+        char* buffer;
+    };
+
+    FsBuffer* blockBuffer;
+
 public:
     static MyFS *Instance();
 
     // TODO: Add attributes of your file system here
-
-    Superblock* superblock;
 
     MyFS();
     ~MyFS();
@@ -79,8 +99,8 @@ public:
     void writeSuperblock(BlockDevice bd);
     void readSuperblock(BlockDevice bd);
 };
-void writeBytes(BlockDevice bd, int firstBlockIndex, char* bytes, int size);
-char* readBytes(BlockDevice bd, int firstBlockIndex, int numberOfBytes);
+void writeBytes(BlockDevice* bd, int firstBlockIndex, char* bytes, int size);
+char* readBytes(BlockDevice* bd, int firstBlockIndex, int numberOfBytes);
 void memset4(uint32_t* ptr, uint32_t value, uint32_t size);
 
 #endif /* myfs_h */

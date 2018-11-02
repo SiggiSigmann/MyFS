@@ -11,11 +11,25 @@ RUN apt-get update &&\
                     pkg-config=0.29.1-0ubuntu1 \
                     vim-common \
                     -y 
+#add Node
+RUN apt-get install --yes curl
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash
+RUN apt-get install nodejs -y
+RUN echo 'alias r="cd /MyFS/fuseTests && npm test && cd .."' >> ~/.bashrc
+RUN echo 'alias e="exit"' >> ~/.bashrc
+RUN echo 'alias log="more /MyFS/log.txt"' >> ~/.bashrc
+RUN echo 'alias tofs="cd /MyFS/fs"' >> ~/.bashrc
+RUN echo 'alias totest="cd /MyFS/fuseTests/testFiles"' >> ~/.bashrc
+RUN echo 'alias s="/MyFS/startmount.sh"' >> ~/.bashrc
+
+
 
 COPY CMakeLists.txt Makefile /MyFS/
 COPY includes /MyFS/includes/
 COPY src /MyFS/src
 COPY unittests /MyFS/unittests
+COPY startmount.sh /MyFS/startmount.sh
+COPY fuseTests /MyFS/fuseTests
 
 WORKDIR /MyFS/
 

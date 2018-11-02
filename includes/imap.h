@@ -25,6 +25,7 @@ class IMapHandler{
         void occupyIMapEntry(uint32_t index);
         void freeIMapEntry(uint32_t index);
         bool getIMapEntry(uint32_t index);
+        uint32_t getNextFreeInode(uint32_t lastindex);
 };
 
 #endif
