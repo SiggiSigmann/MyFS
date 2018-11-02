@@ -48,7 +48,7 @@ describe("Myfs", async function () {
         expect(files).to.be.not.empty;
         //fs.writeFile('file', new Buffer(1024*1024*54));
     });
-    describe("test reading files", function () {
+    describe.skip("test reading files", function () {
         it("Compare container bin to testFiles", function () {
             compareDirectorys()
         });
@@ -72,7 +72,7 @@ describe("Myfs", async function () {
                 }
             }
         });
-        describe("Read:", async () => {
+        describe.skip("Read:", async () => {
             let txtFile = path.join(basePath, "file1.txt");
             let txtTest = path.join(testPath, "file1.txt");
             describe('without offset:', () => {
@@ -134,7 +134,7 @@ describe("Myfs", async function () {
         let smallString = "test";
         let oneBlockString = new Array(512 + 1).join("#");
         let largeString = crypto.randomBytes(20).toString('hex');
-        describe('append:', () => {
+        describe.skip('append:', () => {
             it('append: short', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
@@ -152,7 +152,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
         });
-        describe('write:', () => {
+        describe.skip('write:', () => {
             it('short', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
@@ -178,7 +178,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
         });
-        describe('Write one block offset', () => {
+        describe.skip('Write one block offset', () => {
             it('short', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
@@ -198,26 +198,27 @@ describe("Myfs", async function () {
             it('long', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
-                    writeByByte(path.join(basePath, file), 0, largeString);
-                    writeByByte(path.join(testPath, file), 0, largeString);
+                    writeByByte(path.join(basePath, file), 512, largeString);
+                    writeByByte(path.join(testPath, file), 512, largeString);
                 });
                 compareDirectorys();
             });
         });
         describe('Write offset', () => {
             it('short', () => {
-                let files = fs.readdirSync(basePath);
+                //let files = fs.readdirSync(basePath);
+                let files = ['file1.txt', 'file2.txt', 'file3.txt'];
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 2000, smallString);
                     writeByByte(path.join(testPath, file), 2000, smallString);
                 });
                 compareDirectorys();
             });
-            it('block', () => {
+            /*it('block', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
-                    writeByByte(path.join(basePath, file), 1, oneBlockString);
-                    writeByByte(path.join(testPath, file), 1, oneBlockString);
+                    writeByByte(path.join(basePath, file), 2000, oneBlockString);
+                    writeByByte(path.join(testPath, file), 2000, oneBlockString);
                 });
                 compareDirectorys();
             });
@@ -225,14 +226,14 @@ describe("Myfs", async function () {
                 let files = fs.readdirSync(basePath);
 
                 files.forEach(file => {
-                    writeByByte(path.join(basePath, file), 511, largeString);
-                    writeByByte(path.join(testPath, file), 511, largeString);
+                    writeByByte(path.join(basePath, file), 2000, largeString);
+                    writeByByte(path.join(testPath, file), 2000, largeString);
                 });
                 compareDirectorys();
-            });
+            });*/
         });
     });
-    describe('delete files:', () => {
+    describe.skip('delete files:', () => {
         it('delete all files in directory', () => {
             let files = fs.readdirSync(basePath);
             files.forEach(file => {
@@ -249,7 +250,7 @@ describe("Myfs", async function () {
 
         })
     });
-    describe("create new files:", () => {
+    describe.skip("create new files:", () => {
         it('generate 64 small test files', () => {
             for (let i = 1; i < 65; i++) {
                 token = crypto.randomBytes(513).toString('hex');
@@ -266,7 +267,7 @@ describe("Myfs", async function () {
             expect(file1).to.have.same.members(file2);
         });
     });
-    describe('test time', () => {
+    describe.skip('test time', () => {
         describe('atime:', () => {
             it('read:', () => {
                 let file = path.join(basePath, "file1.txt");
@@ -304,7 +305,7 @@ describe("Myfs", async function () {
             });
         });
     });
-    describe('cleanup', () => {
+    describe.skip('cleanup', () => {
         it('delete all files in base directory', () => {
             let files = fs.readdirSync(basePath);
             files.forEach(file => {
