@@ -48,7 +48,7 @@ describe("Myfs", async function () {
         expect(files).to.be.not.empty;
         //fs.writeFile('file', new Buffer(1024*1024*54));
     });
-    describe.skip("test reading files", function () {
+    describe("test reading files", function () {
         it("Compare container bin to testFiles", function () {
             compareDirectorys()
         });
@@ -72,7 +72,7 @@ describe("Myfs", async function () {
                 }
             }
         });
-        describe.skip("Read:", async () => {
+        describe("Read:", async () => {
             let txtFile = path.join(basePath, "file1.txt");
             let txtTest = path.join(testPath, "file1.txt");
             describe('without offset:', () => {
@@ -233,7 +233,7 @@ describe("Myfs", async function () {
             });
         });
     });
-    describe.skip('delete files:', () => {
+    describe('delete files:', () => {
         it('delete all files in directory', () => {
             let files = fs.readdirSync(basePath);
             files.forEach(file => {
@@ -250,7 +250,7 @@ describe("Myfs", async function () {
 
         })
     });
-    describe.skip("create new files:", () => {
+    describe("create new files:", () => {
         it('generate 64 small test files', () => {
             for (let i = 1; i < 65; i++) {
                 token = crypto.randomBytes(513).toString('hex');
@@ -267,7 +267,7 @@ describe("Myfs", async function () {
             expect(file1).to.have.same.members(file2);
         });
     });
-    describe.skip('test time', () => {
+    describe('test time', () => {
         describe('atime:', () => {
             it('read:', () => {
                 let file = path.join(basePath, "file1.txt");
