@@ -134,7 +134,7 @@ describe("Myfs", async function () {
         let smallString = "test";
         let oneBlockString = new Array(512 + 1).join("#");
         let largeString = crypto.randomBytes(20).toString('hex');
-        describe.skip('append:', () => {
+        describe('append:', () => {
             it('append: short', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
@@ -152,7 +152,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
         });
-        describe.skip('write:', () => {
+        describe('write:', () => {
             it('short', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
@@ -178,7 +178,7 @@ describe("Myfs", async function () {
                 compareDirectorys();
             });
         });
-        describe.skip('Write one block offset', () => {
+        describe('Write one block offset', () => {
             it('short', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
@@ -214,7 +214,7 @@ describe("Myfs", async function () {
                 });
                 compareDirectorys();
             });
-            /*it('block', () => {
+            it('block', () => {
                 let files = fs.readdirSync(basePath);
                 files.forEach(file => {
                     writeByByte(path.join(basePath, file), 2000, oneBlockString);
@@ -230,7 +230,7 @@ describe("Myfs", async function () {
                     writeByByte(path.join(testPath, file), 2000, largeString);
                 });
                 compareDirectorys();
-            });*/
+            });
         });
     });
     describe.skip('delete files:', () => {
