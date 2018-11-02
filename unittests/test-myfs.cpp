@@ -288,7 +288,9 @@ TEST_CASE( "read/write IMap", "[imap]" ) {
         imap->init();
         //mark the first entry as occupied for later comparison purposes
         imap->occupyIMapEntry(0);
+
         REQUIRE(imap->getNextFreeInode(0)==1);
+
         imap->write(&bd);
         //occupy all imap entries and validate that
         for(int i = 0; i < NUM_DIR_ENTRIES; i++){

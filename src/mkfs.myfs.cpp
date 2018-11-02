@@ -16,6 +16,7 @@
 #include "imap.h"
 #include "rootblock.h"
 #include "superblock.h"
+
 #include <sys/stat.h>
 #include <libgen.h>
 
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
     //for (int i = 0; i < argc; ++i) {
     //    std::cout << argv[i] << std::endl;
     //}
+
 
     if(argc==2){
         printf("create empty FS");
