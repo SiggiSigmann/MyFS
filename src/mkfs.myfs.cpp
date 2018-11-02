@@ -105,7 +105,6 @@ int main(int argc, char *argv[]) {
 
         //write files in FS
         for(int i = 2;i<argc;i++){
-            //todo: check if file exists
             struct stat sb;                             //store metadate of given files
             if (stat(argv[i], &sb) == -1) {
                 printf("unable to read metadata from file\n");
