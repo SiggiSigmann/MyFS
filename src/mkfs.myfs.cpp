@@ -5,7 +5,9 @@
 //  Created by Oliveriltus Waldhorst on 07.09.17.
 //  Copyright © 2017 Oliver Waldhorst. All rights reserved.
 
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "myfs.h"
 #include "blockdevice.h"
 #include "macros.h"

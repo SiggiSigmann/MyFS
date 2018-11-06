@@ -9,6 +9,10 @@
 #ifndef myfs_h
 #define myfs_h
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <fuse.h>
 #include <cmath>
 #include <cstring>
