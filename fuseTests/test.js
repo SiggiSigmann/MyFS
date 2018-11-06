@@ -305,7 +305,7 @@ describe("Myfs", async function () {
             });
         });
     });
-    describe.skip('cleanup', () => {
+    describe('cleanup', () => {
         it('delete all files in base directory', () => {
             let files = fs.readdirSync(basePath);
             files.forEach(file => {

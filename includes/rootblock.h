@@ -1,5 +1,10 @@
 #ifndef rootblock_h
 #define rootblock_h
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "blockdevice.h"
 #include <stdlib.h>
 #include "constants.h"
@@ -10,9 +15,9 @@ struct InodeStruct{
     uint32_t firstDataBlock;
     uint32_t fileSizeBlocks;
     uint32_t fileSizeBytes;
-    uint32_t atime;
-    uint32_t mtime;
-    uint32_t ctime;
+    time_t atime;
+    time_t mtime;
+    time_t ctime;
     uint32_t userID;
     uint32_t groupID;
     uint32_t mode;
@@ -23,7 +28,7 @@ class RootBlock{
         RootBlock(IMapHandler* imap);
         void init(BlockDevice*bd);
         void updateInode(BlockDevice *bd, uint32_t blockIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes, uint32_t fileSizeBlocks,
-            uint32_t atime, uint32_t mtime, uint32_t userID, uint32_t groupID, uint32_t mode);
+            time_t atime, time_t mtime, uint32_t userID, uint32_t groupID, uint32_t mode);
         InodeStruct* getInode(BlockDevice *bd, uint32_t relativeIndex);
         uint32_t checkFilenameOccupied(BlockDevice *bd,char *fileName);
         InodeStruct* getInodeByName(BlockDevice *bd, char *fileName);
@@ -31,7 +36,7 @@ class RootBlock{
     private:
         IMapHandler* imap;
         void createInode(BlockDevice *bd, uint32_t blockIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes,uint32_t fileSizeBlocks,
-            uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode);
+            time_t atime, time_t mtime, time_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode);
 
 };
 

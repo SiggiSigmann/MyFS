@@ -22,7 +22,7 @@ void RootBlock::init(BlockDevice*bd){
 
 //create a new Inode directly on the block device
 void RootBlock::createInode(BlockDevice *bd, uint32_t blockIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes, uint32_t fileSizeBlocks,
-        uint32_t atime, uint32_t mtime, uint32_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
+        time_t atime, time_t mtime, time_t ctime, uint32_t userID, uint32_t groupID, uint32_t mode){
     InodeStruct *inode = (InodeStruct *)malloc(BLOCK_SIZE);
     
     //copy everything into InodeStruct
@@ -79,7 +79,7 @@ char* RootBlock::getFileName(BlockDevice *bd, uint32_t relativeIndex){
  * Updates inote, expexts relativeIndex and all inode params
  */
 void RootBlock::updateInode(BlockDevice *bd, uint32_t relativeIndex, char *fileName, uint32_t firstDataBlock, uint32_t fileSizeBytes, uint32_t fileSizeBlocks,
-    uint32_t atime, uint32_t mtime, uint32_t userID, uint32_t groupID, uint32_t mode){
+    time_t atime, time_t mtime, uint32_t userID, uint32_t groupID, uint32_t mode){
     char* chareinode = (char *)malloc(BLOCK_SIZE);
     for(int i =0; i<BLOCK_SIZE; i++){
         if(imap->getIMapEntry(i)){
