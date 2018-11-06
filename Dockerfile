@@ -23,6 +23,7 @@ RUN echo 'alias totest="cd /MyFS/fuseTests/testFiles"' >> ~/.bashrc
 RUN echo 'alias s="/MyFS/startmount.sh"' >> ~/.bashrc
 
 
+
 COPY CMakeLists.txt Makefile /MyFS/
 COPY includes /MyFS/includes/
 COPY src /MyFS/src
