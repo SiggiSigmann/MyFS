@@ -4,4 +4,5 @@ obj/*
 *.txt
 hex.txt
 node_modules
+*.tar
 
